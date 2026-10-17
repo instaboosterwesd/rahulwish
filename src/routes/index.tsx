@@ -125,15 +125,21 @@ function Home() {
               </p>
             </div>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-6 rounded-[2.5rem] bg-rose-gradient opacity-20 blur-3xl" />
+          <div className="relative mx-auto w-full max-w-sm">
+            <div className="absolute -inset-8 rounded-[3rem] bg-rose-gradient opacity-25 blur-3xl" />
             <img
-              src="/images/hero.jpg"
-              alt="A romantic surprise website glowing on a phone"
-              width={1024}
-              height={1024}
-              className="relative w-full rounded-[2.5rem] shadow-card"
+              src="/images/hero-clay.jpg"
+              alt="A clay phone showing a surprise website with a smiling heart"
+              width={896}
+              height={1152}
+              className="relative w-full rotate-2 rounded-[3rem] shadow-card transition-transform duration-500 hover:rotate-0"
             />
+            <div className="clay-sm absolute -left-8 top-10 flex -rotate-6 animate-wobble items-center gap-2 px-4 py-2.5 text-sm font-bold">
+              <Heart className="h-4 w-4 fill-primary text-primary" /> 12,000+ smiles
+            </div>
+            <div className="clay-sm absolute -right-6 bottom-16 flex rotate-3 items-center gap-2 px-4 py-2.5 text-sm font-bold">
+              <Music className="h-4 w-4 text-primary" /> Music included
+            </div>
           </div>
         </div>
       </section>
@@ -189,15 +195,21 @@ function Home() {
         </div>
       </section>
 
-      {/* Reviews slider */}
-      <section className="border-t border-border/60 py-20">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-blush/80">Real stories</p>
-          <h2 className="mt-2 font-display text-5xl font-semibold">
-            They said <span className="font-script text-6xl text-gold">yes</span> to tears of joy
-          </h2>
-          <div className="relative mt-12 rounded-[2.5rem] bg-card p-10 shadow-card md:p-14">
-            <Quote className="mx-auto h-10 w-10 text-primary" />
+      {/* Reviews — spotlight slider + clay cards */}
+      <section className="py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-[0.3em] text-primary/70">Real stories</p>
+            <h2 className="mt-2 font-display text-5xl font-semibold">
+              They said <span className="font-script text-6xl text-gold">yes</span> to tears of joy
+            </h2>
+          </div>
+
+          {/* Spotlight review */}
+          <div className="clay relative mx-auto mt-12 max-w-3xl p-10 text-center md:p-14">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-gradient text-primary-foreground shadow-glow">
+              <Quote className="h-6 w-6" />
+            </div>
             <p className="mt-6 min-h-28 font-display text-2xl leading-relaxed md:text-3xl">
               “{review.text}”
             </p>
@@ -206,11 +218,11 @@ function Home() {
                 <Star key={i} className="h-4 w-4 fill-gold text-gold" />
               ))}
             </div>
-            <p className="mt-3 text-sm font-semibold">{review.name}</p>
+            <p className="mt-3 text-sm font-bold">{review.name}</p>
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{review.city}</p>
             <div className="mt-8 flex items-center justify-center gap-4">
               <Button
-                variant="glass"
+                variant="outline"
                 size="icon"
                 aria-label="Previous review"
                 onClick={() => setReviewIdx((i) => (i - 1 + REVIEWS.length) % REVIEWS.length)}
@@ -223,14 +235,14 @@ function Home() {
                     key={i}
                     aria-label={`Go to review ${i + 1}`}
                     onClick={() => setReviewIdx(i)}
-                    className={`h-2 rounded-full transition-all ${
-                      i === reviewIdx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/40"
+                    className={`h-2.5 rounded-full transition-all ${
+                      i === reviewIdx ? "w-7 bg-primary" : "w-2.5 bg-muted-foreground/30"
                     }`}
                   />
                 ))}
               </div>
               <Button
-                variant="glass"
+                variant="outline"
                 size="icon"
                 aria-label="Next review"
                 onClick={() => setReviewIdx((i) => (i + 1) % REVIEWS.length)}
@@ -238,6 +250,28 @@ function Home() {
                 <ChevronRight />
               </Button>
             </div>
+          </div>
+
+          {/* All reviews as clay cards */}
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {REVIEWS.map((r, i) => (
+              <button
+                key={r.name}
+                onClick={() => setReviewIdx(i)}
+                className={`clay-sm p-6 text-left transition-transform hover:-translate-y-1 hover:rotate-1 ${
+                  i === reviewIdx ? "ring-2 ring-primary" : ""
+                }`}
+              >
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: r.rating }).map((_, j) => (
+                    <Star key={j} className="h-3.5 w-3.5 fill-gold text-gold" />
+                  ))}
+                </div>
+                <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">“{r.text}”</p>
+                <p className="mt-4 text-sm font-bold">{r.name}</p>
+                <p className="text-xs uppercase tracking-[0.15em] text-muted-foreground">{r.city}</p>
+              </button>
+            ))}
           </div>
         </div>
       </section>
