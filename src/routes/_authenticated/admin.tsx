@@ -29,6 +29,7 @@ import {
   adminSettingsQuery,
   adminSetSurpriseStatus,
   adminToggleTemplate,
+  adminSetTemplatePrice,
   adminSetUserBanned,
   adminSetDepositStatus,
   adminSetSetting,
@@ -77,6 +78,17 @@ function AdminPage() {
   const deleteUser = useServerFn(adminDeleteUser);
   const editMut = useMutation({ mutationFn: (v: { id: string; full_name: string }) => editUser({ data: v }), onSuccess: () => { refresh(); setEditing(null); }, onError: (e) => toast.error(e.message) });
   const deleteMut = useMutation({ mutationFn: (id: string) => deleteUser({ data: { id } }), onSuccess: () => refresh(), onError: (e) => toast.error(e.message) });
+  const setPrice = useServerFn(adminSetTemplatePrice);
+  const priceMut = useMutation({
+    mutationFn: (v: { id: string; price_inr: number; original_price_inr: number }) => setPrice({ data: v }),
+    onSuccess: () => {
+      refresh();
+      setPriceEdit(null);
+      toast.success("Price update ho gaya");
+    },
+    onError: (e) => toast.error(e.message),
+  });
+  const [priceEdit, setPriceEdit] = useState<{ id: string; price: string; original: string } | null>(null);
   const [editing, setEditing] = useState<{ id: string; full_name: string } | null>(null);
 
   const { data: stats } = useSuspenseQuery(adminStatsQuery());
@@ -391,7 +403,53 @@ function AdminPage() {
                   <div className="p-5">
                     <p className="text-xs uppercase tracking-[0.2em] text-primary/70">{t.category}</p>
                     <h3 className="mt-1 text-xl font-semibold">{t.title}</h3>
-                    <p className="mt-1 text-sm text-gold">{formatINR(t.price_inr)}</p>
+                    {priceEdit?.id === t.id ? (
+                      <div className="mt-3 flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">Sale</span>
+                          <span className="font-semibold">₹</span>
+                          <input
+                            inputMode="numeric"
+                            value={priceEdit.price}
+                            onChange={(e) => setPriceEdit({ ...priceEdit, price: e.target.value.replace(/\D/g, "") })}
+                            className="clay-pressed w-24 rounded-xl bg-muted px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">MRP</span>
+                          <span className="font-semibold">₹</span>
+                          <input
+                            inputMode="numeric"
+                            value={priceEdit.original}
+                            onChange={(e) => setPriceEdit({ ...priceEdit, original: e.target.value.replace(/\D/g, "") })}
+                            className="clay-pressed w-24 rounded-xl bg-muted px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-ring"
+                          />
+                        </div>
+                        <div className="mt-1 flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="hero"
+                            disabled={priceMut.isPending || !priceEdit.price || Number(priceEdit.original) < Number(priceEdit.price)}
+                            onClick={() =>
+                              priceMut.mutate({ id: t.id, price_inr: Number(priceEdit.price), original_price_inr: Number(priceEdit.original) || Number(priceEdit.price) })
+                            }
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Save
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => setPriceEdit(null)}>
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setPriceEdit({ id: t.id, price: String(t.price_inr), original: String(t.original_price_inr) })}
+                        className="mt-1 inline-flex items-center gap-1.5 text-sm text-gold hover:underline"
+                      >
+                        <Pencil className="h-3 w-3" /> {formatINR(t.price_inr)}
+                      </button>
+                    )}
                     <div className="mt-4 flex gap-2">
                       <Button
                         size="sm"
