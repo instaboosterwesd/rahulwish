@@ -1,5 +1,0 @@
-insert into public.templates (slug, title, category, tagline, description, price_inr, original_price_inr, rating, cover_image, badge, style, featured, active) values
-('golden-anniversary', 'Golden Anniversary', 'Anniversary', 'Celebrate years of togetherness', 'A cinematic anniversary surprise with your journey photos, glowing candles, falling petals and a timeline of your love story — perfect for 1st to 50th anniversaries.', 399, 999, 4.9, '/images/t-anniversary.jpg', 'New', 'romance', true, true),
-('sorry-from-heart', 'Sorry, From My Heart', 'Apology', 'When words are not enough', 'A heartfelt apology page with a glowing rose, your handwritten-style message and soft music — say sorry in a way they will never forget.', 199, 499, 4.8, '/images/t-apology.jpg', null, 'romance', false, true),
-('congrats-spotlight', 'Congrats Spotlight', 'Celebration', 'For their big win', 'A festive congratulations surprise with golden confetti, balloons and your proud message — for graduations, promotions, new jobs and every big win.', 249, 699, 4.7, '/images/t-congrats.jpg', 'Trending', 'celebration', true, true)
-on conflict (slug) do nothing;
