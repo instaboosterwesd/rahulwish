@@ -1,0 +1,4 @@
+- [ ] Secure admin actions; finish user edit/delete/ban controls and mobile tabs.
+- [ ] Connect deposit requests and approval to customer template access.
+- [ ] Build customer dashboard, customization, preview and shared surprise page.
+- [ ] Verify announcement cooldown, maintenance, demos and central approval flow.
