@@ -45,6 +45,7 @@ export type Database = {
         Row: {
           banned: boolean
           created_at: string
+          deleted_at: string | null
           email: string
           full_name: string
           id: string
@@ -52,6 +53,7 @@ export type Database = {
         Insert: {
           banned?: boolean
           created_at?: string
+          deleted_at?: string | null
           email?: string
           full_name?: string
           id: string
@@ -59,6 +61,7 @@ export type Database = {
         Update: {
           banned?: boolean
           created_at?: string
+          deleted_at?: string | null
           email?: string
           full_name?: string
           id?: string
@@ -231,6 +234,21 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      purchase_template: { Args: { _template: string }; Returns: string }
+      request_deposit: {
+        Args: { _amount: number; _note: string }
+        Returns: string
+      }
+      save_surprise: {
+        Args: {
+          _headline: string
+          _id: string
+          _message: string
+          _recipient: string
+          _sender: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
