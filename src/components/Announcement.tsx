@@ -18,7 +18,7 @@ export function Announcement() {
       .then((value) => {
         let seenAt = 0;
         try { seenAt = Number(localStorage.getItem(SEEN_KEY) ?? 0); } catch { /* Storage may be unavailable. */ }
-        if (value.announcement?.trim() && !pathname.startsWith("/admin") && shouldShowAnnouncement(seenAt, Date.now())) {
+        if (value["announcement"]?.trim() && !pathname.startsWith("/admin") && shouldShowAnnouncement(seenAt, Date.now())) {
           setEligible(true);
           try { localStorage.setItem(SEEN_KEY, String(Date.now())); } catch { /* Keep this visit usable. */ }
         }
