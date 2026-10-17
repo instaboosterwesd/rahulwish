@@ -5,3 +5,6 @@
 - [ ] Grant the site owner's account admin access — blocked until the owner creates an account and identifies it.
 - [x] Redesign the Proposal experience with photographic visuals and original romantic music; verify all demo steps.
 - [x] Extend Proposal with a playful secret, story, quiz, reasons, future and countdown; verify the full demo.
+- [ ] Add scratch reveal, typed letter and emerging ring animation.
+- [ ] Persist buyer-created quiz choices and audio; wrong answers continue and score appears at the end.
+- [ ] Verify saved buyer details through the recipient experience.

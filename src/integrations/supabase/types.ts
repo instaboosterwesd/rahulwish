@@ -92,6 +92,7 @@ export type Database = {
           id: string
           message: string
           photos: string[]
+          proposal_config: Json
           recipient_name: string
           sender_name: string
           status: string
@@ -106,6 +107,7 @@ export type Database = {
           id?: string
           message?: string
           photos?: string[]
+          proposal_config?: Json
           recipient_name: string
           sender_name: string
           status?: string
@@ -120,6 +122,7 @@ export type Database = {
           id?: string
           message?: string
           photos?: string[]
+          proposal_config?: Json
           recipient_name?: string
           sender_name?: string
           status?: string
@@ -213,6 +216,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_proposal_config: { Args: { _code: string }; Returns: Json }
       get_surprise: {
         Args: { _code: string }
         Returns: {
@@ -239,6 +243,10 @@ export type Database = {
       request_deposit: {
         Args: { _amount: number; _note: string }
         Returns: string
+      }
+      save_proposal_config: {
+        Args: { _config: Json; _id: string }
+        Returns: undefined
       }
       save_surprise: {
         Args: {
