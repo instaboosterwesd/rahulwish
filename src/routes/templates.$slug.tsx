@@ -21,6 +21,8 @@ export const Route = createFileRoute("/templates/$slug")({
     { name: "description", content: loaderData?.tagline ?? "Surprise website template" },
     { property: "og:title", content: `${loaderData?.title ?? "Template"} — Always4you` },
     { property: "og:description", content: loaderData?.tagline ?? "Surprise website template" },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
   ] }),
   component: Page,
 });

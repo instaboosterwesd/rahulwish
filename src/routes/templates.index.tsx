@@ -10,6 +10,8 @@ export const Route = createFileRoute("/templates/")({
     { name: "description", content: "Birthday, proposal, invitation and flipbook surprise website templates." },
     { property: "og:title", content: "Templates — Always4you" },
     { property: "og:description", content: "Birthday, proposal, invitation and flipbook surprise website templates." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
   ] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(templatesQuery()),
   component: Page,
