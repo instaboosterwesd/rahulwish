@@ -29,6 +29,7 @@ import {
   adminSettingsQuery,
   adminSetSurpriseStatus,
   adminToggleTemplate,
+  adminSetTemplatePrice,
   adminSetUserBanned,
   adminSetDepositStatus,
   adminSetSetting,
