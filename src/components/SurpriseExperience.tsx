@@ -104,6 +104,18 @@ export function SurpriseExperience(p: ExperienceProps) {
   );
 }
 
+function RingReveal({ onNext }: { onNext: () => void }) {
+  const [open, setOpen] = useState(false);
+  return <Screen>
+    <h2 className="font-display text-4xl">Ek chhoti si cheez... 💝</h2>
+    <p className="mt-3 text-muted-foreground">{open ? "Ye sirf tumhare liye hai" : "Box par tap karke kholo"}</p>
+    <button aria-label="Open ring box" onClick={() => setOpen(true)} className={`clay mt-10 grid h-44 w-44 place-items-center transition-transform duration-700 ${open ? "scale-110" : "animate-wobble"}`}>
+      <span className={`text-7xl ${open ? "animate-heartbeat" : ""}`}>{open ? "💍" : "🎁"}</span>
+    </button>
+    {open && <Button variant="hero" size="lg" className="mt-10 animate-rise" onClick={onNext}>Ek sawaal hai... <ChevronRight /></Button>}
+  </Screen>;
+}
+
 function Interactive({ kind, recipient, onDone }: { kind: Kind; recipient: string; onDone: () => void }) {
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
   const [noCount, setNoCount] = useState(0);
