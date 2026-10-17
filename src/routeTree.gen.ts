@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedMyRouteImport } from './routes/_authenticated/my'
+import { Route as DemoSlugRouteImport } from './routes/demo.$slug'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as TemplatesSlugRouteImport } from './routes/templates.$slug'
 
@@ -41,6 +42,11 @@ const AuthenticatedMyRoute = AuthenticatedMyRouteImport.update({
   path: '/my',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const DemoSlugRoute = DemoSlugRouteImport.update({
+  id: '/demo/$slug',
+  path: '/demo/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
   id: '/templates/',
   path: '/templates/',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/my': typeof AuthenticatedMyRoute
+  '/demo/$slug': typeof DemoSlugRoute
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
 }
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/my': typeof AuthenticatedMyRoute
+  '/demo/$slug': typeof DemoSlugRoute
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates': typeof TemplatesIndexRoute
 }
@@ -75,15 +83,29 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/_authenticated/my': typeof AuthenticatedMyRoute
+  '/demo/$slug': typeof DemoSlugRoute
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/admin' | '/auth' | '/my' | '/templates/$slug' | '/templates/'
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/my'
+    | '/demo/$slug'
+    | '/templates/$slug'
+    | '/templates/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/auth' | '/my' | '/templates/$slug' | '/templates'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/my'
+    | '/demo/$slug'
+    | '/templates/$slug'
+    | '/templates'
   id:
     | '__root__'
     | '/'
@@ -91,6 +113,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/_authenticated/my'
+    | '/demo/$slug'
     | '/templates/$slug'
     | '/templates/'
   fileRoutesById: FileRoutesById
@@ -100,6 +123,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  DemoSlugRoute: typeof DemoSlugRoute
   TemplatesSlugRoute: typeof TemplatesSlugRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
 }
@@ -141,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/demo/$slug': {
+      id: '/demo/$slug'
+      path: '/demo/$slug'
+      fullPath: '/demo/$slug'
+      preLoaderRoute: typeof DemoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/templates/': {
       id: '/templates/'
       path: '/templates'
@@ -174,6 +205,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  DemoSlugRoute: DemoSlugRoute,
   TemplatesSlugRoute: TemplatesSlugRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
 }
