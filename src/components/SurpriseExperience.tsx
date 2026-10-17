@@ -47,45 +47,44 @@ export function SurpriseExperience(p: ExperienceProps) {
   useEffect(() => () => music.current?.stop(), []);
 
   const toggleMusic = (force?: boolean) => {
-    if (!music.current) music.current = new MusicBox();
+    if (!music.current) music.current = new MusicBox(kind === "birthday" ? "birthday" : kind === "celebrate" ? "festive" : "romance");
     const next = force ?? !playing;
     if (next) music.current.start(); else music.current.stop();
     setPlaying(next);
   };
   const next = () => setStep((s) => s + 1);
   const photos = p.photos?.length ? p.photos : [p.cover];
+  const party = () => { setCelebrate(true); setTimeout(() => setCelebrate(false), 4000); next(); };
 
-  const screens: React.ReactNode[] = [
-    // 0 — gift intro
-    <Screen key="intro">
+  const intro = <Screen key="intro">
       <p className="text-sm uppercase tracking-[0.3em] text-primary/80">Ek surprise sirf aapke liye</p>
       <h1 className="mt-4 font-display text-5xl font-semibold md:text-6xl">Hey <span className="text-rose-gradient">{p.recipient}</span> 💌</h1>
       <button aria-label="Open surprise" onClick={() => { toggleMusic(true); next(); }} className="clay mt-10 grid h-40 w-40 place-items-center animate-wobble">
         <Gift className="h-20 w-20 text-primary" />
       </button>
       <p className="mt-6 text-muted-foreground">Gift par tap karein 🎁 (sound on rakhein)</p>
-    </Screen>,
-    // 1 — interactive moment
-    <Interactive key="moment" kind={kind} recipient={p.recipient} onDone={() => { setCelebrate(true); setTimeout(() => setCelebrate(false), 4000); next(); }} />,
-    // 2 — memories
-    <Memories key="mem" photos={photos} onNext={next} />,
-    // 3 — letter
-    <Screen key="letter">
+    </Screen>;
+  const memories = <Memories key="mem" photos={photos} onNext={next} />;
+  const letter = <Screen key="letter">
       <div className="clay w-full max-w-lg p-8 text-left">
         <Heart className="mx-auto mb-4 h-8 w-8 animate-heartbeat fill-primary text-primary" />
         <h2 className="text-center font-display text-3xl">{p.headline || "You mean the world to me"}</h2>
         <Typewriter text={p.message || "Har pal tumhare saath ek celebration hai."} />
       </div>
       <Button variant="hero" size="lg" className="mt-8" onClick={next}>Aage dekho <ChevronRight /></Button>
-    </Screen>,
-    // 4 — finale
-    <Screen key="end">
+    </Screen>;
+  const finale = <Screen key="end">
       <img src={p.cover} alt="Surprise" className="clay aspect-[4/3] w-full max-w-sm object-cover" />
-      <p className="mt-8 font-script text-5xl text-primary">With love, {p.sender}</p>
+      {kind === "proposal" && <p className="mt-6 font-display text-3xl">She said YES! 💍💖</p>}
+      <p className="mt-6 font-script text-5xl text-primary">With love, {p.sender}</p>
       <p className="mt-3 text-muted-foreground">Forever & Always 💖</p>
       <Button variant="outline" className="mt-8" onClick={() => setStep(0)}><RotateCcw />Replay</Button>
-    </Screen>,
-  ];
+    </Screen>;
+  const moment = <Interactive key="moment" kind={kind} recipient={p.recipient} onDone={party} />;
+
+  const screens: React.ReactNode[] = kind === "proposal"
+    ? [intro, memories, letter, <RingReveal key="ring" onNext={next} />, moment, finale]
+    : [intro, moment, memories, letter, finale];
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-night px-5 py-10">
@@ -103,6 +102,18 @@ export function SurpriseExperience(p: ExperienceProps) {
       </div>
     </section>
   );
+}
+
+function RingReveal({ onNext }: { onNext: () => void }) {
+  const [open, setOpen] = useState(false);
+  return <Screen>
+    <h2 className="font-display text-4xl">Ek chhoti si cheez... 💝</h2>
+    <p className="mt-3 text-muted-foreground">{open ? "Ye sirf tumhare liye hai" : "Box par tap karke kholo"}</p>
+    <button aria-label="Open ring box" onClick={() => setOpen(true)} className={`clay mt-10 grid h-44 w-44 place-items-center transition-transform duration-700 ${open ? "scale-110" : "animate-wobble"}`}>
+      <span className={`text-7xl ${open ? "animate-heartbeat" : ""}`}>{open ? "💍" : "🎁"}</span>
+    </button>
+    {open && <Button variant="hero" size="lg" className="mt-10 animate-rise" onClick={onNext}>Ek sawaal hai... <ChevronRight /></Button>}
+  </Screen>;
 }
 
 function Interactive({ kind, recipient, onDone }: { kind: Kind; recipient: string; onDone: () => void }) {
