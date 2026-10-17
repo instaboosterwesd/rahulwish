@@ -78,6 +78,17 @@ function AdminPage() {
   const deleteUser = useServerFn(adminDeleteUser);
   const editMut = useMutation({ mutationFn: (v: { id: string; full_name: string }) => editUser({ data: v }), onSuccess: () => { refresh(); setEditing(null); }, onError: (e) => toast.error(e.message) });
   const deleteMut = useMutation({ mutationFn: (id: string) => deleteUser({ data: { id } }), onSuccess: () => refresh(), onError: (e) => toast.error(e.message) });
+  const setPrice = useServerFn(adminSetTemplatePrice);
+  const priceMut = useMutation({
+    mutationFn: (v: { id: string; price_inr: number; original_price_inr: number }) => setPrice({ data: v }),
+    onSuccess: () => {
+      refresh();
+      setPriceEdit(null);
+      toast.success("Price update ho gaya");
+    },
+    onError: (e) => toast.error(e.message),
+  });
+  const [priceEdit, setPriceEdit] = useState<{ id: string; price: string; original: string } | null>(null);
   const [editing, setEditing] = useState<{ id: string; full_name: string } | null>(null);
 
   const { data: stats } = useSuspenseQuery(adminStatsQuery());
