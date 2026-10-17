@@ -8,7 +8,7 @@ export const customerDashboard = createServerFn({ method: "GET" }).middleware([r
   const [profile, deposits, surprises] = await Promise.all([
     context.supabase.from("profiles").select("*").eq("id", context.userId).single(),
     context.supabase.from("deposits").select("*").eq("user_id", context.userId).order("created_at", { ascending: false }),
-    context.supabase.from("surprises").select("*, templates(title,slug,cover_image)").eq("user_id", context.userId).order("created_at", { ascending: false }),
+    context.supabase.from("surprises").select("*, templates(title,slug,cover_image,category)").eq("user_id", context.userId).order("created_at", { ascending: false }),
   ]);
   if (profile.error || deposits.error || surprises.error) throw new Error("Could not load your account");
   if (profile.data.banned || profile.data.deleted_at) throw new Error("Your account is unavailable. Contact the site owner.");
