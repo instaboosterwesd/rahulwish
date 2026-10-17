@@ -9,9 +9,9 @@ export function TemplateCard({ t }: { t: Template }) {
     <Link
       to="/templates/$slug"
       params={{ slug: t.slug }}
-      className="group relative block overflow-hidden rounded-3xl bg-card shadow-card transition-transform duration-500 hover:-translate-y-2"
+      className="group relative block overflow-hidden rounded-[2rem] bg-card shadow-card transition-transform duration-300 hover:-translate-y-2 hover:rotate-1"
     >
-      <div className="relative aspect-[4/5] overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem]">
         <img
           src={t.cover_image}
           alt={`${t.title} surprise website preview`}
