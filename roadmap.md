@@ -3,3 +3,4 @@
 - [x] Build customer dashboard, customization, preview and shared surprise page.
 - [x] Verify announcement cooldown, maintenance and central approval flow.
 - [ ] Grant the site owner's account admin access — blocked until the owner creates an account and identifies it.
+- [x] Redesign the Proposal experience with photographic visuals and original romantic music; verify all demo steps.
