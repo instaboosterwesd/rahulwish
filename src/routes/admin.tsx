@@ -1,14 +1,33 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { CheckCircle2, Clock, LayoutDashboard, Sparkles } from "lucide-react";
+import { useState } from "react";
+import {
+  Ban,
+  CheckCircle2,
+  ChevronDown,
+  Clock,
+  LayoutDashboard,
+  Megaphone,
+  Sparkles,
+  Users,
+  Wallet,
+  Wrench,
+  XCircle,
+} from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import {
   adminStatsQuery,
   adminSurprisesQuery,
   adminTemplatesQuery,
+  adminUsersQuery,
+  adminDepositsQuery,
+  adminSettingsQuery,
   adminSetSurpriseStatus,
   adminToggleTemplate,
+  adminSetUserBanned,
+  adminSetDepositStatus,
+  adminSetSetting,
 } from "@/lib/admin.functions";
 import { formatINR } from "@/lib/format";
 
@@ -16,7 +35,7 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Admin — Always4you" },
-      { name: "description", content: "Manage templates and surprises." },
+      { name: "description", content: "Manage templates, users, deposits and settings." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -25,20 +44,39 @@ export const Route = createFileRoute("/admin")({
       context.queryClient.ensureQueryData(adminStatsQuery()),
       context.queryClient.ensureQueryData(adminSurprisesQuery()),
       context.queryClient.ensureQueryData(adminTemplatesQuery()),
+      context.queryClient.ensureQueryData(adminUsersQuery()),
+      context.queryClient.ensureQueryData(adminDepositsQuery()),
+      context.queryClient.ensureQueryData(adminSettingsQuery()),
     ]),
   component: AdminPage,
 });
+
+const TABS = [
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "users", label: "Users", icon: Users },
+  { id: "deposits", label: "Deposits", icon: Wallet },
+  { id: "templates", label: "Templates", icon: Sparkles },
+  { id: "settings", label: "Settings", icon: Wrench },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
 
 function AdminPage() {
   const qc = useQueryClient();
   const { data: stats } = useSuspenseQuery(adminStatsQuery());
   const { data: surprises } = useSuspenseQuery(adminSurprisesQuery());
   const { data: templates } = useSuspenseQuery(adminTemplatesQuery());
+  const { data: users } = useSuspenseQuery(adminUsersQuery());
+  const { data: deposits } = useSuspenseQuery(adminDepositsQuery());
+  const { data: settings } = useSuspenseQuery(adminSettingsQuery());
+
+  const [tab, setTab] = useState<TabId>("dashboard");
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [announcement, setAnnouncement] = useState(settings.announcement ?? "");
 
   const refresh = () => {
-    qc.invalidateQueries({ queryKey: ["admin-stats"] });
-    qc.invalidateQueries({ queryKey: ["admin-surprises"] });
-    qc.invalidateQueries({ queryKey: ["admin-templates"] });
+    for (const k of ["admin-stats", "admin-surprises", "admin-templates", "admin-users", "admin-deposits", "admin-settings"])
+      qc.invalidateQueries({ queryKey: [k] });
   };
 
   const statusMut = useMutation({
@@ -51,6 +89,38 @@ function AdminPage() {
       adminToggleTemplate({ data: v }),
     onSuccess: refresh,
   });
+  const banMut = useMutation({
+    mutationFn: (v: { id: string; banned: boolean }) => adminSetUserBanned({ data: v }),
+    onSuccess: refresh,
+  });
+  const depositMut = useMutation({
+    mutationFn: (v: { id: string; status: "pending" | "approved" | "rejected" }) =>
+      adminSetDepositStatus({ data: v }),
+    onSuccess: refresh,
+  });
+  const settingMut = useMutation({
+    mutationFn: (v: { key: string; value: string }) => adminSetSetting({ data: v }),
+    onSuccess: refresh,
+  });
+
+  const visibleTabs = TABS.slice(0, 3);
+  const moreTabs = TABS.slice(3);
+  const activeInMore = moreTabs.some((t) => t.id === tab);
+
+  const tabBtn = (t: (typeof TABS)[number]) => (
+    <button
+      key={t.id}
+      onClick={() => {
+        setTab(t.id);
+        setMoreOpen(false);
+      }}
+      className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-all ${
+        tab === t.id ? "bg-rose-gradient text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      <t.icon className="h-4 w-4" /> {t.label}
+    </button>
+  );
 
   return (
     <div className="min-h-screen bg-night">
@@ -63,109 +133,317 @@ function AdminPage() {
           Command <span className="text-rose-gradient">Center</span>
         </h1>
 
-        {/* Stats */}
-        <div className="mt-10 grid gap-5 sm:grid-cols-3">
-          {[
-            { label: "Templates", value: stats.templates },
-            { label: "Surprises created", value: stats.surprises },
-            { label: "Paid orders", value: stats.paid },
-          ].map((s) => (
-            <div key={s.label} className="rounded-3xl bg-card p-7 shadow-card">
-              <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">{s.label}</p>
-              <p className="mt-2 font-display text-5xl font-semibold text-gold">{s.value}</p>
-            </div>
-          ))}
-        </div>
+        {/* Tab bar — desktop shows all, mobile shows first 3 + More */}
+        <nav className="clay-sm mt-8 flex flex-wrap items-center gap-1 p-2">
+          <span className="hidden md:contents">{TABS.map(tabBtn)}</span>
+          <span className="contents md:hidden">
+            {visibleTabs.map(tabBtn)}
+            <span className="relative">
+              <button
+                onClick={() => setMoreOpen((o) => !o)}
+                className={`flex items-center gap-1 rounded-full px-4 py-2 text-sm font-bold ${
+                  activeInMore ? "bg-rose-gradient text-primary-foreground" : "text-muted-foreground"
+                }`}
+              >
+                More <ChevronDown className="h-4 w-4" />
+              </button>
+              {moreOpen && (
+                <div className="clay-sm absolute right-0 top-12 z-20 flex w-44 flex-col gap-1 p-2">
+                  {moreTabs.map(tabBtn)}
+                </div>
+              )}
+            </span>
+          </span>
+        </nav>
 
-        {/* Surprises */}
-        <h2 className="mt-14 font-display text-3xl font-semibold">Recent Surprises</h2>
-        <div className="mt-5 overflow-hidden rounded-3xl bg-card shadow-card">
-          {surprises.length === 0 ? (
-            <p className="p-8 text-sm text-muted-foreground">
-              Abhi koi surprise nahi bana — pehla surprise aate hi yahan dikhega.
-            </p>
-          ) : (
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border text-xs uppercase tracking-widest text-muted-foreground">
-                <tr>
-                  <th className="px-5 py-4">Code</th>
-                  <th className="px-5 py-4">To / From</th>
-                  <th className="px-5 py-4">Amount</th>
-                  <th className="px-5 py-4">Status</th>
-                  <th className="px-5 py-4">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {surprises.map((s) => (
-                  <tr key={s.id} className="border-b border-border/50 last:border-0">
-                    <td className="px-5 py-4 font-mono text-gold">{s.code}</td>
-                    <td className="px-5 py-4">
-                      {s.recipient_name} <span className="text-muted-foreground">← {s.sender_name}</span>
-                    </td>
-                    <td className="px-5 py-4">{formatINR(s.amount_inr)}</td>
-                    <td className="px-5 py-4">
-                      <span
-                        className={
-                          s.status === "paid" || s.status === "delivered"
-                            ? "inline-flex items-center gap-1 text-gold"
-                            : "inline-flex items-center gap-1 text-muted-foreground"
-                        }
-                      >
-                        {s.status === "pending" ? <Clock className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
-                        {s.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4">
-                      {s.status === "pending" && (
+        {/* Dashboard */}
+        {tab === "dashboard" && (
+          <>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+              {[
+                { label: "Templates", value: stats.templates },
+                { label: "Surprises", value: stats.surprises },
+                { label: "Paid orders", value: stats.paid },
+                { label: "Users", value: stats.users },
+                { label: "Pending deposits", value: stats.pendingDeposits },
+              ].map((s) => (
+                <div key={s.label} className="clay p-6">
+                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{s.label}</p>
+                  <p className="mt-2 font-display text-4xl font-semibold text-gold">{s.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <h2 className="mt-12 font-display text-3xl font-semibold">Recent Surprises</h2>
+            <div className="clay mt-5 overflow-hidden">
+              {surprises.length === 0 ? (
+                <p className="p-8 text-sm text-muted-foreground">
+                  Abhi koi surprise nahi bana — pehla surprise aate hi yahan dikhega.
+                </p>
+              ) : (
+                <table className="w-full text-left text-sm">
+                  <thead className="border-b border-border text-xs uppercase tracking-widest text-muted-foreground">
+                    <tr>
+                      <th className="px-5 py-4">Code</th>
+                      <th className="px-5 py-4">To / From</th>
+                      <th className="px-5 py-4">Amount</th>
+                      <th className="px-5 py-4">Status</th>
+                      <th className="px-5 py-4">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {surprises.map((s) => (
+                      <tr key={s.id} className="border-b border-border/50 last:border-0">
+                        <td className="px-5 py-4 font-mono text-gold">{s.code}</td>
+                        <td className="px-5 py-4">
+                          {s.recipient_name} <span className="text-muted-foreground">← {s.sender_name}</span>
+                        </td>
+                        <td className="px-5 py-4">{formatINR(s.amount_inr)}</td>
+                        <td className="px-5 py-4">
+                          <span
+                            className={
+                              s.status === "paid" || s.status === "delivered"
+                                ? "inline-flex items-center gap-1 text-gold"
+                                : "inline-flex items-center gap-1 text-muted-foreground"
+                            }
+                          >
+                            {s.status === "pending" ? <Clock className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+                            {s.status}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4">
+                          {s.status === "pending" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={statusMut.isPending}
+                              onClick={() => statusMut.mutate({ id: s.id, status: "paid" })}
+                            >
+                              Mark paid
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Users */}
+        {tab === "users" && (
+          <div className="clay mt-8 overflow-hidden">
+            {users.length === 0 ? (
+              <p className="p-8 text-sm text-muted-foreground">
+                Abhi koi user nahi — pehla signup hote hi yahan dikhega.
+              </p>
+            ) : (
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border text-xs uppercase tracking-widest text-muted-foreground">
+                  <tr>
+                    <th className="px-5 py-4">Email</th>
+                    <th className="px-5 py-4">Joined</th>
+                    <th className="px-5 py-4">Status</th>
+                    <th className="px-5 py-4">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((u) => (
+                    <tr key={u.id} className="border-b border-border/50 last:border-0">
+                      <td className="px-5 py-4 font-semibold">{u.email || u.id.slice(0, 8)}</td>
+                      <td className="px-5 py-4 text-muted-foreground">
+                        {new Date(u.created_at).toLocaleDateString("en-IN")}
+                      </td>
+                      <td className="px-5 py-4">
+                        {u.banned ? (
+                          <span className="inline-flex items-center gap-1 text-destructive">
+                            <Ban className="h-3.5 w-3.5" /> Banned
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-gold">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Active
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-5 py-4">
                         <Button
                           size="sm"
-                          variant="glass"
-                          disabled={statusMut.isPending}
-                          onClick={() => statusMut.mutate({ id: s.id, status: "paid" })}
+                          variant={u.banned ? "hero" : "outline"}
+                          disabled={banMut.isPending}
+                          onClick={() => banMut.mutate({ id: u.id, banned: !u.banned })}
                         >
-                          Mark paid
+                          {u.banned ? "Unban" : "Ban"}
                         </Button>
-                      )}
-                    </td>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+
+        {/* Deposits */}
+        {tab === "deposits" && (
+          <div className="clay mt-8 overflow-hidden">
+            {deposits.length === 0 ? (
+              <p className="p-8 text-sm text-muted-foreground">
+                Abhi koi deposit request nahi — user payment request bhejte hi yahan aayegi. Approve karte hi user ko credit mil jayega.
+              </p>
+            ) : (
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border text-xs uppercase tracking-widest text-muted-foreground">
+                  <tr>
+                    <th className="px-5 py-4">User</th>
+                    <th className="px-5 py-4">Amount</th>
+                    <th className="px-5 py-4">Note</th>
+                    <th className="px-5 py-4">Status</th>
+                    <th className="px-5 py-4">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+                </thead>
+                <tbody>
+                  {deposits.map((d) => (
+                    <tr key={d.id} className="border-b border-border/50 last:border-0">
+                      <td className="px-5 py-4 font-mono text-xs">{d.user_id.slice(0, 8)}…</td>
+                      <td className="px-5 py-4 font-semibold text-gold">{formatINR(d.amount_inr)}</td>
+                      <td className="px-5 py-4 text-muted-foreground">{d.note || "—"}</td>
+                      <td className="px-5 py-4">
+                        <span
+                          className={
+                            d.status === "approved"
+                              ? "inline-flex items-center gap-1 text-gold"
+                              : d.status === "rejected"
+                                ? "inline-flex items-center gap-1 text-destructive"
+                                : "inline-flex items-center gap-1 text-muted-foreground"
+                          }
+                        >
+                          {d.status === "approved" ? <CheckCircle2 className="h-3.5 w-3.5" /> : d.status === "rejected" ? <XCircle className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+                          {d.status}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        {d.status === "pending" && (
+                          <span className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="hero"
+                              disabled={depositMut.isPending}
+                              onClick={() => depositMut.mutate({ id: d.id, status: "approved" })}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={depositMut.isPending}
+                              onClick={() => depositMut.mutate({ id: d.id, status: "rejected" })}
+                            >
+                              Reject
+                            </Button>
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
 
         {/* Templates */}
-        <h2 className="mt-14 font-display text-3xl font-semibold">Templates</h2>
-        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {templates.map((t) => (
-            <div key={t.id} className="overflow-hidden rounded-3xl bg-card shadow-card">
-              <img src={t.cover_image} alt={t.title} loading="lazy" className="h-40 w-full object-cover" />
-              <div className="p-5">
-                <p className="text-xs uppercase tracking-[0.2em] text-blush/80">{t.category}</p>
-                <h3 className="mt-1 text-xl font-semibold">{t.title}</h3>
-                <p className="mt-1 text-sm text-gold">{formatINR(t.price_inr)}</p>
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    size="sm"
-                    variant={t.active ? "hero" : "glass"}
-                    disabled={toggleMut.isPending}
-                    onClick={() => toggleMut.mutate({ id: t.id, field: "active", value: !t.active })}
-                  >
-                    {t.active ? "Live" : "Hidden"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={t.featured ? "hero" : "glass"}
-                    disabled={toggleMut.isPending}
-                    onClick={() => toggleMut.mutate({ id: t.id, field: "featured", value: !t.featured })}
-                  >
-                    <Sparkles className="h-3.5 w-3.5" /> {t.featured ? "Featured" : "Feature"}
-                  </Button>
+        {tab === "templates" && (
+          <>
+            <p className="mt-8 text-sm text-muted-foreground">
+              Total {templates.length} templates · {templates.filter((t) => t.active).length} live ·{" "}
+              {templates.filter((t) => t.featured).length} featured
+            </p>
+            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {templates.map((t) => (
+                <div key={t.id} className="clay overflow-hidden">
+                  <img src={t.cover_image} alt={t.title} loading="lazy" className="h-40 w-full object-cover" />
+                  <div className="p-5">
+                    <p className="text-xs uppercase tracking-[0.2em] text-primary/70">{t.category}</p>
+                    <h3 className="mt-1 text-xl font-semibold">{t.title}</h3>
+                    <p className="mt-1 text-sm text-gold">{formatINR(t.price_inr)}</p>
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        size="sm"
+                        variant={t.active ? "hero" : "outline"}
+                        disabled={toggleMut.isPending}
+                        onClick={() => toggleMut.mutate({ id: t.id, field: "active", value: !t.active })}
+                      >
+                        {t.active ? "Live" : "Hidden"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={t.featured ? "hero" : "outline"}
+                        disabled={toggleMut.isPending}
+                        onClick={() => toggleMut.mutate({ id: t.id, field: "featured", value: !t.featured })}
+                      >
+                        <Sparkles className="h-3.5 w-3.5" /> {t.featured ? "Featured" : "Feature"}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Settings */}
+        {tab === "settings" && (
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <div className="clay p-8">
+              <h3 className="flex items-center gap-2 text-xl font-semibold">
+                <Wrench className="h-5 w-5 text-primary" /> Maintenance Mode
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                On karne par visitors ko maintenance page dikhega. Admin panel hamesha khula rahega.
+              </p>
+              <div className="mt-5">
+                <Button
+                  variant={settings.maintenance_mode === "on" ? "hero" : "outline"}
+                  disabled={settingMut.isPending}
+                  onClick={() =>
+                    settingMut.mutate({
+                      key: "maintenance_mode",
+                      value: settings.maintenance_mode === "on" ? "off" : "on",
+                    })
+                  }
+                >
+                  {settings.maintenance_mode === "on" ? "Maintenance ON" : "Maintenance OFF"}
+                </Button>
               </div>
             </div>
-          ))}
-        </div>
+
+            <div className="clay p-8">
+              <h3 className="flex items-center gap-2 text-xl font-semibold">
+                <Megaphone className="h-5 w-5 text-primary" /> Announcement Message
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Ye message har visitor ko website kholte hi ek baar dikhega (24 ghante mein ek baar).
+              </p>
+              <textarea
+                value={announcement}
+                onChange={(e) => setAnnouncement(e.target.value)}
+                rows={3}
+                className="clay-pressed mt-4 w-full rounded-2xl bg-muted p-4 text-sm outline-none focus:ring-2 focus:ring-ring"
+                placeholder="Apna message likhiye…"
+              />
+              <Button
+                className="mt-4"
+                variant="hero"
+                disabled={settingMut.isPending}
+                onClick={() => settingMut.mutate({ key: "announcement", value: announcement })}
+              >
+                Save Message
+              </Button>
+            </div>
+          </div>
+        )}
       </main>
       <SiteFooter />
     </div>
