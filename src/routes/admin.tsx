@@ -72,7 +72,7 @@ function AdminPage() {
 
   const [tab, setTab] = useState<TabId>("dashboard");
   const [moreOpen, setMoreOpen] = useState(false);
-  const [announcement, setAnnouncement] = useState(settings.announcement ?? "");
+  const [announcement, setAnnouncement] = useState(settings["announcement"] ?? "");
 
   const refresh = () => {
     for (const k of ["admin-stats", "admin-surprises", "admin-templates", "admin-users", "admin-deposits", "admin-settings"])
@@ -405,16 +405,16 @@ function AdminPage() {
               </p>
               <div className="mt-5">
                 <Button
-                  variant={settings.maintenance_mode === "on" ? "hero" : "outline"}
+                  variant={settings["maintenance_mode"] === "on" ? "hero" : "outline"}
                   disabled={settingMut.isPending}
                   onClick={() =>
                     settingMut.mutate({
                       key: "maintenance_mode",
-                      value: settings.maintenance_mode === "on" ? "off" : "on",
+                      value: settings["maintenance_mode"] === "on" ? "off" : "on",
                     })
                   }
                 >
-                  {settings.maintenance_mode === "on" ? "Maintenance ON" : "Maintenance OFF"}
+                  {settings["maintenance_mode"] === "on" ? "Maintenance ON" : "Maintenance OFF"}
                 </Button>
               </div>
             </div>
