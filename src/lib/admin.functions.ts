@@ -10,12 +10,21 @@ async function adminClient() {
 
 export const adminStats = createServerFn({ method: "GET" }).handler(async () => {
   const db = await adminClient();
-  const [{ count: templates }, { count: surprises }, { count: paid }] = await Promise.all([
-    db.from("templates").select("*", { count: "exact", head: true }),
-    db.from("surprises").select("*", { count: "exact", head: true }),
-    db.from("surprises").select("*", { count: "exact", head: true }).eq("status", "paid"),
-  ]);
-  return { templates: templates ?? 0, surprises: surprises ?? 0, paid: paid ?? 0 };
+  const [{ count: templates }, { count: surprises }, { count: paid }, { count: users }, { count: pendingDeposits }] =
+    await Promise.all([
+      db.from("templates").select("*", { count: "exact", head: true }),
+      db.from("surprises").select("*", { count: "exact", head: true }),
+      db.from("surprises").select("*", { count: "exact", head: true }).eq("status", "paid"),
+      db.from("profiles").select("*", { count: "exact", head: true }),
+      db.from("deposits").select("*", { count: "exact", head: true }).eq("status", "pending"),
+    ]);
+  return {
+    templates: templates ?? 0,
+    surprises: surprises ?? 0,
+    paid: paid ?? 0,
+    users: users ?? 0,
+    pendingDeposits: pendingDeposits ?? 0,
+  };
 });
 
 export const adminListSurprises = createServerFn({ method: "GET" }).handler(async () => {
