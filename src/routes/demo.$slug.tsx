@@ -4,6 +4,7 @@ import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { templateQuery } from "@/lib/templates.functions";
 import { SurpriseExperience } from "@/components/SurpriseExperience";
 import { Button } from "@/components/ui/button";
+import proposalMemory from "@/assets/proposal-memory.jpg";
 
 export const Route = createFileRoute("/demo/$slug")({
   loader: async ({ context, params }) => {
@@ -32,9 +33,9 @@ function DemoPage() {
   return (
     <div className="relative">
       <SurpriseExperience category={t.category} recipient="Jaan" sender="Your Name" headline={t.title}
-        message={"Ye sirf ek demo hai 💖\nAsli surprise mein yahan aapka apna naam, photos aur dil ki baat hogi — bilkul aise hi music aur animations ke saath."}
-        cover={t.cover_image} photos={[t.cover_image, "/images/hero.jpg", "/images/hero-clay.jpg"]} />
-      <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center gap-3 px-4">
+        message={"Tumhare saath har chhota pal bhi khaas lagta hai. Tumhari muskurahat, tumhari baatein, aur tumhara saath — yahi meri favourite kahaani hai.\n\nI don't need a perfect life. I just want a life with you. Aaj, kal, aur hamesha."}
+        cover={t.cover_image} photos={t.category.toLowerCase().includes("proposal") ? [proposalMemory] : [t.cover_image, "/images/hero.jpg", "/images/hero-clay.jpg"]} />
+      <div className="demo-actions fixed inset-x-0 bottom-4 z-40 flex justify-center gap-3 px-4">
         <Button asChild variant="glass" size="sm"><Link to="/templates/$slug" params={{ slug }}><ArrowLeft />Back</Link></Button>
         <Button asChild variant="hero" size="sm"><Link to="/templates/$slug" params={{ slug }}><ShoppingBag />Ye template lein</Link></Button>
       </div>

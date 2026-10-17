@@ -250,3 +250,107 @@
 @utility animate-wobble {
   animation: wobble 3s ease-in-out infinite;
 }
+
+/* Proposal's photographic, paper-and-rose visual language. */
+.proposal-experience {
+  --proposal-ink: oklch(0.32 0.055 350);
+  --proposal-rose: oklch(0.51 0.14 8);
+  --proposal-paper: oklch(0.99 0.008 35);
+  --proposal-fold: oklch(0.92 0.045 5);
+  --proposal-edge: oklch(0.82 0.06 5);
+  --proposal-veil: oklch(0.99 0.012 35 / 68%);
+  --proposal-shadow: 0 16px 40px oklch(0.35 0.055 350 / 16%);
+  --proposal-paper-shadow: 0 8px 30px oklch(0.35 0.055 350 / 12%);
+  --primary: var(--proposal-rose);
+  --foreground: var(--proposal-ink);
+  --gradient-rose: linear-gradient(130deg, var(--proposal-rose), oklch(0.58 0.14 15));
+  --shadow-glow: 0 8px 24px oklch(0.51 0.14 8 / 22%);
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  color: var(--proposal-ink);
+  background: var(--proposal-paper);
+  overflow: hidden;
+  font-weight: 500;
+  padding-bottom: 85px;
+}
+.proposal-backdrop { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; z-index: -3; }
+.proposal-veil { position: absolute; inset: 0; background: var(--proposal-veil); z-index: -2; }
+.proposal-header { display: flex; align-items: center; justify-content: space-between; padding: 24px 36px; position: relative; }
+.proposal-wordmark { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--proposal-rose); }
+.proposal-stage { min-height: calc(100svh - 245px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 28px 24px 18px; animation: proposal-enter .7s ease both; }
+.proposal-eyebrow { text-transform: uppercase; font-size: 10px; letter-spacing: 0; color: var(--proposal-rose); margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+.proposal-title { font-family: var(--font-sans); font-weight: 500; font-size: 46px; line-height: 1.16; max-width: 800px; overflow-wrap: anywhere; }
+.proposal-title > span { font-family: var(--font-script); font-weight: 400; font-size: 72px; color: var(--proposal-rose); line-height: 1.35; }
+.proposal-subtitle { margin-top: 16px; font-size: 16px; line-height: 1.6; max-width: 450px; overflow-wrap: anywhere; }
+.proposal-cta { margin-top: 28px; flex-shrink: 0; max-width: 100%; white-space: normal; min-height: 48px; height: auto; padding-block: 12px; }
+.proposal-signature { font-size: 12px; margin-top: 20px; color: var(--proposal-rose); overflow-wrap: anywhere; }
+.proposal-envelope { position: relative; width: 240px; height: 145px; margin-top: 48px; border-radius: 8px; background: var(--proposal-fold); box-shadow: var(--proposal-shadow); padding: 0; overflow: visible; border: 1px solid var(--proposal-edge); transition: transform .35s ease; }
+.proposal-envelope:hover { transform: translateY(-5px) rotate(-2deg); background: var(--proposal-fold); }
+.proposal-envelope-paper { position: absolute; bottom: 36px; inset-inline: 18px; height: 130px; padding: 17px 12px; background: var(--proposal-paper); border-radius: 4px; box-shadow: var(--proposal-paper-shadow); display: flex; flex-direction: column; align-items: center; font-size: 12px; white-space: normal; overflow-wrap: anywhere; }
+.proposal-envelope-paper > span { font-size: 26px; margin-top: 8px; font-weight: 400; }
+.proposal-envelope-fold { position: absolute; inset: 0; background: var(--proposal-fold); clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%); border-radius: 8px; }
+.proposal-seal { position: absolute; bottom: 46px; left: calc(50% - 22px); width: 44px; height: 44px; display: grid; place-items: center; background: var(--proposal-rose); color: var(--proposal-paper); border-radius: 50%; box-shadow: var(--shadow-clay-sm); }
+.proposal-footer { text-align: center; padding: 20px 24px 12px; }
+.proposal-progress { display: flex; justify-content: center; gap: 6px; }
+.proposal-progress-dot { width: 24px; height: 24px; padding: 0; }
+.proposal-progress-dot > span { width: 6px; height: 6px; border-radius: 50%; background: var(--proposal-edge); transition: width .3s; }
+.proposal-progress-dot.is-complete > span { background: var(--proposal-rose); }
+.proposal-progress-dot[aria-current] > span { width: 20px; border-radius: 20px; }
+.proposal-track { font-size: 10px; display: block; margin-top: 8px; color: var(--proposal-rose); }
+.proposal-photo-stack { position: relative; width: min(280px, 80vw); margin: 24px 0; }
+.proposal-photo-under { position: absolute; inset: 0; background: var(--proposal-paper); box-shadow: var(--proposal-paper-shadow); transform: rotate(7deg); border-radius: 4px; }
+.proposal-polaroid { position: relative; padding: 10px 10px 15px; background: var(--proposal-paper); box-shadow: var(--proposal-shadow); transform: rotate(-3deg); border-radius: 4px; }
+.proposal-polaroid img { aspect-ratio: 1; width: 100%; object-fit: cover; }
+.proposal-polaroid figcaption { font-family: var(--font-script); font-size: 25px; padding-top: 10px; font-weight: 400; }
+.proposal-counter { font-size: 12px; }
+.proposal-letter { position: relative; text-align: left; width: min(480px, 100%); margin-top: 24px; padding: 28px 32px; background: var(--proposal-paper); box-shadow: var(--proposal-paper-shadow); border-radius: 4px; border-top: 2px solid var(--proposal-edge); }
+.proposal-letter-greeting { font-family: var(--font-script); color: var(--proposal-rose); font-size: 32px; font-weight: 400; }
+.proposal-letter h3 { font-family: var(--font-sans); font-size: 15px; margin-top: 10px; }
+.proposal-letter-message { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.8; margin-top: 14px; }
+.proposal-letter-sign { margin-top: 20px; font-size: 12px; }
+.proposal-letter-sign span { font-family: var(--font-script); color: var(--proposal-rose); font-size: 30px; overflow-wrap: anywhere; }
+.proposal-ring-reveal { position: relative; width: min(300px, 80vw); aspect-ratio: 1; margin-top: 24px; box-shadow: var(--proposal-shadow); border-radius: 8px; overflow: hidden; }
+.proposal-ring-reveal img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s; transform: scale(1.1); }
+.proposal-ring-reveal.is-open img { transform: scale(1); }
+.proposal-ring-cover { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 8px; flex-direction: column; background: var(--proposal-fold); color: var(--proposal-rose); box-shadow: var(--shadow-clay); }
+.proposal-ring-monogram { font-family: var(--font-script); font-size: 60px; font-weight: 400; }
+.proposal-question-mark { display: grid; place-items: center; width: 72px; height: 72px; border: 1px solid var(--proposal-edge); border-radius: 50%; color: var(--proposal-rose); margin-bottom: 24px; background: var(--proposal-paper); box-shadow: var(--shadow-clay-sm); }
+.proposal-answer-row { margin-top: 32px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.proposal-reassurance { max-width: 370px; font-size: 13px; line-height: 1.6; margin-top: 24px; }
+.proposal-finale-photo { width: 220px; height: 220px; object-fit: cover; border-radius: 50%; margin-top: 24px; border: 6px solid var(--proposal-paper); box-shadow: var(--proposal-shadow); }
+.proposal-couple { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; font-family: var(--font-script); font-size: 36px; margin-top: 20px; overflow-wrap: anywhere; max-width: 100%; }
+.proposal-celebrating .proposal-question-mark { animation: proposal-bloom 1.8s ease both; }
+@keyframes proposal-enter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes proposal-bloom { 0% { transform: scale(.5); } 55% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@media (min-width: 1100px) { .proposal-backdrop { object-position: center 55%; } .proposal-veil { background: oklch(0.99 0.012 35 / 74%); } }
+@media (max-width: 600px) {
+  .proposal-header { padding: 16px 18px; }
+  .proposal-stage { padding: 20px 20px 12px; min-height: calc(100svh - 225px); }
+  .proposal-title { font-size: 30px; }
+  .proposal-title > span { font-size: 48px; }
+  .proposal-subtitle { font-size: 14px; }
+  .proposal-envelope { width: 210px; height: 125px; margin-top: 40px; }
+  .proposal-envelope-paper { height: 115px; }
+  .proposal-seal { bottom: 36px; }
+  .proposal-letter { padding: 22px; }
+  .proposal-answer-row { flex-direction: column; }
+}
+@media (max-height: 650px) and (min-width: 601px) {
+  .proposal-header { padding: 12px 24px; }
+  .proposal-stage { padding-top: 4px; }
+  .proposal-title { font-size: 30px; }
+  .proposal-title > span { font-size: 48px; }
+  .proposal-eyebrow { margin-bottom: 10px; }
+  .proposal-envelope { margin-top: 32px; width: 180px; height: 105px; }
+  .proposal-envelope-paper { height: 95px; padding: 10px; }
+  .proposal-envelope-paper > span { font-size: 20px; }
+  .proposal-seal { bottom: 26px; }
+  .proposal-cta { margin-top: 20px; }
+  .proposal-photo-stack { width: 210px; }
+  .proposal-ring-reveal { width: 230px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .proposal-stage, .proposal-celebrating .proposal-question-mark { animation: none; }
+  .proposal-experience *, .proposal-experience *::before, .proposal-experience *::after { transition: none; }
+}

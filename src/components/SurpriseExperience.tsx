@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Gift, Heart, Music, Pause, RotateCcw } from 
 import { Petals } from "@/components/Petals";
 import { Button } from "@/components/ui/button";
 import { MusicBox } from "@/lib/music";
+import { ProposalExperience } from "@/components/ProposalExperience";
 
 export type ExperienceProps = {
   category: string;
@@ -39,6 +40,10 @@ function Screen({ children }: { children: React.ReactNode }) {
 }
 
 export function SurpriseExperience(p: ExperienceProps) {
+  return experienceKind(p.category) === "proposal" ? <ProposalExperience {...p} /> : <ClassicExperience {...p} />;
+}
+
+function ClassicExperience(p: ExperienceProps) {
   const kind = experienceKind(p.category);
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
