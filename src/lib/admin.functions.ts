@@ -61,6 +61,16 @@ export const adminSetSurpriseStatus = createServerFn({ method: "POST" }).middlew
     return { ok: true };
   });
 
+export const adminSetTemplatePrice = createServerFn({ method: "POST" }).middleware([requireAdmin])
+  .inputValidator((d: { id: string; price_inr: number; original_price_inr: number }) =>
+    z.object({ id: z.string().uuid(), price_inr: z.number().int().min(0).max(1000000), original_price_inr: z.number().int().min(0).max(1000000) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.db.from("templates").update({ price_inr: data.price_inr, original_price_inr: data.original_price_inr }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const adminToggleTemplate = createServerFn({ method: "POST" }).middleware([requireAdmin])
   .inputValidator((d: { id: string; field: "active" | "featured"; value: boolean }) =>
     z
