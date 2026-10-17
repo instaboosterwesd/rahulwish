@@ -1,2 +1,0 @@
-drop policy if exists "public read photos" on storage.objects;
-create policy "owners read photos" on storage.objects for select to authenticated using (bucket_id='photos' and (storage.foldername(name))[1] = auth.uid()::text);
