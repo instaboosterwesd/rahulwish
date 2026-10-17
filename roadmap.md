@@ -4,3 +4,4 @@
 - [x] Verify announcement cooldown, maintenance and central approval flow.
 - [ ] Grant the site owner's account admin access — blocked until the owner creates an account and identifies it.
 - [x] Redesign the Proposal experience with photographic visuals and original romantic music; verify all demo steps.
+- [ ] Extend Proposal with a playful secret, story, quiz, reasons, future and countdown; verify the full demo.

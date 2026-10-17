@@ -15,3 +15,4 @@
 - Removing a customer soft-deletes their profile and disables access while preserving financial records.
 - Dispatch Proposal experiences to their dedicated presentation component while preserving the shared content props across demo, editor preview and live surprises; keep other categories unchanged.
 - Proposal audio is an original bundled loop played only after user interaction, with pause and unmount cleanup; avoid third-party music licensing and autoplay failures.
+- Proposal's recipient-name unlock is only a playful presentation reveal, never an access-control boundary; share its flow rules across all presentations to keep demos and live surprises consistent.
