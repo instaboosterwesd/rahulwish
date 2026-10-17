@@ -1,7 +1,9 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Eye, ShoppingBag } from "lucide-react";
 import { templateQuery } from "@/lib/templates.functions";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { Button } from "@/components/ui/button";
 import { discountPercent, formatINR } from "@/lib/format";
 
 export const Route = createFileRoute("/templates/$slug")({
@@ -35,6 +37,18 @@ function Page() {
           <p className="mt-6 text-3xl text-gold">{formatINR(t.price_inr)}
             {t.original_price_inr > t.price_inr && <span className="ml-3 text-base text-primary">{discountPercent(t.price_inr, t.original_price_inr)}% off</span>}
           </p>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Button asChild variant="hero" size="lg">
+              <Link to="/templates/$slug" params={{ slug }}>
+                <ShoppingBag /> Buy / Customize
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/demo/$slug" params={{ slug }}>
+                <Eye /> Live Demo
+              </Link>
+            </Button>
+          </div>
         </div>
       </main>
       <SiteFooter />

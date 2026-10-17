@@ -10,12 +10,21 @@ async function adminClient() {
 
 export const adminStats = createServerFn({ method: "GET" }).handler(async () => {
   const db = await adminClient();
-  const [{ count: templates }, { count: surprises }, { count: paid }] = await Promise.all([
-    db.from("templates").select("*", { count: "exact", head: true }),
-    db.from("surprises").select("*", { count: "exact", head: true }),
-    db.from("surprises").select("*", { count: "exact", head: true }).eq("status", "paid"),
-  ]);
-  return { templates: templates ?? 0, surprises: surprises ?? 0, paid: paid ?? 0 };
+  const [{ count: templates }, { count: surprises }, { count: paid }, { count: users }, { count: pendingDeposits }] =
+    await Promise.all([
+      db.from("templates").select("*", { count: "exact", head: true }),
+      db.from("surprises").select("*", { count: "exact", head: true }),
+      db.from("surprises").select("*", { count: "exact", head: true }).eq("status", "paid"),
+      db.from("profiles").select("*", { count: "exact", head: true }),
+      db.from("deposits").select("*", { count: "exact", head: true }).eq("status", "pending"),
+    ]);
+  return {
+    templates: templates ?? 0,
+    surprises: surprises ?? 0,
+    paid: paid ?? 0,
+    users: users ?? 0,
+    pendingDeposits: pendingDeposits ?? 0,
+  };
 });
 
 export const adminListSurprises = createServerFn({ method: "GET" }).handler(async () => {
@@ -65,6 +74,77 @@ export const adminToggleTemplate = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const adminListUsers = createServerFn({ method: "GET" }).handler(async () => {
+  const db = await adminClient();
+  const { data, error } = await db
+    .from("profiles")
+    .select("id, email, full_name, banned, created_at")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
+
+export const adminSetUserBanned = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string; banned: boolean }) =>
+    z.object({ id: z.string().uuid(), banned: z.boolean() }).parse(d),
+  )
+  .handler(async ({ data }) => {
+    const db = await adminClient();
+    const { error } = await db.from("profiles").update({ banned: data.banned }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminListDeposits = createServerFn({ method: "GET" }).handler(async () => {
+  const db = await adminClient();
+  const { data, error } = await db
+    .from("deposits")
+    .select("id, user_id, amount_inr, status, note, created_at")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
+
+export const adminSetDepositStatus = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string; status: string }) =>
+    z.object({ id: z.string().uuid(), status: z.enum(["pending", "approved", "rejected"]) }).parse(d),
+  )
+  .handler(async ({ data }) => {
+    const db = await adminClient();
+    const { error } = await db.from("deposits").update({ status: data.status }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminGetSettings = createServerFn({ method: "GET" }).handler(async () => {
+  const db = await adminClient();
+  const { data, error } = await db.from("settings").select("key, value");
+  if (error) throw new Error(error.message);
+  return Object.fromEntries((data ?? []).map((r) => [r.key, r.value])) as Record<string, string>;
+});
+
+export const adminSetSetting = createServerFn({ method: "POST" })
+  .inputValidator((d: { key: string; value: string }) =>
+    z.object({ key: z.string().min(1), value: z.string() }).parse(d),
+  )
+  .handler(async ({ data }) => {
+    const db = await adminClient();
+    const { error } = await db
+      .from("settings")
+      .upsert({ key: data.key, value: data.value } as never);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminUsersQuery = () =>
+  queryOptions({ queryKey: ["admin-users"], queryFn: () => adminListUsers() });
+export const adminDepositsQuery = () =>
+  queryOptions({ queryKey: ["admin-deposits"], queryFn: () => adminListDeposits() });
+export const adminSettingsQuery = () =>
+  queryOptions({ queryKey: ["admin-settings"], queryFn: () => adminGetSettings() });
 
 export const adminStatsQuery = () =>
   queryOptions({ queryKey: ["admin-stats"], queryFn: () => adminStats() });

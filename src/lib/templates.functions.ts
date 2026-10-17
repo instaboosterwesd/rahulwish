@@ -65,6 +65,12 @@ export const getSurprise = createServerFn({ method: "GET" })
     return { ...row, photoUrls };
   });
 
+export const getPublicSettings = createServerFn({ method: "GET" }).handler(async () => {
+  const { data, error } = await publicClient().from("settings").select("key, value");
+  if (error) throw new Error(error.message);
+  return Object.fromEntries((data ?? []).map((r) => [r.key, r.value])) as Record<string, string>;
+});
+
 export const templatesQuery = () =>
   queryOptions({ queryKey: ["templates"], queryFn: () => listTemplates() });
 export const templateQuery = (slug: string) =>
