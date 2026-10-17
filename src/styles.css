@@ -304,6 +304,29 @@
 .proposal-polaroid img { aspect-ratio: 1; width: 100%; object-fit: cover; }
 .proposal-polaroid figcaption { font-family: var(--font-script); font-size: 25px; padding-top: 10px; font-weight: 400; }
 .proposal-counter { font-size: 12px; }
+.proposal-unlock { width: min(340px, 100%); margin-top: 28px; text-align: left; }
+.proposal-unlock label { display: block; font-size: 13px; margin-bottom: 8px; }
+.proposal-unlock input { background: var(--proposal-paper); border-color: var(--proposal-edge); color: var(--proposal-ink); text-align: center; height: 50px; }
+.proposal-unlock .proposal-cta { width: 100%; }
+.proposal-hint { color: var(--proposal-rose); font-size: 12px; margin-top: 12px; text-align: center; }
+.proposal-timeline { width: min(460px, 100%); margin-top: 28px; text-align: left; }
+.proposal-timeline li { display: flex; gap: 18px; padding: 18px 0; border-bottom: 1px solid var(--proposal-edge); }
+.proposal-timeline li > span { color: var(--proposal-rose); font-size: 12px; padding-top: 4px; }
+.proposal-timeline h3 { font-size: 17px; }
+.proposal-timeline p { font-size: 14px; line-height: 1.7; margin-top: 6px; }
+.proposal-quiz { width: min(440px, 100%); margin-top: 28px; }
+.proposal-quiz h3 { font-size: 20px; line-height: 1.5; margin-top: 14px; }
+.proposal-quiz-options { display: grid; gap: 10px; margin-top: 22px; }
+.proposal-quiz-option { min-height: 50px; height: auto; padding: 14px 18px; white-space: normal; color: var(--proposal-ink); background: var(--proposal-paper); border: 1px solid var(--proposal-edge); border-radius: 8px; box-shadow: var(--proposal-paper-shadow); }
+.proposal-quiz-option.is-selected { border-color: var(--proposal-rose); }
+.proposal-quiz .proposal-reassurance { margin-inline: auto; min-height: 42px; }
+.proposal-reason { max-width: 430px; min-height: 170px; margin-top: 32px; }
+.proposal-reason-number { color: var(--proposal-rose); font-family: var(--font-script); font-size: 44px; }
+.proposal-reason p { font-size: 24px; line-height: 1.6; margin-top: 12px; }
+.proposal-future { width: min(440px, 100%); margin-top: 24px; }
+.proposal-future p { padding: 16px 0; border-bottom: 1px solid var(--proposal-edge); font-size: 17px; line-height: 1.6; }
+.proposal-countdown { width: 130px; height: 130px; display: grid; place-items: center; margin-top: 32px; border: 1px solid var(--proposal-edge); border-radius: 50%; color: var(--proposal-rose); font-size: 72px; font-family: var(--font-script); }
+.proposal-progress { flex-wrap: wrap; max-width: 100%; }
 .proposal-letter { position: relative; text-align: left; width: min(480px, 100%); margin-top: 24px; padding: 28px 32px; background: var(--proposal-paper); box-shadow: var(--proposal-paper-shadow); border-radius: 4px; border-top: 2px solid var(--proposal-edge); }
 .proposal-letter-greeting { font-family: var(--font-script); color: var(--proposal-rose); font-size: 32px; font-weight: 400; }
 .proposal-letter h3 { font-family: var(--font-sans); font-size: 15px; margin-top: 10px; }
