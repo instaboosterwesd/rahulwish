@@ -22,7 +22,7 @@ export function Announcement() {
   // Admin panel hamesha accessible rahe
   const isAdmin = pathname.startsWith("/admin");
 
-  if (settings.maintenance_mode === "on" && !isAdmin) {
+  if (settings["maintenance_mode"] === "on" && !isAdmin) {
     return (
       <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-night px-6 text-center">
         <div className="clay max-w-md p-10">
@@ -39,7 +39,7 @@ export function Announcement() {
     );
   }
 
-  const message = settings.announcement?.trim();
+  const message = settings["announcement"]?.trim();
   if (!message || dismissed || isAdmin) return null;
 
   const seenAt = Number(localStorage.getItem(SEEN_KEY) ?? 0);
