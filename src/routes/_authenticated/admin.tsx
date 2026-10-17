@@ -99,24 +99,29 @@ function AdminPage() {
     mutationFn: (v: { id: string; status: "pending" | "paid" | "delivered" }) =>
       adminSetSurpriseStatus({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
   const toggleMut = useMutation({
     mutationFn: (v: { id: string; field: "active" | "featured"; value: boolean }) =>
       adminToggleTemplate({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
   const banMut = useMutation({
     mutationFn: (v: { id: string; banned: boolean }) => adminSetUserBanned({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
   const depositMut = useMutation({
     mutationFn: (v: { id: string; status: "pending" | "approved" | "rejected" }) =>
       adminSetDepositStatus({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
   const settingMut = useMutation({
     mutationFn: (v: { key: string; value: string }) => adminSetSetting({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
 
   const visibleTabs = TABS.slice(0, 3);
@@ -124,7 +129,7 @@ function AdminPage() {
   const activeInMore = moreTabs.some((t) => t.id === tab);
 
   const tabBtn = (t: (typeof TABS)[number]) => (
-    <Button
+    <Button variant="ghost"
       key={t.id}
       onClick={() => {
         setTab(t.id);
@@ -155,7 +160,8 @@ function AdminPage() {
           <span className="contents md:hidden">
             {visibleTabs.map(tabBtn)}
             <span className="relative">
-              <Button
+              <Button variant="ghost"
+                aria-expanded={moreOpen}
                 onClick={() => setMoreOpen((o) => !o)}
                 className={`flex items-center gap-1 rounded-full px-4 py-2 text-sm font-bold ${
                   activeInMore ? "bg-rose-gradient text-primary-foreground" : "text-muted-foreground"
