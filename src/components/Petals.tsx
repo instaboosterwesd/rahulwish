@@ -11,7 +11,7 @@ export function Petals({ count = 18, chars = ["❤", "✿", "❀", "✦"] }: { c
         delay: Math.random() * 12,
         dur: 10 + Math.random() * 12,
         size: 10 + Math.random() * 18,
-        char: chars[Math.floor(Math.random() * chars.length)],
+        char: chars[Math.floor(Math.random() * chars.length)] ?? "❤",
       })),
     );
   }, [count]);

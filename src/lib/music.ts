@@ -59,12 +59,12 @@ export class MusicBox {
     const t = this.ctx.currentTime;
     const root = this.mood === "festive" ? 293.66 : 261.63;
     const mel = MELODIES[this.mood];
-    const semi = mel[this.step % mel.length];
+    const semi = mel[this.step % mel.length] ?? 0;
     const f = root * Math.pow(2, (semi + 12) / 12);
     this.note(f, t, 1.4, "sine", 0.18);
     this.note(f * 2, t, 0.6, "triangle", 0.03);
     if (this.step % 8 === 0) {
-      const chord = CHORDS[(this.step / 8) % CHORDS.length];
+      const chord = CHORDS[(this.step / 8) % CHORDS.length] ?? [0, 4, 7];
       chord.forEach((c) => this.note(root * Math.pow(2, c / 12), t, 3.4, "triangle", 0.05));
     }
     this.step++;
