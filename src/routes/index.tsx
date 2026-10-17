@@ -93,7 +93,7 @@ function Home() {
     return () => clearInterval(id);
   }, []);
 
-  const review = REVIEWS[reviewIdx];
+  const review = REVIEWS[reviewIdx] ?? REVIEWS[0]!;
 
   return (
     <div className="min-h-screen bg-night">

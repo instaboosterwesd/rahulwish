@@ -60,7 +60,7 @@ export const adminToggleTemplate = createServerFn({ method: "POST" })
     const db = await adminClient();
     const { error } = await db
       .from("templates")
-      .update({ [data.field]: data.value })
+      .update({ [data.field]: data.value } as never)
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
