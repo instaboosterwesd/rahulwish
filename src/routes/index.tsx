@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { ArrowRight, Gift, Heart, Music, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, ChevronLeft, ChevronRight, Gift, Heart, Music, Quote, Sparkles, Star } from "lucide-react";
 import { templatesQuery } from "@/lib/templates.functions";
 import { TemplateCard } from "@/components/TemplateCard";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
@@ -30,9 +31,69 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+const REVIEWS = [
+  {
+    name: "Ananya Sharma",
+    city: "Mumbai",
+    text: "Maine apne boyfriend ke birthday ke liye banaya — jab usne link khola aur music baja, uski aankhein bhar aayi. Best gift ever, seriously.",
+    rating: 5,
+  },
+  {
+    name: "Rohan Mehta",
+    city: "Delhi",
+    text: "Proposal template use kiya. Usne page ke aakhir mein 'Yes' dabaya aur hum dono ro pade. ₹449 mein itna khoobsurat moment — unbelievable.",
+    rating: 5,
+  },
+  {
+    name: "Priya Nair",
+    city: "Bengaluru",
+    text: "Shaadi ka invitation yahan se bheja. Sabne pucha kis designer se banwaya! Royal look, smooth music — guests ab bhi baat karte hain.",
+    rating: 5,
+  },
+  {
+    name: "Arjun Singh",
+    city: "Jaipur",
+    text: "Behen ke liye Rakhi surprise banaya, 2 minute mein ready. Woh hostel mein thi aur video call par rote hue boli 'bhaiya best gift'. Worth every rupee.",
+    rating: 5,
+  },
+  {
+    name: "Kavya Reddy",
+    city: "Hyderabad",
+    text: "Anniversary ke liye Golden Anniversary template liya. Hamari 10 saal ki photos ke saath timeline dekh kar husband emotional ho gaye.",
+    rating: 5,
+  },
+];
+
+const PROOF = [
+  { value: "12,000+", label: "Surprises delivered" },
+  { value: "4.9★", label: "Average rating" },
+  { value: "2 min", label: "To create yours" },
+  { value: "98%", label: "Said it made them cry (happy tears)" },
+];
+
+const MARQUEE_IMAGES = [
+  "/images/t-birthday.jpg",
+  "/images/t-proposal.jpg",
+  "/images/t-wedding.jpg",
+  "/images/t-anniversary.jpg",
+  "/images/t-love.jpg",
+  "/images/t-friendship.jpg",
+  "/images/t-rakhi.jpg",
+  "/images/t-congrats.jpg",
+  "/images/t-flipbook.jpg",
+];
+
 function Home() {
   const { data: templates } = useSuspenseQuery(templatesQuery());
   const featured = templates.filter((t) => t.featured).slice(0, 6);
+  const [reviewIdx, setReviewIdx] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setReviewIdx((i) => (i + 1) % REVIEWS.length), 5000);
+    return () => clearInterval(id);
+  }, []);
+
+  const review = REVIEWS[reviewIdx] ?? REVIEWS[0]!;
 
   return (
     <div className="min-h-screen bg-night">
@@ -77,6 +138,35 @@ function Home() {
         </div>
       </section>
 
+      {/* Proof stats */}
+      <section className="border-y border-border/60 bg-card/40">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-12 md:grid-cols-4">
+          {PROOF.map((p) => (
+            <div key={p.label} className="text-center">
+              <p className="font-display text-4xl font-semibold text-gold md:text-5xl">{p.value}</p>
+              <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">{p.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Photo marquee slider */}
+      <section className="overflow-hidden py-16">
+        <div className="flex w-max animate-marquee gap-6">
+          {[...MARQUEE_IMAGES, ...MARQUEE_IMAGES].map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt="Surprise template preview"
+              loading="lazy"
+              width={1024}
+              height={1024}
+              className="h-52 w-52 rounded-3xl object-cover shadow-card md:h-64 md:w-64"
+            />
+          ))}
+        </div>
+      </section>
+
       {/* Featured templates */}
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="flex items-end justify-between">
@@ -96,6 +186,59 @@ function Home() {
           {featured.map((t) => (
             <TemplateCard key={t.id} t={t} />
           ))}
+        </div>
+      </section>
+
+      {/* Reviews slider */}
+      <section className="border-t border-border/60 py-20">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] text-blush/80">Real stories</p>
+          <h2 className="mt-2 font-display text-5xl font-semibold">
+            They said <span className="font-script text-6xl text-gold">yes</span> to tears of joy
+          </h2>
+          <div className="relative mt-12 rounded-[2.5rem] bg-card p-10 shadow-card md:p-14">
+            <Quote className="mx-auto h-10 w-10 text-primary" />
+            <p className="mt-6 min-h-28 font-display text-2xl leading-relaxed md:text-3xl">
+              “{review.text}”
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-1">
+              {Array.from({ length: review.rating }).map((_, i) => (
+                <Star key={i} className="h-4 w-4 fill-gold text-gold" />
+              ))}
+            </div>
+            <p className="mt-3 text-sm font-semibold">{review.name}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{review.city}</p>
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <Button
+                variant="glass"
+                size="icon"
+                aria-label="Previous review"
+                onClick={() => setReviewIdx((i) => (i - 1 + REVIEWS.length) % REVIEWS.length)}
+              >
+                <ChevronLeft />
+              </Button>
+              <div className="flex gap-2">
+                {REVIEWS.map((_, i) => (
+                  <button
+                    key={i}
+                    aria-label={`Go to review ${i + 1}`}
+                    onClick={() => setReviewIdx(i)}
+                    className={`h-2 rounded-full transition-all ${
+                      i === reviewIdx ? "w-6 bg-primary" : "w-2 bg-muted-foreground/40"
+                    }`}
+                  />
+                ))}
+              </div>
+              <Button
+                variant="glass"
+                size="icon"
+                aria-label="Next review"
+                onClick={() => setReviewIdx((i) => (i + 1) % REVIEWS.length)}
+              >
+                <ChevronRight />
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
 

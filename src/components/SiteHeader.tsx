@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 export function SiteHeader() {
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   return (
     <header className="fixed inset-x-0 top-0 z-50">
@@ -25,11 +25,9 @@ export function SiteHeader() {
               My Surprises
             </Link>
           )}
-          {isAdmin && (
-            <Link to="/admin" className="text-gold hover:brightness-110">
-              Admin
-            </Link>
-          )}
+          <Link to="/admin" className="text-gold hover:brightness-110" activeProps={{ className: "text-gold brightness-110" }}>
+            Admin
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           {user ? (
