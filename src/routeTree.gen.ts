@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMyRouteImport } from './routes/_authenticated/my'
 import { Route as DemoSlugRouteImport } from './routes/demo.$slug'
+import { Route as SurpriseCodeRouteImport } from './routes/surprise.$code'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as TemplatesSlugRouteImport } from './routes/templates.$slug'
 
@@ -47,6 +48,11 @@ const DemoSlugRoute = DemoSlugRouteImport.update({
   path: '/demo/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SurpriseCodeRoute = SurpriseCodeRouteImport.update({
+  id: '/surprise/$code',
+  path: '/surprise/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
   id: '/templates/',
   path: '/templates/',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/my': typeof AuthenticatedMyRoute
   '/demo/$slug': typeof DemoSlugRoute
+  '/surprise/$code': typeof SurpriseCodeRoute
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
 }
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/my': typeof AuthenticatedMyRoute
   '/demo/$slug': typeof DemoSlugRoute
+  '/surprise/$code': typeof SurpriseCodeRoute
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates': typeof TemplatesIndexRoute
 }
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/my': typeof AuthenticatedMyRoute
   '/demo/$slug': typeof DemoSlugRoute
+  '/surprise/$code': typeof SurpriseCodeRoute
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
 }
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/my'
     | '/demo/$slug'
+    | '/surprise/$code'
     | '/templates/$slug'
     | '/templates/'
   fileRoutesByTo: FileRoutesByTo
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/my'
     | '/demo/$slug'
+    | '/surprise/$code'
     | '/templates/$slug'
     | '/templates'
   id:
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/my'
     | '/demo/$slug'
+    | '/surprise/$code'
     | '/templates/$slug'
     | '/templates/'
   fileRoutesById: FileRoutesById
@@ -123,6 +135,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   DemoSlugRoute: typeof DemoSlugRoute
+  SurpriseCodeRoute: typeof SurpriseCodeRoute
   TemplatesSlugRoute: typeof TemplatesSlugRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
 }
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/surprise/$code': {
+      id: '/surprise/$code'
+      path: '/surprise/$code'
+      fullPath: '/surprise/$code'
+      preLoaderRoute: typeof SurpriseCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/templates/': {
       id: '/templates/'
       path: '/templates'
@@ -206,6 +226,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   DemoSlugRoute: DemoSlugRoute,
+  SurpriseCodeRoute: SurpriseCodeRoute,
   TemplatesSlugRoute: TemplatesSlugRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
 }
