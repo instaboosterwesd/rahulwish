@@ -250,6 +250,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      save_surprise_photos: {
+        Args: { _id: string; _photos: string[] }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
