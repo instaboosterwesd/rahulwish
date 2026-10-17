@@ -1,15 +1,17 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createMiddleware, createServerFn } from "@tanstack/react-start";
 import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 
-// NOTE: Admin access is intentionally open (no login) per site owner's request.
-async function adminClient() {
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+const requireAdmin = createMiddleware({ type: "function" }).middleware([requireSupabaseAuth]).server(async ({ context, next }) => {
+  const { data, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+  if (error || !data) throw new Error("Admin access required");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  return supabaseAdmin;
-}
+  return next({ context: { db: supabaseAdmin } });
+});
 
-export const adminStats = createServerFn({ method: "GET" }).handler(async () => {
-  const db = await adminClient();
+export const adminStats = createServerFn({ method: "GET" }).middleware([requireAdmin]).handler(async ({ context }) => {
+  const db = context.db;
   const [{ count: templates }, { count: surprises }, { count: paid }, { count: users }, { count: pendingDeposits }] =
     await Promise.all([
       db.from("templates").select("*", { count: "exact", head: true }),
@@ -27,8 +29,8 @@ export const adminStats = createServerFn({ method: "GET" }).handler(async () => 
   };
 });
 
-export const adminListSurprises = createServerFn({ method: "GET" }).handler(async () => {
-  const db = await adminClient();
+export const adminListSurprises = createServerFn({ method: "GET" }).middleware([requireAdmin]).handler(async ({ context }) => {
+  const db = context.db;
   const { data, error } = await db
     .from("surprises")
     .select("id, code, recipient_name, sender_name, status, amount_inr, created_at, templates(title)")
@@ -38,8 +40,8 @@ export const adminListSurprises = createServerFn({ method: "GET" }).handler(asyn
   return data ?? [];
 });
 
-export const adminListTemplates = createServerFn({ method: "GET" }).handler(async () => {
-  const db = await adminClient();
+export const adminListTemplates = createServerFn({ method: "GET" }).middleware([requireAdmin]).handler(async ({ context }) => {
+  const db = context.db;
   const { data, error } = await db
     .from("templates")
     .select("id, slug, title, category, price_inr, original_price_inr, active, featured, cover_image")
@@ -48,25 +50,25 @@ export const adminListTemplates = createServerFn({ method: "GET" }).handler(asyn
   return data ?? [];
 });
 
-export const adminSetSurpriseStatus = createServerFn({ method: "POST" })
+export const adminSetSurpriseStatus = createServerFn({ method: "POST" }).middleware([requireAdmin])
   .inputValidator((d: { id: string; status: string }) =>
     z.object({ id: z.string().uuid(), status: z.enum(["pending", "paid", "delivered"]) }).parse(d),
   )
-  .handler(async ({ data }) => {
-    const db = await adminClient();
+  .handler(async ({ data, context }) => {
+    const db = context.db;
     const { error } = await db.from("surprises").update({ status: data.status }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
-export const adminToggleTemplate = createServerFn({ method: "POST" })
+export const adminToggleTemplate = createServerFn({ method: "POST" }).middleware([requireAdmin])
   .inputValidator((d: { id: string; field: "active" | "featured"; value: boolean }) =>
     z
       .object({ id: z.string().uuid(), field: z.enum(["active", "featured"]), value: z.boolean() })
       .parse(d),
   )
-  .handler(async ({ data }) => {
-    const db = await adminClient();
+  .handler(async ({ data, context }) => {
+    const db = context.db;
     const { error } = await db
       .from("templates")
       .update({ [data.field]: data.value } as never)
@@ -75,30 +77,31 @@ export const adminToggleTemplate = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminListUsers = createServerFn({ method: "GET" }).handler(async () => {
-  const db = await adminClient();
+export const adminListUsers = createServerFn({ method: "GET" }).middleware([requireAdmin]).handler(async ({ context }) => {
+  const db = context.db;
   const { data, error } = await db
     .from("profiles")
     .select("id, email, full_name, banned, created_at")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false })
     .limit(200);
   if (error) throw new Error(error.message);
   return data ?? [];
 });
 
-export const adminSetUserBanned = createServerFn({ method: "POST" })
+export const adminSetUserBanned = createServerFn({ method: "POST" }).middleware([requireAdmin])
   .inputValidator((d: { id: string; banned: boolean }) =>
     z.object({ id: z.string().uuid(), banned: z.boolean() }).parse(d),
   )
-  .handler(async ({ data }) => {
-    const db = await adminClient();
+  .handler(async ({ data, context }) => {
+    const db = context.db;
     const { error } = await db.from("profiles").update({ banned: data.banned }).eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
-export const adminListDeposits = createServerFn({ method: "GET" }).handler(async () => {
-  const db = await adminClient();
+export const adminListDeposits = createServerFn({ method: "GET" }).middleware([requireAdmin]).handler(async ({ context }) => {
+  const db = context.db;
   const { data, error } = await db
     .from("deposits")
     .select("id, user_id, amount_inr, status, note, created_at")
@@ -108,30 +111,30 @@ export const adminListDeposits = createServerFn({ method: "GET" }).handler(async
   return data ?? [];
 });
 
-export const adminSetDepositStatus = createServerFn({ method: "POST" })
+export const adminSetDepositStatus = createServerFn({ method: "POST" }).middleware([requireAdmin])
   .inputValidator((d: { id: string; status: string }) =>
     z.object({ id: z.string().uuid(), status: z.enum(["pending", "approved", "rejected"]) }).parse(d),
   )
-  .handler(async ({ data }) => {
-    const db = await adminClient();
-    const { error } = await db.from("deposits").update({ status: data.status }).eq("id", data.id);
+  .handler(async ({ data, context }) => {
+    const db = context.db;
+    const { error } = await db.from("deposits").update({ status: data.status }).eq("id", data.id).eq("status", "pending");
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
-export const adminGetSettings = createServerFn({ method: "GET" }).handler(async () => {
-  const db = await adminClient();
+export const adminGetSettings = createServerFn({ method: "GET" }).middleware([requireAdmin]).handler(async ({ context }) => {
+  const db = context.db;
   const { data, error } = await db.from("settings").select("key, value");
   if (error) throw new Error(error.message);
   return Object.fromEntries((data ?? []).map((r) => [r.key, r.value])) as Record<string, string>;
 });
 
-export const adminSetSetting = createServerFn({ method: "POST" })
+export const adminSetSetting = createServerFn({ method: "POST" }).middleware([requireAdmin])
   .inputValidator((d: { key: string; value: string }) =>
     z.object({ key: z.string().min(1), value: z.string() }).parse(d),
   )
-  .handler(async ({ data }) => {
-    const db = await adminClient();
+  .handler(async ({ data, context }) => {
+    const db = context.db;
     const { error } = await db
       .from("settings")
       .upsert({ key: data.key, value: data.value } as never);
@@ -152,3 +155,10 @@ export const adminSurprisesQuery = () =>
   queryOptions({ queryKey: ["admin-surprises"], queryFn: () => adminListSurprises() });
 export const adminTemplatesQuery = () =>
   queryOptions({ queryKey: ["admin-templates"], queryFn: () => adminListTemplates() });
+
+export const adminEditUser = createServerFn({ method: "POST" }).middleware([requireAdmin])
+  .inputValidator((d: { id: string; full_name: string }) => z.object({ id: z.string().uuid(), full_name: z.string().max(100) }).parse(d))
+  .handler(async ({ data, context }) => { const { error } = await context.db.from("profiles").update({ full_name: data.full_name }).eq("id", data.id); if (error) throw new Error(error.message); return { ok: true }; });
+export const adminDeleteUser = createServerFn({ method: "POST" }).middleware([requireAdmin])
+  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => { if (data.id === context.userId) throw new Error("Cannot delete your own admin account"); const { error } = await context.db.from("profiles").update({ deleted_at: new Date().toISOString(), banned: true }).eq("id", data.id); if (error) throw new Error(error.message); return { ok: true }; });

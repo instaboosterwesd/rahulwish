@@ -2,18 +2,28 @@ import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import { Megaphone, Wrench, X } from "lucide-react";
 import { getPublicSettings } from "@/lib/templates.functions";
+import { Button } from "@/components/ui/button";
+import { shouldShowAnnouncement } from "@/lib/announcement";
 
 const SEEN_KEY = "a4y-announcement-seen-at";
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function Announcement() {
   const [settings, setSettings] = useState<Record<string, string> | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const [eligible, setEligible] = useState(false);
   const { pathname } = useLocation();
 
   useEffect(() => {
     getPublicSettings()
-      .then(setSettings)
+      .then((value) => {
+        let seenAt = 0;
+        try { seenAt = Number(localStorage.getItem(SEEN_KEY) ?? 0); } catch { /* Storage may be unavailable. */ }
+        if (value["announcement"]?.trim() && !pathname.startsWith("/admin") && shouldShowAnnouncement(seenAt, Date.now())) {
+          setEligible(true);
+          try { localStorage.setItem(SEEN_KEY, String(Date.now())); } catch { /* Keep this visit usable. */ }
+        }
+        setSettings(value);
+      })
       .catch(() => setSettings({}));
   }, []);
 
@@ -22,7 +32,7 @@ export function Announcement() {
   // Admin panel hamesha accessible rahe
   const isAdmin = pathname.startsWith("/admin");
 
-  if (settings["maintenance_mode"] === "on" && !isAdmin) {
+  if (settings["maintenance_mode"] === "on" && !isAdmin && pathname !== "/auth") {
     return (
       <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-night px-6 text-center">
         <div className="clay max-w-md p-10">
@@ -40,24 +50,20 @@ export function Announcement() {
   }
 
   const message = settings["announcement"]?.trim();
-  if (!message || dismissed || isAdmin) return null;
-
-  const seenAt = Number(localStorage.getItem(SEEN_KEY) ?? 0);
-  if (Date.now() - seenAt < DAY_MS) return null;
+  if (!message || dismissed || isAdmin || !eligible) return null;
 
   return (
     <div className="fixed inset-0 z-[90] flex items-center justify-center bg-foreground/20 px-6 backdrop-blur-sm">
       <div className="clay relative max-w-md p-10 text-center animate-rise">
-        <button
+        <Button variant="ghost" size="icon"
           aria-label="Close announcement"
           onClick={() => {
-            localStorage.setItem(SEEN_KEY, String(Date.now()));
             setDismissed(true);
           }}
           className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-secondary"
         >
           <X className="h-4 w-4" />
-        </button>
+        </Button>
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gold-gradient text-accent-foreground shadow-card">
           <Megaphone className="h-6 w-6" />
         </div>

@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMyRouteImport } from './routes/_authenticated/my'
 import { Route as DemoSlugRouteImport } from './routes/demo.$slug'
+import { Route as SurpriseCodeRouteImport } from './routes/surprise.$code'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as TemplatesSlugRouteImport } from './routes/templates.$slug'
+import { Route as AuthenticatedCustomizeIdRouteImport } from './routes/_authenticated/customize.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -27,15 +29,15 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMyRoute = AuthenticatedMyRouteImport.update({
   id: '/my',
@@ -45,6 +47,11 @@ const AuthenticatedMyRoute = AuthenticatedMyRouteImport.update({
 const DemoSlugRoute = DemoSlugRouteImport.update({
   id: '/demo/$slug',
   path: '/demo/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SurpriseCodeRoute = SurpriseCodeRouteImport.update({
+  id: '/surprise/$code',
+  path: '/surprise/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
@@ -57,73 +64,91 @@ const TemplatesSlugRoute = TemplatesSlugRouteImport.update({
   path: '/templates/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCustomizeIdRoute =
+  AuthenticatedCustomizeIdRouteImport.update({
+    id: '/customize/$id',
+    path: '/customize/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/my': typeof AuthenticatedMyRoute
   '/demo/$slug': typeof DemoSlugRoute
+  '/surprise/$code': typeof SurpriseCodeRoute
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/customize/$id': typeof AuthenticatedCustomizeIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/my': typeof AuthenticatedMyRoute
   '/demo/$slug': typeof DemoSlugRoute
+  '/surprise/$code': typeof SurpriseCodeRoute
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates': typeof TemplatesIndexRoute
+  '/customize/$id': typeof AuthenticatedCustomizeIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/my': typeof AuthenticatedMyRoute
   '/demo/$slug': typeof DemoSlugRoute
+  '/surprise/$code': typeof SurpriseCodeRoute
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/_authenticated/customize/$id': typeof AuthenticatedCustomizeIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/auth'
+    | '/admin'
     | '/my'
     | '/demo/$slug'
+    | '/surprise/$code'
     | '/templates/$slug'
     | '/templates/'
+    | '/customize/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/auth'
+    | '/admin'
     | '/my'
     | '/demo/$slug'
+    | '/surprise/$code'
     | '/templates/$slug'
     | '/templates'
+    | '/customize/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/admin'
     | '/auth'
+    | '/_authenticated/admin'
     | '/_authenticated/my'
     | '/demo/$slug'
+    | '/surprise/$code'
     | '/templates/$slug'
     | '/templates/'
+    | '/_authenticated/customize/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   DemoSlugRoute: typeof DemoSlugRoute
+  SurpriseCodeRoute: typeof SurpriseCodeRoute
   TemplatesSlugRoute: typeof TemplatesSlugRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
 }
@@ -144,19 +169,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/my': {
       id: '/_authenticated/my'
@@ -170,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/$slug'
       fullPath: '/demo/$slug'
       preLoaderRoute: typeof DemoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/surprise/$code': {
+      id: '/surprise/$code'
+      path: '/surprise/$code'
+      fullPath: '/surprise/$code'
+      preLoaderRoute: typeof SurpriseCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/templates/': {
@@ -186,15 +218,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplatesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/customize/$id': {
+      id: '/_authenticated/customize/$id'
+      path: '/customize/$id'
+      fullPath: '/customize/$id'
+      preLoaderRoute: typeof AuthenticatedCustomizeIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedMyRoute: typeof AuthenticatedMyRoute
+  AuthenticatedCustomizeIdRoute: typeof AuthenticatedCustomizeIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedMyRoute: AuthenticatedMyRoute,
+  AuthenticatedCustomizeIdRoute: AuthenticatedCustomizeIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -203,9 +246,9 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   DemoSlugRoute: DemoSlugRoute,
+  SurpriseCodeRoute: SurpriseCodeRoute,
   TemplatesSlugRoute: TemplatesSlugRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
 }

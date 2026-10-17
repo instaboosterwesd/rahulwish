@@ -3,6 +3,8 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { useState } from "react";
 import {
   Ban,
+  Pencil,
+  Trash2,
   CheckCircle2,
   ChevronDown,
   Clock,
@@ -17,6 +19,8 @@ import {
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import {
+  adminEditUser,
+  adminDeleteUser,
   adminStatsQuery,
   adminSurprisesQuery,
   adminTemplatesQuery,
@@ -29,14 +33,20 @@ import {
   adminSetDepositStatus,
   adminSetSetting,
 } from "@/lib/admin.functions";
+import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { formatINR } from "@/lib/format";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
       { title: "Admin — Always4you" },
       { name: "description", content: "Manage templates, users, deposits and settings." },
       { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Admin — Always4you" },
+      { property: "og:description", content: "Manage templates, users, deposits and settings." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) =>
@@ -63,6 +73,12 @@ type TabId = (typeof TABS)[number]["id"];
 
 function AdminPage() {
   const qc = useQueryClient();
+  const editUser = useServerFn(adminEditUser);
+  const deleteUser = useServerFn(adminDeleteUser);
+  const editMut = useMutation({ mutationFn: (v: { id: string; full_name: string }) => editUser({ data: v }), onSuccess: () => { refresh(); setEditing(null); }, onError: (e) => toast.error(e.message) });
+  const deleteMut = useMutation({ mutationFn: (id: string) => deleteUser({ data: { id } }), onSuccess: () => refresh(), onError: (e) => toast.error(e.message) });
+  const [editing, setEditing] = useState<{ id: string; full_name: string } | null>(null);
+
   const { data: stats } = useSuspenseQuery(adminStatsQuery());
   const { data: surprises } = useSuspenseQuery(adminSurprisesQuery());
   const { data: templates } = useSuspenseQuery(adminTemplatesQuery());
@@ -83,24 +99,29 @@ function AdminPage() {
     mutationFn: (v: { id: string; status: "pending" | "paid" | "delivered" }) =>
       adminSetSurpriseStatus({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
   const toggleMut = useMutation({
     mutationFn: (v: { id: string; field: "active" | "featured"; value: boolean }) =>
       adminToggleTemplate({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
   const banMut = useMutation({
     mutationFn: (v: { id: string; banned: boolean }) => adminSetUserBanned({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
   const depositMut = useMutation({
     mutationFn: (v: { id: string; status: "pending" | "approved" | "rejected" }) =>
       adminSetDepositStatus({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
   const settingMut = useMutation({
     mutationFn: (v: { key: string; value: string }) => adminSetSetting({ data: v }),
     onSuccess: refresh,
+    onError: (e) => toast.error(e.message),
   });
 
   const visibleTabs = TABS.slice(0, 3);
@@ -108,7 +129,7 @@ function AdminPage() {
   const activeInMore = moreTabs.some((t) => t.id === tab);
 
   const tabBtn = (t: (typeof TABS)[number]) => (
-    <button
+    <Button variant="ghost"
       key={t.id}
       onClick={() => {
         setTab(t.id);
@@ -119,7 +140,7 @@ function AdminPage() {
       }`}
     >
       <t.icon className="h-4 w-4" /> {t.label}
-    </button>
+    </Button>
   );
 
   return (
@@ -139,14 +160,15 @@ function AdminPage() {
           <span className="contents md:hidden">
             {visibleTabs.map(tabBtn)}
             <span className="relative">
-              <button
+              <Button variant="ghost"
+                aria-expanded={moreOpen}
                 onClick={() => setMoreOpen((o) => !o)}
                 className={`flex items-center gap-1 rounded-full px-4 py-2 text-sm font-bold ${
                   activeInMore ? "bg-rose-gradient text-primary-foreground" : "text-muted-foreground"
                 }`}
               >
                 More <ChevronDown className="h-4 w-4" />
-              </button>
+              </Button>
               {moreOpen && (
                 <div className="clay-sm absolute right-0 top-12 z-20 flex w-44 flex-col gap-1 p-2">
                   {moreTabs.map(tabBtn)}
@@ -175,7 +197,7 @@ function AdminPage() {
             </div>
 
             <h2 className="mt-12 font-display text-3xl font-semibold">Recent Surprises</h2>
-            <div className="clay mt-5 overflow-hidden">
+            <div className="clay mt-5 overflow-x-auto">
               {surprises.length === 0 ? (
                 <p className="p-8 text-sm text-muted-foreground">
                   Abhi koi surprise nahi bana — pehla surprise aate hi yahan dikhega.
@@ -234,7 +256,7 @@ function AdminPage() {
 
         {/* Users */}
         {tab === "users" && (
-          <div className="clay mt-8 overflow-hidden">
+          <div className="clay mt-8 overflow-x-auto">
             {users.length === 0 ? (
               <p className="p-8 text-sm text-muted-foreground">
                 Abhi koi user nahi — pehla signup hote hi yahan dikhega.
@@ -252,7 +274,7 @@ function AdminPage() {
                 <tbody>
                   {users.map((u) => (
                     <tr key={u.id} className="border-b border-border/50 last:border-0">
-                      <td className="px-5 py-4 font-semibold">{u.email || u.id.slice(0, 8)}</td>
+                      <td className="px-5 py-4 font-semibold"><p>{u.full_name || "Unnamed user"}</p><p className="text-xs text-muted-foreground">{u.email || u.id.slice(0, 8)}</p></td>
                       <td className="px-5 py-4 text-muted-foreground">
                         {new Date(u.created_at).toLocaleDateString("en-IN")}
                       </td>
@@ -276,6 +298,8 @@ function AdminPage() {
                         >
                           {u.banned ? "Unban" : "Ban"}
                         </Button>
+                        <Button size="icon" variant="ghost" aria-label="Edit user" title="Edit user" onClick={() => setEditing({ id: u.id, full_name: u.full_name })}><Pencil /></Button>
+                        <Button size="icon" variant="ghost" aria-label="Delete user" title="Delete user" disabled={deleteMut.isPending} onClick={() => { if (window.confirm("Remove this user and disable their access? Payment records will be retained.")) deleteMut.mutate(u.id); }}><Trash2 /></Button>
                       </td>
                     </tr>
                   ))}
@@ -287,7 +311,7 @@ function AdminPage() {
 
         {/* Deposits */}
         {tab === "deposits" && (
-          <div className="clay mt-8 overflow-hidden">
+          <div className="clay mt-8 overflow-x-auto">
             {deposits.length === 0 ? (
               <p className="p-8 text-sm text-muted-foreground">
                 Abhi koi deposit request nahi — user payment request bhejte hi yahan aayegi. Approve karte hi user ko credit mil jayega.
@@ -357,12 +381,12 @@ function AdminPage() {
         {tab === "templates" && (
           <>
             <p className="mt-8 text-sm text-muted-foreground">
-              Total {templates.length} templates · {templates.filter((t) => t.active).length} live ·{" "}
+              {new Set(templates.map((t) => t.category)).size} categories · Total {templates.length} templates · {templates.filter((t) => t.active).length} live ·{" "}
               {templates.filter((t) => t.featured).length} featured
             </p>
             <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {templates.map((t) => (
-                <div key={t.id} className="clay overflow-hidden">
+                <div key={t.id} className="clay overflow-x-auto">
                   <img src={t.cover_image} alt={t.title} loading="lazy" className="h-40 w-full object-cover" />
                   <div className="p-5">
                     <p className="text-xs uppercase tracking-[0.2em] text-primary/70">{t.category}</p>
@@ -445,6 +469,7 @@ function AdminPage() {
           </div>
         )}
       </main>
+      {editing && <div role="dialog" aria-label="Edit user" className="fixed inset-0 z-[80] flex items-center justify-center bg-foreground/20 p-6"><form className="clay w-full max-w-sm space-y-4 p-6" onSubmit={(e) => { e.preventDefault(); editMut.mutate(editing); }}><h2 className="text-2xl">Edit user</h2><label className="block">Full name<input className="mt-2 w-full rounded-xl border bg-background p-3" value={editing.full_name} onChange={(e) => setEditing({ ...editing, full_name: e.target.value })} maxLength={100} /></label><div className="flex gap-2"><Button type="submit" disabled={editMut.isPending}>Save</Button><Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button></div></form></div>}
       <SiteFooter />
     </div>
   );

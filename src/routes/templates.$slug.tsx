@@ -1,5 +1,9 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { purchaseTemplate } from "@/lib/customer.functions";
 import { Eye, ShoppingBag } from "lucide-react";
 import { templateQuery } from "@/lib/templates.functions";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
@@ -17,12 +21,16 @@ export const Route = createFileRoute("/templates/$slug")({
     { name: "description", content: loaderData?.tagline ?? "Surprise website template" },
     { property: "og:title", content: `${loaderData?.title ?? "Template"} — Always4you` },
     { property: "og:description", content: loaderData?.tagline ?? "Surprise website template" },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
   ] }),
   component: Page,
 });
 
 function Page() {
   const { slug } = Route.useParams();
+  const { user } = useAuth(); const navigate = useNavigate(); const qc = useQueryClient(); const buy = useServerFn(purchaseTemplate);
+  const purchase = useMutation({ mutationFn: (template: string) => buy({ data: { template } }), onSuccess: (id) => { qc.invalidateQueries({ queryKey: ["customer-dashboard"] }); if (id) navigate({ to: "/customize/$id", params: { id } }); }, onError: () => toast.error("Approved credit required. Send a deposit request from My surprises.") });
   const { data: t } = useSuspenseQuery(templateQuery(slug));
   if (!t) return null;
   return (
@@ -38,11 +46,8 @@ function Page() {
             {t.original_price_inr > t.price_inr && <span className="ml-3 text-base text-primary">{discountPercent(t.price_inr, t.original_price_inr)}% off</span>}
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <Button asChild variant="hero" size="lg">
-              <Link to="/templates/$slug" params={{ slug }}>
-                <ShoppingBag /> Buy / Customize
-              </Link>
-            </Button>
+            {user ? <Button variant="hero" size="lg" disabled={purchase.isPending} onClick={() => purchase.mutate(t.id)}><ShoppingBag /> Buy / Customize</Button> : <Button asChild variant="hero" size="lg"><Link to="/auth"><ShoppingBag /> Sign in to customize</Link></Button>}
+            {user && <Button asChild variant="glass"><Link to="/my">My credit / Deposit</Link></Button>}
             <Button asChild variant="outline" size="lg">
               <Link to="/demo/$slug" params={{ slug }}>
                 <Eye /> Live Demo

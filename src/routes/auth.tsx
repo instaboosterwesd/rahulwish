@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — Always4you" }, { name: "description", content: "Sign in to Always4you" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Always4you" }, { name: "description", content: "Sign in to Always4you" }, { property: "og:title", content: "Sign in — Always4you" }, { property: "og:description", content: "Sign in to manage your Always4you surprises." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: Page,
 });
 
