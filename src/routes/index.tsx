@@ -277,7 +277,7 @@ function Home() {
       </section>
 
       {/* How it works */}
-      <section className="border-t border-border/60 py-20">
+      <section className="py-20">
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-center font-display text-5xl font-semibold">
             Three steps to their <span className="font-script text-6xl text-gold">smile</span>
@@ -300,8 +300,8 @@ function Home() {
                 text: "Send the secret link on WhatsApp. They open it — and the surprise unfolds.",
               },
             ].map((s, i) => (
-              <div key={s.title} className="rounded-3xl bg-card p-8 shadow-card">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-gradient text-primary-foreground">
+              <div key={s.title} className="clay p-8 transition-transform hover:-translate-y-1 hover:rotate-1">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-rose-gradient text-primary-foreground shadow-glow">
                   <s.icon className="h-5 w-5" />
                 </div>
                 <p className="mt-5 text-xs uppercase tracking-[0.25em] text-muted-foreground">
