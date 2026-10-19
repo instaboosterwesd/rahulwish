@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button";
 import type { ExperienceProps } from "@/components/SurpriseExperience";
 import garden from "@/assets/proposal-garden.jpg";
 import ring from "@/assets/proposal-ring.jpg";
+import { WrittenLetter, ScratchMemory, EmergingRing } from "@/components/ProposalMoments";
+import { TemplateAudio } from "@/components/TemplateAudio";
+import { uploadedMedia } from "@/lib/uploaded-templates";
+import { scoreProposalQuiz, canContinueProposalQuiz } from "@/lib/proposal";
 import { Input } from "@/components/ui/input";
 import { matchesProposalSecret, proposalChapters as chapters, proposalQuiz } from "@/lib/proposal";
 
 
 
-export function ProposalExperience({ recipient, sender, headline, message, photos, cover }: ExperienceProps) {
+export function ProposalExperience({ recipient, sender, headline, message, photos, cover, proposalConfig, audioUrl, demo }: ExperienceProps) {
   const [step, setStep] = useState(0);
   const [secret, setSecret] = useState("");
   const [secretError, setSecretError] = useState(false);
@@ -17,6 +21,8 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
   const [furthest, setFurthest] = useState(0);
   const [quizIndex, setQuizIndex] = useState(0);
   const [quizAnswer, setQuizAnswer] = useState<number | null>(null);
+  const questions = proposalConfig?.quiz?.length ? proposalConfig.quiz : proposalQuiz;
+  const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [reason, setReason] = useState(0);
   const [countdown, setCountdown] = useState(3);
   const [photo, setPhoto] = useState(0);
@@ -25,15 +31,15 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
   const [audioFailed, setAudioFailed] = useState(false);
   const [thinking, setThinking] = useState(false);
   const audio = useRef<HTMLAudioElement | null>(null);
-  const memories = photos?.length ? photos : [cover];
+  const memories = photos?.length ? photos : demo ? uploadedMedia.proposalPhotos : [cover];
 
   useEffect(() => {
-    const track = new Audio("/audio/our-forever.mp3");
+    const track = new Audio(audioUrl || uploadedMedia.proposalSong);
     track.loop = true;
     track.volume = 0.55;
     audio.current = track;
     return () => { track.pause(); track.removeAttribute("src"); track.load(); audio.current = null; };
-  }, []);
+  }, [audioUrl]);
 
   useEffect(() => {
     if (step !== 8) return;
@@ -52,7 +58,7 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
     else void play();
   };
   const next = () => { const target = Math.min(step + 1, chapters.length - 1); setStep(target); setFurthest((current) => Math.max(current, target)); };
-  const replay = () => { setStep(0); setFurthest(0); setUnlocked(false); setSecret(""); setSecretError(false); setQuizIndex(0); setQuizAnswer(null); setReason(0); setOpened(false); setThinking(false); setPhoto(0); if (audio.current) audio.current.currentTime = 0; };
+  const replay = () => { setStep(0); setFurthest(0); setUnlocked(false); setSecret(""); setSecretError(false); setQuizIndex(0); setQuizAnswer(null); setAnswers([]); setReason(0); setOpened(false); setThinking(false); setPhoto(0); if (audio.current) audio.current.currentTime = 0; };
 
   return (
     <section className={`proposal-experience ${step === 11 ? "proposal-celebrating" : ""}`} aria-label="Your proposal surprise">
@@ -62,7 +68,7 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
         <span className="proposal-wordmark"><Heart size={15} /> always4you</span>
         <div className="flex items-center gap-2">
           {step > 1 && <Button variant="ghost" size="icon" title="Previous chapter" aria-label="Previous chapter" onClick={() => setStep(step - 1)}><ArrowLeft /></Button>}
-          <Button variant="glass" size="icon" title={playing ? "Pause Our Forever" : "Play Our Forever"} aria-label={playing ? "Pause music" : "Play music"} onClick={toggleMusic}>{playing ? <Pause /> : <Music2 />}</Button>
+          <Button variant="glass" size="icon" title={playing ? "Pause our song" : "Play our song"} aria-label={playing ? "Pause music" : "Play music"} onClick={toggleMusic}>{playing ? <Pause /> : <Music2 />}</Button>
         </div>
       </header>
 
@@ -108,23 +114,17 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
         {step === 4 && <>
           <h2 className="proposal-title">A tiny love quiz.<br /><span>You know my heart.</span></h2>
           <div className="proposal-quiz">
-            <p className="proposal-counter">{quizIndex + 1} / {proposalQuiz.length}</p>
-            <h3>{proposalQuiz[quizIndex]?.question}</h3>
-            <div className="proposal-quiz-options">{proposalQuiz[quizIndex]?.options.map((option, index) => <Button key={option} variant="glass" className={`proposal-quiz-option ${quizAnswer === index ? "is-selected" : ""}`} disabled={quizAnswer === proposalQuiz[quizIndex]?.answer} onClick={() => setQuizAnswer(index)}>{option}{quizAnswer === index && quizAnswer === proposalQuiz[quizIndex]?.answer && <Check size={18} />}</Button>)}</div>
-            {quizAnswer !== null && <p role="status" className="proposal-reassurance">{quizAnswer === proposalQuiz[quizIndex]?.answer ? "Exactly. You already knew, didn’t you?" : "A little hint: my heart always chooses you. Try again."}</p>}
+            <p className="proposal-counter">{quizIndex + 1} / {questions.length}</p>
+            <h3>{questions[quizIndex]?.question}</h3>
+            <div className="proposal-quiz-options">{questions[quizIndex]?.options.map((option, index) => <Button key={option} variant="glass" className={`proposal-quiz-option ${quizAnswer === index ? "is-selected" : ""}`} disabled={quizAnswer !== null} onClick={() => { setQuizAnswer(index); setAnswers(current => { const updated = [...current]; updated[quizIndex] = index; return updated; }); }}>{option}{quizAnswer === index && quizAnswer === questions[quizIndex]?.answer && <Check size={18} />}</Button>)}</div>
+            {quizAnswer !== null && <p role="status" className="proposal-reassurance">{quizAnswer === questions[quizIndex]?.answer ? "Exactly. You already knew, didn’t you?" : "Not this time. Another little thing to discover about us."}</p>}
           </div>
-          <Button variant="hero" size="lg" className="proposal-cta" disabled={quizAnswer !== proposalQuiz[quizIndex]?.answer} onClick={() => { if (quizIndex < proposalQuiz.length - 1) { setQuizIndex(quizIndex + 1); setQuizAnswer(null); } else next(); }}>{quizIndex < proposalQuiz.length - 1 ? "One more question" : "Our favourite memories"}<ArrowRight /></Button>
+          <Button variant="hero" size="lg" className="proposal-cta" disabled={!canContinueProposalQuiz(quizAnswer)} onClick={() => { if (quizIndex < questions.length - 1) { setQuizIndex(quizIndex + 1); setQuizAnswer(null); } else next(); }}>{quizIndex < questions.length - 1 ? "One more question" : "Our favourite memories"}<ArrowRight /></Button>
         </>}
 
         {step === 5 && <>
           <h2 className="proposal-title">My favourite place?<br /><span>Right beside you.</span></h2>
-          <div className="proposal-photo-stack">
-            <div className="proposal-photo-under" aria-hidden="true" />
-            <figure className="proposal-polaroid">
-              <img src={memories[photo]} alt={`Our memory ${photo + 1}`} width={1024} height={1024} />
-              <figcaption>you & me. my favourite story.</figcaption>
-            </figure>
-          </div>
+          <ScratchMemory key={photo} src={memories[photo] ?? cover} caption="you & me. my favourite story." />
           <div className="flex items-center justify-center gap-4">
             <Button variant="glass" size="icon" disabled={memories.length < 2} aria-label="Previous memory" onClick={() => setPhoto((photo + memories.length - 1) % memories.length)}><ArrowLeft /></Button>
             <span className="proposal-counter">{photo + 1} / {memories.length}</span>
@@ -138,7 +138,7 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
           <article className="proposal-letter">
             <p className="proposal-letter-greeting">My dearest {recipient},</p>
             <h3>{headline || "You are my favourite forever."}</h3>
-            <p className="proposal-letter-message">{message || "Tumhare saath har chhota pal bhi khaas lagta hai. I don’t need a perfect life. I just want a life with you."}</p>
+            <WrittenLetter text={message || "Tumhare saath har chhota pal bhi khaas lagta hai. I don’t need a perfect life. I just want a life with you."} />
             <p className="proposal-letter-sign">Always yours,<br /><span>{sender}</span></p>
           </article>
           <Button variant="hero" size="lg" className="proposal-cta" onClick={next}>Do you know my heart? <ArrowRight /></Button>
@@ -167,10 +167,8 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
 
         {step === 9 && <>
           <h2 className="proposal-title">Not just a ring.<br /><span>A little forever.</span></h2>
-          <div className={`proposal-ring-reveal ${opened ? "is-open" : ""}`}>
-            <img src={ring} alt="A diamond engagement ring in a velvet box surrounded by roses" width={1024} height={1024} loading="lazy" />
-            {!opened && <Button variant="secondary" className="proposal-ring-cover" aria-label="Reveal the ring" onClick={() => setOpened(true)}><span className="proposal-ring-monogram">For you</span><span className="flex items-center gap-2 text-sm">A promise inside <Sparkles size={16} /></span></Button>}
-          </div>
+          <EmergingRing opened={opened} onOpen={() => setOpened(true)} />
+          {opened && demo && <TemplateAudio src={uploadedMedia.proposalVoice} title="A little voice note" />}
           <p className="proposal-subtitle">{opened ? "Every tomorrow. Every adventure. With you." : "Some promises deserve a beautiful beginning."}</p>
           <Button variant="hero" size="lg" className="proposal-cta" onClick={opened ? next : () => setOpened(true)}>{opened ? "Can I ask you something?" : "Unwrap my promise"} <ArrowRight /></Button>
         </>}
@@ -193,13 +191,14 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
           <img src={ring} alt="Our forever promise" width={1024} height={1024} loading="lazy" className="proposal-finale-photo" />
           <p className="proposal-couple">{recipient} <Heart size={20} /> {sender}</p>
           <p className="proposal-subtitle">One yes. A lifetime of us.</p>
+          <p className="proposal-final-score" role="status">Our love quiz · {scoreProposalQuiz(questions, answers)} / {questions.length} correct</p>
           <Button variant="glass" className="proposal-cta" onClick={replay}><RotateCcw /> Relive our story</Button>
         </>}
       </main>
 
       <footer className="proposal-footer">
         <nav aria-label="Proposal chapters" className="proposal-progress">{chapters.map((chapter, i) => <Button key={chapter} variant="ghost" aria-label={`Chapter ${i + 1}: ${chapter}`} aria-current={i === step ? "step" : undefined} disabled={i > furthest || (i > 0 && !unlocked)} onClick={() => setStep(i)} className={`proposal-progress-dot ${i <= step ? "is-complete" : ""}`}><span /></Button>)}</nav>
-        <span className="proposal-track">{audioFailed ? "Music couldn’t play — tap music to retry" : playing ? "♪ Our Forever · original piano" : "Made with a heart full of you"}</span>
+        <span className="proposal-track">{audioFailed ? "Music couldn’t play — tap music to retry" : playing ? "♪ Our song · just for you" : "Made with a heart full of you"}</span>
       </footer>
     </section>
   );
