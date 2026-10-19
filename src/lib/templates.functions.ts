@@ -3,6 +3,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
+import { readProposalConfig } from "@/lib/proposal";
 
 export type Template = Database["public"]["Tables"]["templates"]["Row"];
 
@@ -62,7 +63,17 @@ export const getSurprise = createServerFn({ method: "GET" })
         .createSignedUrls(row.photos, 60 * 60 * 24);
       photoUrls = (signed ?? []).map((s) => s.signedUrl).filter(Boolean) as string[];
     }
-    return { ...row, photoUrls };
+    const { data: config, error: configError } = await publicClient().rpc("get_proposal_config", { _code: data.code });
+    if (configError) throw new Error(configError.message);
+    const proposalConfig = readProposalConfig(config);
+    let audioUrl: string | undefined;
+    if (proposalConfig.audioPath) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: signed, error: audioError } = await supabaseAdmin.storage.from("proposal-audio").createSignedUrl(proposalConfig.audioPath, 3600);
+      if (audioError) throw new Error(audioError.message);
+      audioUrl = signed?.signedUrl;
+    }
+    return { ...row, photoUrls, proposalConfig, audioUrl };
   });
 
 export const getPublicSettings = createServerFn({ method: "GET" }).handler(async () => {
