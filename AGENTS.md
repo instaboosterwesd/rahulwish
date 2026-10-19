@@ -13,6 +13,6 @@
 - Admin pages live under the authenticated layout and every admin server function checks the caller's protected role before loading a privileged client; public admin access would expose customer data.
 - Deposits and purchases use restricted database functions with a locked profile row for spending; balance is approved deposits minus paid orders, preventing double spending and client-forged approvals.
 - Removing a customer soft-deletes their profile and disables access while preserving financial records.
-- Dispatch Proposal experiences to their dedicated presentation component while preserving the shared content props across demo, editor preview and live surprises; keep other categories unchanged.
-- Proposal audio is an original bundled loop played only after user interaction, with pause and unmount cleanup; avoid third-party music licensing and autoplay failures.
+- Dispatch uploaded Proposal, Birthday, Love and Your Surprise categories to dedicated React presentations using shared saved props across demos, editor previews and recipient links; never execute uploaded scripts or embed standalone documents.
+- Template audio uses uploaded asset pointers or buyer-owned signed storage URLs, starts only after user interaction, and pauses on unmount; the original loop remains available as a fallback.
 - Proposal's recipient-name unlock is only a playful presentation reveal, never an access-control boundary; share its flow rules across all presentations to keep demos and live surprises consistent.

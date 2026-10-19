@@ -4,6 +4,9 @@ import { Petals } from "@/components/Petals";
 import { Button } from "@/components/ui/button";
 import { MusicBox } from "@/lib/music";
 import { ProposalExperience } from "@/components/ProposalExperience";
+import { LoveExperience, BirthdayExperience, GiftExperience } from "@/components/UploadedExperiences";
+import { uploadedExperienceKind } from "@/lib/uploaded-templates";
+import type { ProposalConfig } from "@/lib/proposal";
 
 export type ExperienceProps = {
   category: string;
@@ -13,6 +16,9 @@ export type ExperienceProps = {
   message: string;
   cover: string;
   photos?: string[];
+  proposalConfig?: ProposalConfig;
+  audioUrl?: string;
+  demo?: boolean;
 };
 
 type Kind = "birthday" | "proposal" | "love" | "celebrate";
@@ -40,6 +46,11 @@ function Screen({ children }: { children: React.ReactNode }) {
 }
 
 export function SurpriseExperience(p: ExperienceProps) {
+  const kind = uploadedExperienceKind(p.category);
+  if (kind === "proposal") return <ProposalExperience {...p} />;
+  if (kind === "birthday") return <BirthdayExperience {...p} />;
+  if (kind === "love") return <LoveExperience {...p} />;
+  if (kind === "gift") return <GiftExperience {...p} />;
   return experienceKind(p.category) === "proposal" ? <ProposalExperience {...p} /> : <ClassicExperience {...p} />;
 }
 

@@ -21,6 +21,7 @@ export function ScratchMemory({ src, caption }: { src: string; caption: string }
   const last = useRef<{ x: number; y: number } | null>(null);
   const [revealed, setRevealed] = useState(false);
   useEffect(() => {
+    setRevealed(false); dragging.current = false; last.current = null;
     const element = canvas.current;
     if (!element) return;
     const context = element.getContext("2d", { willReadFrequently: true });

@@ -3,6 +3,15 @@ import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { approvedBalance } from "@/lib/credit";
+import { proposalConfigSchema } from "@/lib/proposal";
+
+export const saveProposalConfig = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), config: proposalConfigSchema }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.rpc("save_proposal_config", { _id: data.id, _config: data.config });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
 
 export const customerDashboard = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const [profile, deposits, surprises] = await Promise.all([
