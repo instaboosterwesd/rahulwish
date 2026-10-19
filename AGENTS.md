@@ -16,3 +16,5 @@
 - Dispatch uploaded Proposal, Birthday, Love and Your Surprise categories to dedicated React presentations using shared saved props across demos, editor previews and recipient links; never execute uploaded scripts or embed standalone documents.
 - Template audio uses uploaded asset pointers or buyer-owned signed storage URLs, starts only after user interaction, and pauses on unmount; the original loop remains available as a fallback.
 - Proposal's recipient-name unlock is only a playful presentation reveal, never an access-control boundary; share its flow rules across all presentations to keep demos and live surprises consistent.
+- The connected Supabase owns sign-in; use its OAuth flow instead of the Lovable Cloud broker so accounts and data stay on the same backend.
+- Keep restricted security-definer RPCs for credit mutations and capability-link reads; they intentionally bypass direct table writes while validating active accounts, ownership and approved status.

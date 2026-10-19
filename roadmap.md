@@ -1,3 +1,10 @@
+- [x] Write root agent_memory.md with current project context and limitations.
+- [x] Export the current code to instaboosterwesd/rahulwish without secrets or rewriting history.
+- [x] Connect the app to the newly linked Supabase and restore the existing schema.
+- [x] Copy the accessible old template and two settings.
+- [ ] Import old private customers, deposits, surprises and storage — blocked until an authorized source export is supplied.
+- [x] Verify new Supabase catalog data through the running app.
+- [ ] Verify new Supabase sign-in and provider settings — external unmanaged authentication cannot be tested with a managed session.
 - [x] Secure admin actions; finish user edit/delete/ban controls and mobile tabs.
 - [x] Connect deposit requests and approval to customer template access.
 - [x] Build customer dashboard, customization, preview and shared surprise page.

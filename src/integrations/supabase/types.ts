@@ -21,14 +21,16 @@ export type Database = {
           id: string
           note: string
           status: string
+          updated_at: string
           user_id: string
         }
         Insert: {
-          amount_inr?: number
+          amount_inr: number
           created_at?: string
           id?: string
           note?: string
           status?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -37,9 +39,18 @@ export type Database = {
           id?: string
           note?: string
           status?: string
+          updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "deposits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -49,6 +60,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          updated_at: string
         }
         Insert: {
           banned?: boolean
@@ -57,6 +69,7 @@ export type Database = {
           email?: string
           full_name?: string
           id: string
+          updated_at?: string
         }
         Update: {
           banned?: boolean
@@ -65,20 +78,27 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          updated_at?: string
         }
         Relationships: []
       }
       settings: {
         Row: {
+          created_at: string
           key: string
+          updated_at: string
           value: string
         }
         Insert: {
+          created_at?: string
           key: string
+          updated_at?: string
           value?: string
         }
         Update: {
+          created_at?: string
           key?: string
+          updated_at?: string
           value?: string
         }
         Relationships: []
@@ -97,10 +117,11 @@ export type Database = {
           sender_name: string
           status: string
           template_id: string
+          updated_at: string
           user_id: string
         }
         Insert: {
-          amount_inr?: number
+          amount_inr: number
           code?: string
           created_at?: string
           headline?: string
@@ -108,10 +129,11 @@ export type Database = {
           message?: string
           photos?: string[]
           proposal_config?: Json
-          recipient_name: string
-          sender_name: string
+          recipient_name?: string
+          sender_name?: string
           status?: string
           template_id: string
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -127,6 +149,7 @@ export type Database = {
           sender_name?: string
           status?: string
           template_id?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -137,12 +160,19 @@ export type Database = {
             referencedRelation: "templates"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "surprises_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       templates: {
         Row: {
           active: boolean
-          badge: string | null
+          badge: string
           category: string
           cover_image: string
           created_at: string
@@ -156,10 +186,11 @@ export type Database = {
           style: string
           tagline: string
           title: string
+          updated_at: string
         }
         Insert: {
           active?: boolean
-          badge?: string | null
+          badge?: string
           category: string
           cover_image?: string
           created_at?: string
@@ -173,10 +204,11 @@ export type Database = {
           style?: string
           tagline?: string
           title: string
+          updated_at?: string
         }
         Update: {
           active?: boolean
-          badge?: string | null
+          badge?: string
           category?: string
           cover_image?: string
           created_at?: string
@@ -190,23 +222,30 @@ export type Database = {
           style?: string
           tagline?: string
           title?: string
+          updated_at?: string
         }
         Relationships: []
       }
       user_roles: {
         Row: {
+          created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
           user_id: string
         }
         Insert: {
+          created_at?: string
           id?: string
           role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
           user_id: string
         }
         Update: {
+          created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -227,9 +266,6 @@ export type Database = {
           photos: string[]
           recipient_name: string
           sender_name: string
-          status: string
-          style: string
-          title: string
         }[]
       }
       has_role: {
@@ -264,7 +300,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -392,7 +428,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "moderator", "user"],
     },
   },
 } as const

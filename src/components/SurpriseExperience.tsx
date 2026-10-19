@@ -17,7 +17,7 @@ export type ExperienceProps = {
   cover: string;
   photos?: string[];
   proposalConfig?: ProposalConfig;
-  audioUrl?: string;
+  audioUrl?: string | undefined;
   demo?: boolean;
 };
 
