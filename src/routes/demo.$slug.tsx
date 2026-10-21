@@ -21,6 +21,10 @@ export const Route = createFileRoute("/demo/$slug")({
       { property: "og:description", content: "Preview an interactive Always4you surprise." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      ...(loaderData?.cover_image.startsWith('https://') ? [
+        { property: 'og:image', content: loaderData.cover_image },
+        { name: 'twitter:image', content: loaderData.cover_image },
+      ] : []),
     ],
   }),
   component: DemoPage,

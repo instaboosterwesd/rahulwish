@@ -1,4 +1,7 @@
 - [x] Write root agent_memory.md with current project context and limitations.
+- [x] Bundle all 22 supplied media files, resolve catalog covers, add protected admin photo uploads, preserve on/off and user controls, remove favicon and Lovable Twitter metadata; 19 tests and public demo media verified.
+- [ ] Verify photo upload and template/user controls signed in as admin — external unmanaged Supabase has no browser test session.
+- [ ] Hide published Lovable badge — tool refused due to account role/plan permission.
 - [x] Export the current code to instaboosterwesd/rahulwish without secrets or rewriting history.
 - [x] Connect the app to the newly linked Supabase and restore the existing schema.
 - [x] Copy the accessible old template and two settings.

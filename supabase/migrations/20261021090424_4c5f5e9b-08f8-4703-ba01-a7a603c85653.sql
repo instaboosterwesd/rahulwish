@@ -1,0 +1,1 @@
+CREATE POLICY template_covers_admin_read ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'template-covers' AND public.has_role(auth.uid(), 'admin'::public.app_role));

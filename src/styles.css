@@ -421,16 +421,18 @@
 .proposal-writing-cursor { color:var(--proposal-rose); animation:heartbeat 1s infinite; }
 .proposal-read-all { margin-top:12px; color:var(--proposal-rose); }
 .proposal-final-score { margin-top:20px; padding:14px 24px; border-block:1px solid var(--proposal-edge); color:var(--proposal-rose); font-size:18px; }
-.proposal-jewel-scene { --jewel-gold:var(--gold); --jewel-diamond:var(--card); position:relative; width:260px; height:280px; perspective:800px; margin-top:30px; }
+.proposal-jewel-scene { --jewel-gold:var(--gold); position:relative; width:260px; max-width:100%; height:320px; perspective:800px; margin-top:30px; }
 .proposal-jewel-lid { position:absolute; top:68px; left:20px; width:220px; height:105px; border-radius:14px; background:var(--proposal-rose); box-shadow:var(--shadow-clay); transform-origin:center bottom; transition:transform 1.1s ease; z-index:3; display:grid; place-items:center; color:var(--proposal-paper); font-family:var(--font-script); font-size:30px; }
 .proposal-jewel-box { position:absolute; left:20px; bottom:24px; width:220px; height:95px; background:var(--proposal-rose); border-radius:12px 12px 26px 26px; box-shadow:var(--shadow-clay); z-index:2; display:grid; place-items:center; color:var(--proposal-paper); font-family:var(--font-script); font-size:24px; border-top:8px solid var(--proposal-edge); }
-.proposal-jewel { position:absolute; top:130px; left:80px; width:100px; height:110px; opacity:0; transform:translateY(35px) scale(.6); transition:transform 1.4s .35s ease,opacity .8s .35s; z-index:1; }
-.proposal-band { position:absolute; width:76px; height:85px; border:9px solid var(--jewel-gold); border-radius:50%; top:30px; left:12px; box-shadow:var(--shadow-clay-sm); }
-.proposal-diamond { position:absolute; top:5px; left:28px; width:46px; height:46px; background:var(--jewel-diamond); border:5px solid var(--proposal-edge); transform:rotate(45deg); z-index:2; box-shadow:var(--shadow-clay-sm); }
-.proposal-jewel-glint { position:absolute; top:-6px; right:3px; color:var(--jewel-gold); }
+.proposal-jewel { position:absolute; top:135px; left:35px; width:190px; height:190px; opacity:0; transform:translateY(35px) scale(.6); transition:transform 1.4s .35s cubic-bezier(.22,1,.36,1),opacity .8s .35s; z-index:1; }
+.proposal-luxury-ring { width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 12px 12px color-mix(in oklab,var(--proposal-ink) 16%,transparent)); }
+.proposal-finale-ring { width:min(260px,70vw); height:auto; aspect-ratio:1; object-fit:contain; margin-top:24px; filter:drop-shadow(0 16px 16px color-mix(in oklab,var(--proposal-ink) 16%,transparent)); }
+.proposal-jewel-glint { position:absolute; top:20px; right:34px; color:var(--jewel-gold); opacity:0; }
 .proposal-jewel-trigger { position:absolute; inset:0; width:100%; height:100%; z-index:5; background:transparent; color:var(--proposal-paper); padding-top:190px; }
 .proposal-jewel-scene.is-open .proposal-jewel-lid { transform:translateY(-45px) rotateX(110deg); }
-.proposal-jewel-scene.is-open .proposal-jewel { opacity:1; transform:translateY(-72px) scale(1); }
+.proposal-jewel-scene.is-open .proposal-jewel { opacity:1; transform:translateY(-115px) scale(1); z-index:4; }
+.proposal-jewel-scene.is-open .proposal-jewel-glint { animation:proposal-ring-glint 2.8s 1.7s ease-in-out infinite; }
+@keyframes proposal-ring-glint { 0%,100% { opacity:0; transform:scale(.7) rotate(0deg); } 45% { opacity:1; transform:scale(1.1) rotate(15deg); } }
 @media(max-width:600px) { .uploaded-experience { padding-inline:18px; } .uploaded-experience h1 { font-size:30px; } .uploaded-experience h1 span { font-size:48px; } .uploaded-experience h2 { font-size:27px; } .template-sculpture { width:220px; height:220px; } .gift-discoveries { gap:4px; } .gift-discovery span { font-size:11px; } .birthday-note-section { margin-inline:-18px; padding-inline:18px; } }
 @media(prefers-reduced-motion:reduce) { .uploaded-experience *, .proposal-jewel-scene *, .proposal-writing-cursor { animation:none!important; transition:none!important; } }
 

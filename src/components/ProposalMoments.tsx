@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
+import luxuryRing from "@/assets/proposal-luxury-ring.png";
 
 export function WrittenLetter({ text }: { text: string }) {
   const [length, setLength] = useState(0);
@@ -62,7 +63,7 @@ export function EmergingRing({ opened, onOpen }: { opened: boolean; onOpen: () =
   useEffect(() => () => { if (hold.current) clearTimeout(hold.current); }, []);
   return <div className={`proposal-jewel-scene ${opened ? "is-open" : ""}`}>
     <div className="proposal-jewel-lid" aria-hidden="true"><span>always yours</span></div>
-    <div className="proposal-jewel" role="img" aria-label="A diamond ring rising from a velvet box"><span className="proposal-diamond" /><span className="proposal-band" /><Sparkles className="proposal-jewel-glint" size={22} aria-hidden="true" /></div>
+    <div className="proposal-jewel"><img src={luxuryRing} width={1024} height={1024} loading="lazy" alt="A sculpted champagne-gold engagement ring with a brilliant solitaire diamond" className="proposal-luxury-ring" /><Sparkles className="proposal-jewel-glint" size={18} aria-hidden="true" /></div>
     <div className="proposal-jewel-box" aria-hidden="true"><span>our forever</span></div>
     {!opened && <Button variant="ghost" className={`proposal-jewel-trigger ${holding ? 'is-holding' : ''}`} aria-label="Hold to reveal the ring" onPointerDown={() => { setHolding(true); hold.current = setTimeout(() => { onOpen(); setHolding(false); }, 1600); }} onPointerUp={cancel} onPointerCancel={cancel} onPointerLeave={cancel} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }}><span>Hold to open your promise</span><span className="proposal-hold-progress" /></Button>}
   </div>;

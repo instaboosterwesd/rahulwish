@@ -32,7 +32,8 @@ export const listTemplates = createServerFn({ method: "GET" }).handler(async () 
     .order("featured", { ascending: false })
     .order("created_at", { ascending: true });
   if (error) throw new Error(error.message);
-  return data ?? [];
+  const { resolveTemplateCover } = await import('@/lib/template-cover.server');
+  return Promise.all((data ?? []).map(async row => ({ ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category) })));
 });
 
 export const getTemplate = createServerFn({ method: "GET" })
@@ -45,7 +46,9 @@ export const getTemplate = createServerFn({ method: "GET" })
       .eq("active", true)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return row;
+    if (!row) return null;
+    const { resolveTemplateCover } = await import('@/lib/template-cover.server');
+    return { ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category) };
   });
 
 export const getSurprise = createServerFn({ method: "GET" })
@@ -73,7 +76,8 @@ export const getSurprise = createServerFn({ method: "GET" })
       if (audioError) throw new Error(audioError.message);
       audioUrl = signed?.signedUrl;
     }
-    return { ...row, photoUrls, proposalConfig, audioUrl };
+    const { resolveTemplateCover } = await import('@/lib/template-cover.server');
+    return { ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category), photoUrls, proposalConfig, audioUrl };
   });
 
 export const getPublicSettings = createServerFn({ method: "GET" }).handler(async () => {

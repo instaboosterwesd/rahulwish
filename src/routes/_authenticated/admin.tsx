@@ -37,6 +37,7 @@ import {
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { formatINR } from "@/lib/format";
+import { AdminTemplatePhoto } from '@/components/AdminTemplatePhoto';
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -103,7 +104,7 @@ function AdminPage() {
   const [announcement, setAnnouncement] = useState(settings["announcement"] ?? "");
 
   const refresh = () => {
-    for (const k of ["admin-stats", "admin-surprises", "admin-templates", "admin-users", "admin-deposits", "admin-settings"])
+    for (const k of ["admin-stats", "admin-surprises", "admin-templates", "admin-users", "admin-deposits", "admin-settings", "templates", "template", "customer-dashboard", "surprise"])
       qc.invalidateQueries({ queryKey: [k] });
   };
 
@@ -403,6 +404,7 @@ function AdminPage() {
                   <div className="p-5">
                     <p className="text-xs uppercase tracking-[0.2em] text-primary/70">{t.category}</p>
                     <h3 className="mt-1 text-xl font-semibold">{t.title}</h3>
+                    <AdminTemplatePhoto id={t.id} title={t.title} onSaved={refresh} />
                     {priceEdit?.id === t.id ? (
                       <div className="mt-3 flex flex-col gap-2">
                         <div className="flex items-center gap-2">

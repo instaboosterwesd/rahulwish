@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Heart, Music2, Pause, RotateCcw, Sparkles
 import { Button } from "@/components/ui/button";
 import type { ExperienceProps } from "@/components/SurpriseExperience";
 import garden from "@/assets/proposal-garden.jpg";
-import ring from "@/assets/proposal-ring.jpg";
+import ring from "@/assets/proposal-luxury-ring.png";
 import { WrittenLetter, ScratchMemory, EmergingRing } from "@/components/ProposalMoments";
 import { TemplateAudio } from "@/components/TemplateAudio";
 import { uploadedMedia } from "@/lib/uploaded-templates";
@@ -200,7 +200,7 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
         {step === 13 && <>
           <div className="proposal-question-mark" aria-hidden="true"><Check size={32} /></div>
           <h2 className="proposal-title">And just like that,<br /><span>our forever begins.</span></h2>
-          <img src={ring} alt="Our forever promise" width={1024} height={1024} loading="lazy" className="proposal-finale-photo" />
+          <img src={ring} alt="Our forever promise — a gold solitaire diamond ring" width={1024} height={1024} loading="lazy" className="proposal-finale-ring" />
           <p className="proposal-couple">{recipient} <Heart size={20} /> {sender}</p>
           <p className="proposal-subtitle">One yes. A lifetime of us.</p>
           <p className="proposal-final-score" role="status">Our love quiz · {scoreProposalQuiz(questions, answers)} / {questions.length} correct</p>

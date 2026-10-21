@@ -1,6 +1,7 @@
 import { createMiddleware, createServerFn } from "@tanstack/react-start";
 import { queryOptions } from "@tanstack/react-query";
 import { z } from "zod";
+import { validateTemplatePhoto } from '@/lib/template-upload';
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const requireAdmin = createMiddleware({ type: "function" }).middleware([requireSupabaseAuth]).server(async ({ context, next }) => {
@@ -47,8 +48,33 @@ export const adminListTemplates = createServerFn({ method: "GET" }).middleware([
     .select("id, slug, title, category, price_inr, original_price_inr, active, featured, cover_image")
     .order("created_at", { ascending: true });
   if (error) throw new Error(error.message);
-  return data ?? [];
+  const { resolveTemplateCover } = await import('@/lib/template-cover.server');
+  return Promise.all((data ?? []).map(async row => ({ ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category) })));
 });
+
+export const adminUploadTemplateCover = createServerFn({ method: 'POST' }).middleware([requireAdmin])
+  .inputValidator((input: FormData) => {
+    if (!(input instanceof FormData)) throw new Error('Choose a photo.');
+    const id = z.string().uuid().parse(input.get('id'));
+    const photo = input.get('photo');
+    if (!(photo instanceof File)) throw new Error('Choose a photo.');
+    validateTemplatePhoto(photo.type, photo.size);
+    return { id, photo };
+  })
+  .handler(async ({ data, context }) => {
+    const { data: template, error: lookupError } = await context.db.from('templates').select('id').eq('id', data.id).single();
+    if (lookupError || !template) throw new Error('Template not found.');
+    const extensions: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' };
+    const path = `${data.id}/${crypto.randomUUID()}.${extensions[data.photo.type]}`;
+    const { error: uploadError } = await context.db.storage.from('template-covers').upload(path, await data.photo.arrayBuffer(), { contentType: data.photo.type, upsert: false });
+    if (uploadError) throw new Error('Photo could not be uploaded. Please retry.');
+    const { error } = await context.db.from('templates').update({ cover_image: `storage:template-covers/${path}` }).eq('id', data.id);
+    if (error) {
+      await context.db.storage.from('template-covers').remove([path]);
+      throw new Error('Photo could not be saved. Please retry.');
+    }
+    return { ok: true };
+  });
 
 export const adminSetSurpriseStatus = createServerFn({ method: "POST" }).middleware([requireAdmin])
   .inputValidator((d: { id: string; status: string }) =>

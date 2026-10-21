@@ -24,7 +24,9 @@ export const customerDashboard = createServerFn({ method: "GET" }).middleware([r
   const requests = deposits.data ?? [];
   const orders = surprises.data ?? [];
   const balance = approvedBalance(requests, orders);
-  return { profile: profile.data, deposits: requests, surprises: orders, balance };
+  const { resolveTemplateCover } = await import('@/lib/template-cover.server');
+  const resolvedOrders = await Promise.all(orders.map(async order => ({ ...order, templates: order.templates ? { ...order.templates, cover_image: await resolveTemplateCover(order.templates.cover_image, order.templates.category) } : null })));
+  return { profile: profile.data, deposits: requests, surprises: resolvedOrders, balance };
 });
 export const requestDeposit = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
   .inputValidator((d: { amount: number; note: string }) => z.object({ amount: z.number().int().positive(), note: z.string().max(500) }).parse(d))

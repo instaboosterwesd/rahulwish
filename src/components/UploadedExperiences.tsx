@@ -8,12 +8,12 @@ import { uploadedMedia } from '@/lib/uploaded-templates';
 import { celebrate } from '@/lib/celebration';
 import type { ExperienceProps } from '@/components/SurpriseExperience';
 import gift from '@/assets/surprise-clay-gift.png';
-import cake from '@/assets/templates/birthday-template-cake.png.asset.json';
-import disc from '@/assets/templates/birthday-template-disc.png.asset.json';
-import giftDisc from '@/assets/templates/your-surprise-template-disc.webp.asset.json';
-import envelope from '@/assets/templates/your-surprise-template-envelope.png.asset.json';
-import camera from '@/assets/templates/your-surprise-template-camera.png.asset.json';
-import music from '@/assets/templates/your-surprise-template-music.png.asset.json';
+import cake from '@/assets/templates/birthday-template-cake.png';
+import disc from '@/assets/templates/birthday-template-disc.png';
+import giftDisc from '@/assets/templates/your-surprise-template-disc.webp';
+import envelope from '@/assets/templates/your-surprise-template-envelope.png';
+import camera from '@/assets/templates/your-surprise-template-camera.png';
+import music from '@/assets/templates/your-surprise-template-music.png';
 
 function Brand() { return <div className="template-brand"><Heart size={15} /> always4you</div>; }
 
@@ -51,9 +51,9 @@ export function BirthdayExperience(p: ExperienceProps) {
     <section className="birthday-note-section" id="birthday-note"><p className="template-eyebrow">Your little note</p><h2>{p.headline || 'A note for wonderful you.'}</h2>
       <article className="template-note"><p className="template-signature">Dear {p.recipient},</p><WrittenLetter text={p.message} /><p className="template-signature">With love, {p.sender}</p></article>
       <figure className="birthday-polaroid birthday-letter-photo"><img src={p.photos?.[1] || photo} alt="Another beautiful memory" width={600} height={600} /><figcaption>So glad you’re in my world.</figcaption></figure>
-      <TemplateAudio src={p.audioUrl || uploadedMedia.birthdaySong} title={`A birthday song from ${p.sender}`} artwork={disc.url} />
+      <TemplateAudio src={p.audioUrl || uploadedMedia.birthdaySong} title={`A birthday song from ${p.sender}`} artwork={disc} />
     </section>
-    <section className="birthday-finale"><p className="template-eyebrow">Final surprise</p><h2>Let’s celebrate!</h2><img src={cake.url} width={600} height={600} className="birthday-cake" alt="A decorated birthday cake" /><p>Make a wish, {p.recipient}. You deserve all the happiness today and always.</p>
+    <section className="birthday-finale"><p className="template-eyebrow">Final surprise</p><h2>Let’s celebrate!</h2><img src={cake} width={600} height={600} className="birthday-cake" alt="A decorated birthday cake" /><p>Make a wish, {p.recipient}. You deserve all the happiness today and always.</p>
       <p className="birthday-joy" role="status"><Heart size={16} /> JOY × {String(joy).padStart(2, '0')}</p>
       <Button variant="hero" size="lg" onClick={() => { setJoy(v => v + 1); celebrate(); }}>Celebrate <Sparkles /></Button>
     </section>
@@ -65,7 +65,7 @@ export function GiftExperience(p: ExperienceProps) {
   const [viewed, setViewed] = useState<string[]>([]);
   const [active, setActive] = useState<string | null>(null);
   const [final, setFinal] = useState(false);
-  const items = [{ key: 'letter', label: 'Your letter', src: envelope.url, icon: Mail }, { key: 'photo', label: 'Our memory', src: camera.url, icon: Camera }, { key: 'song', label: 'A song for you', src: music.url, icon: Music2 }];
+  const items = [{ key: 'letter', label: 'Your letter', src: envelope, icon: Mail }, { key: 'photo', label: 'Our memory', src: camera, icon: Camera }, { key: 'song', label: 'A song for you', src: music, icon: Music2 }];
   return <section className="uploaded-experience gift-experience"><Brand /><main className="uploaded-stage">
     <p className="template-eyebrow">{final ? 'A note, just for you' : open ? 'Three little pieces of my heart' : `A special delivery from ${p.sender}`}</p>
     <h1>{final ? 'Always & forever.' : open ? 'A little world of us.' : 'Something special'}<span>{final ? p.recipient : open ? 'All for you.' : `for ${p.recipient}.`}</span></h1>
@@ -75,7 +75,7 @@ export function GiftExperience(p: ExperienceProps) {
     <Dialog open={active !== null} onOpenChange={v => { if (!v) setActive(null); }}><DialogContent className="gift-dialog"><DialogTitle>{items.find(i => i.key === active)?.label}</DialogTitle><DialogDescription>A little something from {p.sender}, for {p.recipient}.</DialogDescription>
       {active === 'letter' && <><WrittenLetter text={p.message} /><p className="template-signature">{p.sender}</p></>}
       {active === 'photo' && <ScratchMemory src={p.photos?.[0] || (p.demo ? uploadedMedia.giftPhoto : p.cover) || uploadedMedia.giftPhoto} caption="You make every moment special." />}
-      {active === 'song' && <><img src={p.cover || uploadedMedia.giftCover} alt="Our song cover" width={300} height={300} className="gift-song-cover" /><TemplateAudio src={p.audioUrl || uploadedMedia.giftSong} artwork={giftDisc.url} start={p.audioUrl ? 0 : 20} end={p.audioUrl ? undefined : 60} /></>}
+      {active === 'song' && <><img src={p.cover || uploadedMedia.giftCover} alt="Our song cover" width={300} height={300} className="gift-song-cover" /><TemplateAudio src={p.audioUrl || uploadedMedia.giftSong} artwork={giftDisc} start={p.audioUrl ? 0 : 20} end={p.audioUrl ? undefined : 60} /></>}
     </DialogContent></Dialog>
   </main></section>;
 }

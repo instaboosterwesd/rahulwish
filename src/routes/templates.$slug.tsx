@@ -23,6 +23,10 @@ export const Route = createFileRoute("/templates/$slug")({
     { property: "og:description", content: loaderData?.tagline ?? "Surprise website template" },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
+    ...(loaderData?.cover_image.startsWith('https://') ? [
+      { property: 'og:image', content: loaderData.cover_image },
+      { name: 'twitter:image', content: loaderData.cover_image },
+    ] : []),
   ] }),
   component: Page,
 });
