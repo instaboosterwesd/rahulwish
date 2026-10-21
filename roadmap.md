@@ -12,7 +12,7 @@
 - [ ] Grant the site owner's account admin access — blocked until the owner creates an account and identifies it.
 - [x] Redesign the Proposal experience with photographic visuals and original romantic music; verify all demo steps.
 - [x] Extend Proposal with a playful secret, story, quiz, reasons, future and countdown; verify the full demo.
-- [ ] Integrate uploaded Proposal, Love, Birthday and Your Surprise templates with polished icons and supplied audio.
-- [ ] Add scratch reveal, typed letter and emerging ring animation.
+- [x] Inspect the four newly uploaded ZIPs and integrate their complete presentations, media and catalog entries; all four demos verified on desktop and mobile.
+- [x] Add scratch reveal, typed letter and emerging ring animation.
 - [ ] Persist buyer-created quiz choices and audio; wrong answers continue and score appears at the end.
 - [ ] Verify saved buyer details through the recipient experience.

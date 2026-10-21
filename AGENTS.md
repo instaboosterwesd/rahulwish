@@ -18,3 +18,5 @@
 - Proposal's recipient-name unlock is only a playful presentation reveal, never an access-control boundary; share its flow rules across all presentations to keep demos and live surprises consistent.
 - The connected Supabase owns sign-in; use its OAuth flow instead of the Lovable Cloud broker so accounts and data stay on the same backend.
 - Keep restricted security-definer RPCs for credit mutations and capability-link reads; they intentionally bypass direct table writes while validating active accounts, ownership and approved status.
+- Keep uploaded-template media in project-owned asset pointers and template interactions in React with shared dispatch; standalone archives are references, never executable app embeds.
+- Use the shared reduced-motion-aware celebration helper for template bursts so all presentations respect accessibility preferences.

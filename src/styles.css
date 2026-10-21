@@ -433,3 +433,31 @@
 .proposal-jewel-scene.is-open .proposal-jewel { opacity:1; transform:translateY(-72px) scale(1); }
 @media(max-width:600px) { .uploaded-experience { padding-inline:18px; } .uploaded-experience h1 { font-size:30px; } .uploaded-experience h1 span { font-size:48px; } .uploaded-experience h2 { font-size:27px; } .template-sculpture { width:220px; height:220px; } .gift-discoveries { gap:4px; } .gift-discovery span { font-size:11px; } .birthday-note-section { margin-inline:-18px; padding-inline:18px; } }
 @media(prefers-reduced-motion:reduce) { .uploaded-experience *, .proposal-jewel-scene *, .proposal-writing-cursor { animation:none!important; transition:none!important; } }
+
+.template-reaction { width:250px; height:250px; object-fit:contain; }
+.love-prompt { min-height:24px; color:var(--muted-foreground); }
+.love-answers { width:min(480px,100%); height:210px; position:relative; display:flex; align-items:center; justify-content:center; }
+.love-yes { position:absolute; left:calc(50% - 135px); transition:transform .25s; z-index:2; }
+.love-no { position:absolute; right:calc(50% - 125px); top:82px; transition:top .25s,right .25s; }
+.love-position-1 .love-no { right:8px; top:8px; }
+.love-position-2 .love-no { right:10px; top:158px; }
+.love-position-3 .love-no { right:calc(100% - 80px); top:160px; }
+.love-answers[data-growth="1"] .love-yes { transform:scale(1.1); }
+.love-answers[data-growth="2"] .love-yes { transform:scale(1.2); }
+.love-answers[data-growth="3"] .love-yes { transform:scale(1.3); }
+.love-answers[data-growth="4"] .love-yes { transform:scale(1.4); }
+.template-disc { width:54px; height:54px; flex-shrink:0; object-fit:contain; border-radius:50%; }
+.is-playing .template-disc { animation:disc-spin 6s linear infinite; }
+.birthday-lanterns { display:flex; justify-content:space-around; width:min(600px,100%); height:74px; color:var(--gold); }
+.birthday-lanterns span { display:grid; place-items:center; width:40px; height:48px; border-radius:50%; border:1px solid var(--gold); position:relative; animation:wobble 5s ease-in-out infinite; }
+.birthday-lanterns span::before { content:''; width:1px; height:35px; background:var(--gold); position:absolute; bottom:100%; }
+.birthday-lanterns span:nth-child(even) { margin-top:15px; animation-delay:-2s; }
+.birthday-letter-photo { width:200px; transform:rotate(4deg); }
+.gift-discoveries { animation:rise .7s ease both; }
+.proposal-thread { display:flex; gap:12px; align-items:center; width:min(450px,100%); color:var(--proposal-rose); margin:40px 0; }
+.proposal-thread input { width:100%; accent-color:var(--proposal-rose); min-width:0; }
+.proposal-hold-progress { position:absolute; bottom:10px; height:4px; background:var(--gold); left:30px; width:0; }
+.is-holding .proposal-hold-progress { width:calc(100% - 60px); transition:width 1.6s linear; }
+.proposal-jewel-trigger { touch-action:none; user-select:none; }
+@keyframes disc-spin { to { transform:rotate(360deg); } }
+@media(prefers-reduced-motion:reduce) { .birthday-lanterns span,.template-disc,.gift-discoveries { animation:none; } .love-no,.love-yes { transition:none; } }

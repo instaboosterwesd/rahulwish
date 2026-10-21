@@ -30,8 +30,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Credentials are configured outside the repository
-.env
-.env.*
-!.env.example

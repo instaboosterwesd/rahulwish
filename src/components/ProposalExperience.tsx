@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, Heart, Music2, Pause, RotateCcw, Sparkles, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ExperienceProps } from "@/components/SurpriseExperience";
@@ -8,6 +8,8 @@ import { WrittenLetter, ScratchMemory, EmergingRing } from "@/components/Proposa
 import { TemplateAudio } from "@/components/TemplateAudio";
 import { uploadedMedia } from "@/lib/uploaded-templates";
 import { scoreProposalQuiz, canContinueProposalQuiz } from "@/lib/proposal";
+import { RedString } from "@/components/RedString";
+import { celebrate } from "@/lib/celebration";
 import { Input } from "@/components/ui/input";
 import { matchesProposalSecret, proposalChapters as chapters, proposalQuiz } from "@/lib/proposal";
 
@@ -30,6 +32,8 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
   const [playing, setPlaying] = useState(false);
   const [audioFailed, setAudioFailed] = useState(false);
   const [thinking, setThinking] = useState(false);
+  const [voiceDone, setVoiceDone] = useState(false);
+  const finishVoice = useCallback(() => setVoiceDone(true), []);
   const audio = useRef<HTMLAudioElement | null>(null);
   const memories = photos?.length ? photos : demo ? uploadedMedia.proposalPhotos : [cover];
 
@@ -42,7 +46,7 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
   }, [audioUrl]);
 
   useEffect(() => {
-    if (step !== 8) return;
+    if (step !== 9) return;
     setCountdown(3);
     const timer = window.setInterval(() => setCountdown((value) => Math.max(0, value - 1)), 1000);
     return () => window.clearInterval(timer);
@@ -58,10 +62,10 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
     else void play();
   };
   const next = () => { const target = Math.min(step + 1, chapters.length - 1); setStep(target); setFurthest((current) => Math.max(current, target)); };
-  const replay = () => { setStep(0); setFurthest(0); setUnlocked(false); setSecret(""); setSecretError(false); setQuizIndex(0); setQuizAnswer(null); setAnswers([]); setReason(0); setOpened(false); setThinking(false); setPhoto(0); if (audio.current) audio.current.currentTime = 0; };
+  const replay = () => { setStep(0); setFurthest(0); setUnlocked(false); setSecret(""); setSecretError(false); setQuizIndex(0); setQuizAnswer(null); setAnswers([]); setReason(0); setOpened(false); setThinking(false); setVoiceDone(false); setPhoto(0); if (audio.current) audio.current.currentTime = 0; };
 
   return (
-    <section className={`proposal-experience ${step === 11 ? "proposal-celebrating" : ""}`} aria-label="Your proposal surprise">
+    <section className={`proposal-experience ${step === 13 ? "proposal-celebrating" : ""}`} aria-label="Your proposal surprise">
       <img src={garden} width={1024} height={1536} alt="Roses framing a lakeside garden at sunset" className="proposal-backdrop" />
       <div className="proposal-veil" aria-hidden="true" />
       <header className="proposal-header">
@@ -158,34 +162,42 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
           <Button variant="hero" size="lg" className="proposal-cta" onClick={next}>There’s one last surprise <ArrowRight /></Button>
         </>}
 
-        {step === 8 && <>
+        {step === 8 && <RedString onNext={next} />}
+
+        {step === 9 && <>
           <h2 className="proposal-title">Take a little breath.<br /><span>This is our moment.</span></h2>
           <div className="proposal-countdown" role="status" aria-live="polite">{countdown > 0 ? countdown : <Heart size={56} />}</div>
           <p className="proposal-subtitle">{countdown > 0 ? "A promise, waiting just for you." : "My heart is ready. Are you?"}</p>
           <Button variant="hero" size="lg" className="proposal-cta" disabled={countdown > 0} onClick={next}>Show me the surprise <ArrowRight /></Button>
         </>}
 
-        {step === 9 && <>
+        {step === 10 && <>
           <h2 className="proposal-title">Not just a ring.<br /><span>A little forever.</span></h2>
           <EmergingRing opened={opened} onOpen={() => setOpened(true)} />
-          {opened && demo && <TemplateAudio src={uploadedMedia.proposalVoice} title="A little voice note" />}
           <p className="proposal-subtitle">{opened ? "Every tomorrow. Every adventure. With you." : "Some promises deserve a beautiful beginning."}</p>
           <Button variant="hero" size="lg" className="proposal-cta" onClick={opened ? next : () => setOpened(true)}>{opened ? "Can I ask you something?" : "Unwrap my promise"} <ArrowRight /></Button>
         </>}
 
-        {step === 10 && <>
+        {step === 11 && <>
+          <h2 className="proposal-title">Listen to my heart.<br /><span>Before I ask you.</span></h2>
+          <p className="proposal-subtitle">A little voice note, from {sender}.</p>
+          <TemplateAudio src={uploadedMedia.proposalVoice} title={`For ${recipient}`} onEnded={finishVoice} />
+          <Button variant="hero" size="lg" className="proposal-cta" onClick={next}>{voiceDone ? "My heart is ready" : "Read my question instead"}<ArrowRight /></Button>
+        </>}
+
+        {step === 12 && <>
           <div className="proposal-question-mark" aria-hidden="true"><Heart size={32} /></div>
           <p className="proposal-subtitle">{recipient}, my today and all my tomorrows…</p>
           <h2 className="proposal-title">Will you<br /><span>marry me?</span></h2>
           <p className="proposal-subtitle">I choose you. In every lifetime.</p>
           <div className="proposal-answer-row">
-            <Button variant="hero" size="lg" onClick={next}>Yes, a thousand times <Heart /></Button>
+            <Button variant="hero" size="lg" onClick={() => { celebrate(true); next(); }}>Yes, a thousand times <Heart /></Button>
             <Button variant="glass" size="lg" onClick={() => setThinking(true)}>Let me think</Button>
           </div>
           {thinking && <p className="proposal-reassurance" role="status">Take your time. Your answer is yours, and you mean the world to me.</p>}
         </>}
 
-        {step === 11 && <>
+        {step === 13 && <>
           <div className="proposal-question-mark" aria-hidden="true"><Check size={32} /></div>
           <h2 className="proposal-title">And just like that,<br /><span>our forever begins.</span></h2>
           <img src={ring} alt="Our forever promise" width={1024} height={1024} loading="lazy" className="proposal-finale-photo" />

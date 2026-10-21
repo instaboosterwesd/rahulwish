@@ -56,10 +56,14 @@ export function ScratchMemory({ src, caption }: { src: string; caption: string }
 }
 
 export function EmergingRing({ opened, onOpen }: { opened: boolean; onOpen: () => void }) {
+  const hold = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [holding, setHolding] = useState(false);
+  const cancel = () => { if (hold.current) clearTimeout(hold.current); hold.current = null; setHolding(false); };
+  useEffect(() => () => { if (hold.current) clearTimeout(hold.current); }, []);
   return <div className={`proposal-jewel-scene ${opened ? "is-open" : ""}`}>
     <div className="proposal-jewel-lid" aria-hidden="true"><span>always yours</span></div>
     <div className="proposal-jewel" role="img" aria-label="A diamond ring rising from a velvet box"><span className="proposal-diamond" /><span className="proposal-band" /><Sparkles className="proposal-jewel-glint" size={22} aria-hidden="true" /></div>
     <div className="proposal-jewel-box" aria-hidden="true"><span>our forever</span></div>
-    {!opened && <Button variant="ghost" className="proposal-jewel-trigger" aria-label="Reveal the ring" onClick={onOpen}><span>Open your promise</span></Button>}
+    {!opened && <Button variant="ghost" className={`proposal-jewel-trigger ${holding ? 'is-holding' : ''}`} aria-label="Hold to reveal the ring" onPointerDown={() => { setHolding(true); hold.current = setTimeout(() => { onOpen(); setHolding(false); }, 1600); }} onPointerUp={cancel} onPointerCancel={cancel} onPointerLeave={cancel} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }}><span>Hold to open your promise</span><span className="proposal-hold-progress" /></Button>}
   </div>;
 }

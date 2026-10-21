@@ -1,4 +1,4 @@
-export const proposalChapters = ["A little secret", "Just for you", "Our little world", "From my heart", "How well do you know us?", "Our memories", "Why you", "Our tomorrows", "Almost there", "A promise", "One question", "Our forever"];
+export const proposalChapters = ["A little secret", "Just for you", "Our little world", "From my heart", "How well do you know us?", "Our memories", "Why you", "Our tomorrows", "Connected, always", "Almost there", "A promise", "Listen to my heart", "One question", "Our forever"];
 
 // This is a playful reveal, not authentication or protection for private data.
 export function matchesProposalSecret(value: string, recipient: string) {
