@@ -15,7 +15,7 @@ export function SiteHeader() {
         <Link to="/" className="flex items-center gap-2">
           <Heart className="h-5 w-5 fill-primary text-primary animate-heartbeat" />
           <span className="font-display text-2xl font-semibold tracking-tight">
-            Always<span className="text-rose-gradient">4</span>you
+            RJX<span className="text-rose-gradient">4</span>You
           </span>
         </Link>
         <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
@@ -61,7 +61,7 @@ export function SiteFooter() {
     <footer className="relative z-10 border-t border-border py-12">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm text-muted-foreground md:flex-row">
         <p className="font-display text-xl text-foreground">
-          Always<span className="text-rose-gradient">4</span>you
+          RJX<span className="text-rose-gradient">4</span>You
         </p>
         <p>Made with ❤ in India · Bring smiles to faces you love</p>
         <div className="flex gap-5">

@@ -6,6 +6,7 @@ import { MusicBox } from "@/lib/music";
 import { ProposalExperience } from "@/components/ProposalExperience";
 import { LoveExperience, BirthdayExperience, GiftExperience } from "@/components/UploadedExperiences";
 import { KarwaChauthExperience } from "@/components/KarwaChauthExperience";
+import { DiwaliExperience } from "@/components/DiwaliExperience";
 import { uploadedExperienceKind } from "@/lib/uploaded-templates";
 import type { ProposalConfig } from "@/lib/proposal";
 
@@ -53,6 +54,7 @@ export function SurpriseExperience(p: ExperienceProps) {
   if (kind === "love") return <LoveExperience {...p} />;
   if (kind === "gift") return <GiftExperience {...p} />;
   if (kind === "karwa") return <KarwaChauthExperience {...p} />;
+  if (kind === "diwali") return <DiwaliExperience {...p} />;
   return experienceKind(p.category) === "proposal" ? <ProposalExperience {...p} /> : <ClassicExperience {...p} />;
 }
 

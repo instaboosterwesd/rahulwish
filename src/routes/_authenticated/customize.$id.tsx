@@ -11,12 +11,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { SurpriseExperience } from "@/components/SurpriseExperience";
 import { customerQuery, saveSurprise, savePhotos, saveProposalConfig } from "@/lib/customer.functions";
 import { proposalQuiz, proposalQuestionSchema, readProposalConfig, type ProposalQuestion } from "@/lib/proposal";
+import { diwaliQuiz } from "@/lib/diwali";
 import { karwaQuiz } from "@/lib/karwa";
 import { uploadedExperienceKind } from "@/lib/uploaded-templates";
 
 export const Route = createFileRoute("/_authenticated/customize/$id")({
   loader: async ({ context, params }) => { const data = await context.queryClient.ensureQueryData(customerQuery()); if (!data.surprises.some((s) => s.id === params.id && ["paid", "delivered"].includes(s.status))) throw notFound(); },
-  head: () => ({ meta: [{ title: "Customize your surprise — Always4you" }, { name: "description", content: "Add names, photos and questions, then preview your surprise live." }, { property: "og:title", content: "Customize your surprise — Always4you" }, { property: "og:description", content: "Add names, photos and questions, then preview your surprise live." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: Page,
+  head: () => ({ meta: [{ title: "Customize your surprise — RJX4You" }, { name: "description", content: "Add names, photos and questions, then preview your surprise live." }, { property: "og:title", content: "Customize your surprise — RJX4You" }, { property: "og:description", content: "Add names, photos and questions, then preview your surprise live." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: Page,
 });
 function Page() {
   const { id } = Route.useParams(); const { data } = useSuspenseQuery(customerQuery()); const s = data.surprises.find((s) => s.id === id); if (!s) return null; return <Editor key={id} surprise={s} />;
@@ -27,7 +28,8 @@ const blankQuestion = (): ProposalQuestion => ({ question: "", options: ["", "",
 function Editor({ surprise: s }: { surprise: Surprise }) {
   const category = s.templates?.category ?? "";
   const existing = readProposalConfig(s.proposal_config);
-  const defaults = uploadedExperienceKind(category) === "karwa" ? karwaQuiz : proposalQuiz;
+  const kindNow = uploadedExperienceKind(category);
+  const defaults = kindNow === "karwa" ? karwaQuiz : kindNow === "diwali" ? diwaliQuiz : proposalQuiz;
   const [form, setForm] = useState({ id: s.id, recipient: s.recipient_name, sender: s.sender_name, headline: s.headline, message: s.message });
   const [quiz, setQuiz] = useState<ProposalQuestion[]>(existing.quiz?.length ? existing.quiz : defaults.map((q) => ({ ...q, options: [...q.options] })));
   const [preview, setPreview] = useState(false);

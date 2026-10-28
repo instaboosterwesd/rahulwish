@@ -80,9 +80,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Always4you — Surprise Websites for Every Occasion" },
+      { title: "RJX4You — Surprise Websites for Every Occasion" },
       { name: "description", content: "Create beautiful surprise websites for birthdays, proposals, anniversaries and more. Pick a template, add your photos and message, share a secret link." },
-      { property: "og:title", content: "Always4you — Surprise Websites for Every Occasion" },
+      { property: "og:title", content: "RJX4You — Surprise Websites for Every Occasion" },
       { property: "og:description", content: "Create beautiful surprise websites for birthdays, proposals, anniversaries and more." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

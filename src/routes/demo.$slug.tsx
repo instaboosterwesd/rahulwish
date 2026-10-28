@@ -14,11 +14,11 @@ export const Route = createFileRoute("/demo/$slug")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `Live Demo: ${loaderData?.title ?? "Template"} — Always4you` },
+      { title: `Live Demo: ${loaderData?.title ?? "Template"} — RJX4You` },
       { name: "description", content: "Try the interactive live demo — music, games, memories and a love letter." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: `Live Demo: ${loaderData?.title ?? "Template"} — Always4you` },
-      { property: "og:description", content: "Preview an interactive Always4you surprise." },
+      { property: "og:title", content: `Live Demo: ${loaderData?.title ?? "Template"} — RJX4You` },
+      { property: "og:description", content: "Preview an interactive RJX4You surprise." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       ...(loaderData?.cover_image.startsWith('https://') ? [

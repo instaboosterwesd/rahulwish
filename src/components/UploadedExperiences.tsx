@@ -7,15 +7,15 @@ import { TemplateAudio } from '@/components/TemplateAudio';
 import { uploadedMedia } from '@/lib/uploaded-templates';
 import { celebrate } from '@/lib/celebration';
 import type { ExperienceProps } from '@/components/SurpriseExperience';
-import gift from '@/assets/surprise-clay-gift.png';
+import gift from '@/assets/surprise-clay-gift.webp';
 import cake from '@/assets/templates/birthday-template-cake.png';
 import disc from '@/assets/templates/birthday-template-disc.png';
 import giftDisc from '@/assets/templates/your-surprise-template-disc.webp';
-import envelope from '@/assets/templates/your-surprise-template-envelope.png';
-import camera from '@/assets/templates/your-surprise-template-camera.png';
+import envelope from '@/assets/templates/your-surprise-template-envelope.webp';
+import camera from '@/assets/templates/your-surprise-template-camera.webp';
 import music from '@/assets/templates/your-surprise-template-music.png';
 
-function Brand() { return <div className="template-brand"><Heart size={15} /> always4you</div>; }
+function Brand() { return <div className="template-brand"><Heart size={15} /> RJX4You</div>; }
 
 const noMessages = ['Please select one…', 'Hmm… are you sure?', 'One more little thought?', 'My heart was hoping for a yes.', 'You’re making this little bear blush.', 'Is that your final answer?'];
 export function LoveExperience(p: ExperienceProps) {

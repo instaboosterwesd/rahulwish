@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
-import luxuryRing from "@/assets/proposal-luxury-ring.png";
+import luxuryRing from "@/assets/proposal-luxury-ring.webp";
 
 export function WrittenLetter({ text }: { text: string }) {
   const [length, setLength] = useState(0);

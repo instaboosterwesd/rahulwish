@@ -11,13 +11,13 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Always4you — Surprise Websites for People You Love" },
+      { title: "RJX4You — Surprise Websites for People You Love" },
       {
         name: "description",
         content:
           "Create a magical personalised surprise website — birthday, proposal, invitation or love letter — with photos, music and a secret link. Starting at ₹0.",
       },
-      { property: "og:title", content: "Always4you — Surprise Websites for People You Love" },
+      { property: "og:title", content: "RJX4You — Surprise Websites for People You Love" },
       {
         property: "og:description",
         content:
@@ -85,7 +85,11 @@ const MARQUEE_IMAGES = [
 
 function Home() {
   const { data: templates } = useSuspenseQuery(templatesQuery());
-  const featured = templates.filter((t) => t.featured).slice(0, 6);
+  const featured = [...templates].sort((a, b) => Number(b.featured) - Number(a.featured)).slice(0, 6);
+  const trending = [...templates].sort((a, b) => Number(b.rating) - Number(a.rating));
+  const categories = ["all", ...Array.from(new Set(templates.map((t) => t.category)))];
+  const [cat, setCat] = useState("all");
+  const byCat = cat === "all" ? templates : templates.filter((t) => t.category === cat);
   const [reviewIdx, setReviewIdx] = useState(0);
 
   useEffect(() => {
@@ -129,6 +133,7 @@ function Home() {
             <div className="absolute -inset-8 rounded-[3rem] bg-rose-gradient opacity-25 blur-3xl" />
             <img
               src="/images/hero-clay.jpg"
+              fetchPriority="high"
               alt="A clay phone showing a surprise website with a smiling heart"
               width={896}
               height={1152}
@@ -192,6 +197,34 @@ function Home() {
           {featured.map((t) => (
             <TemplateCard key={t.id} t={t} />
           ))}
+        </div>
+      </section>
+
+      {/* Trending */}
+      <section className="mx-auto max-w-6xl px-6 py-12">
+        <p className="text-xs uppercase tracking-[0.3em] text-blush/80">Sabse zyada pasand</p>
+        <h2 className="mt-2 font-display text-4xl font-semibold">Trending <span className="text-rose-gradient">now</span></h2>
+        <div className="mt-8 flex snap-x gap-5 overflow-x-auto pb-4">
+          {trending.map((t) => (
+            <div key={t.id} className="w-64 shrink-0 snap-start"><TemplateCard t={t} /></div>
+          ))}
+        </div>
+      </section>
+
+      {/* By category */}
+      <section className="mx-auto max-w-6xl px-6 py-12">
+        <p className="text-xs uppercase tracking-[0.3em] text-blush/80">Har mauke ke liye</p>
+        <h2 className="mt-2 font-display text-4xl font-semibold">Browse by <span className="text-rose-gradient">occasion</span></h2>
+        <div className="mt-6 flex flex-wrap gap-2">
+          {categories.map((c) => (
+            <button key={c} type="button" onClick={() => setCat(c)}
+              className={`rounded-full px-4 py-2 text-sm capitalize transition-colors ${cat === c ? "bg-primary text-primary-foreground" : "glass text-muted-foreground hover:text-foreground"}`}>
+              {c === "all" ? "All" : c.replace(/-/g, " ")}
+            </button>
+          ))}
+        </div>
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {byCat.map((t) => <TemplateCard key={t.id} t={t} />)}
         </div>
       </section>
 

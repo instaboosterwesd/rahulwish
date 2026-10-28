@@ -17,9 +17,8 @@ const VOWS = [
   "Saat janam — sirf tum",
 ];
 
-function BgVideo({ src, dim }: { src: string; dim?: boolean }) {
-  return <div className={`karwa-bg ${dim ? "karwa-bg-dim" : ""}`}><video className="karwa-video" src={src} autoPlay muted loop playsInline /></div>;
-}
+const STEPS = ["Shuruaat", "Chalni", "Sawaal", "Score", "Yaadein", "Vaade", "Chitthi"];
+const BACKGROUNDS = [karwaMedia.moon, karwaMedia.chalni, karwaMedia.diyas, karwaMedia.thali, karwaMedia.cover, karwaMedia.mehendi, karwaMedia.diyas];
 
 export function KarwaChauthExperience(p: ExperienceProps) {
   const [step, setStep] = useState(0);
@@ -49,7 +48,7 @@ export function KarwaChauthExperience(p: ExperienceProps) {
   useEffect(() => {
     if (step !== 5) return;
     setVows(0);
-    const t = window.setInterval(() => setVows((v) => { if (v >= VOWS.length) { window.clearInterval(t); return v; } return v + 1; }), 900);
+    const t = window.setInterval(() => setVows((v) => { if (v >= VOWS.length) { window.clearInterval(t); return v; } return v + 1; }), 800);
     return () => window.clearInterval(t);
   }, [step]);
   useEffect(() => { if (step === 6) celebrate(true); }, [step]);
@@ -62,74 +61,100 @@ export function KarwaChauthExperience(p: ExperienceProps) {
 
   return (
     <section className="karwa-experience">
-      <BgVideo src={karwaMedia.videos.gold} dim />
-      {step > 0 && <button type="button" className="karwa-mute" aria-label={muted ? "Unmute music" : "Mute music"} onClick={() => setMuted((m) => !m)}>{muted ? <VolumeX /> : <Volume2 />}</button>}
+      {BACKGROUNDS.map((bg, i) => (
+        <div key={i} aria-hidden className={`karwa-bg ${i === step ? "is-active" : ""}`} style={{ backgroundImage: `url(${bg})` }} />
+      ))}
+      <div className="karwa-shade" aria-hidden />
+
+      {step > 0 && (
+        <header className="karwa-top">
+          <div className="karwa-progress" aria-label={`Step ${step} of ${STEPS.length - 1}`}>
+            {STEPS.slice(1).map((s, i) => <span key={s} className={i + 1 <= step ? "is-done" : ""} />)}
+          </div>
+          <button type="button" className="karwa-mute" aria-label={muted ? "Unmute music" : "Mute music"} onClick={() => setMuted((m) => !m)}>{muted ? <VolumeX size={18} /> : <Volume2 size={18} />}</button>
+        </header>
+      )}
+
       <main key={step} className="karwa-stage">
-        {step === 0 && <>
-          <BgVideo src={karwaMedia.videos.moon} />
+        {step === 0 && (
           <div className="karwa-content">
             <p className="karwa-eyebrow">Karwa Chauth · Ek chaand raat</p>
             <h1 className="karwa-title">{name}<span>ye raat sirf tumhare liye</span></h1>
             <Button variant="hero" size="lg" onClick={begin}>Surprise kholo <ArrowRight /></Button>
             <p className="karwa-hint">Sound on rakhiye 🎶</p>
           </div>
-        </>}
+        )}
 
-        {step === 1 && <>
-          <BgVideo src={karwaMedia.videos.sieve} dim />
+        {step === 1 && (
           <div className="karwa-content">
             <p className="karwa-eyebrow">Chalni ki rasm</p>
-            <h2 className="karwa-heading">{revealed ? <>Pehle chaand dekha…<span>phir mera chaand, {name}</span></> : <>Chalni uthao<span>aur chaand ko dekho</span></>}</h2>
+            <h2 className="karwa-heading">{revealed ? <>Pehle chaand dekha…<span>phir mera chaand</span></> : <>Chalni se dekho<span>aaj ka chaand</span></>}</h2>
             <button type="button" className={`karwa-sieve ${revealed ? "is-revealed" : ""}`} onClick={() => setRevealed(true)} aria-label="Look through the sieve">
-              <img src={karwaMedia.moon} alt="Full moon through the sieve" className="karwa-sieve-moon" />
+              <img src={karwaMedia.moon} alt="Full moon" className="karwa-sieve-moon" />
               <img src={partner} alt={name} className="karwa-sieve-face" />
               <span className="karwa-sieve-mesh" aria-hidden />
               <span className="karwa-sieve-rim" aria-hidden />
             </button>
-            {revealed ? <Button variant="hero" onClick={next}>Aage <ArrowRight /></Button> : <p className="karwa-hint">Chalni par tap karo</p>}
+            {revealed ? <Button variant="hero" onClick={next}>Aage chalo <ArrowRight /></Button> : <p className="karwa-hint">Chalni par tap karo</p>}
           </div>
-        </>}
+        )}
 
-        {step === 2 && q && <div className="karwa-content">
-          <p className="karwa-eyebrow">Sawaal {qi + 1} / {questions.length}</p>
-          <h2 className="karwa-heading">{q.question}</h2>
-          <div className="karwa-quiz">
-            {q.options.map((o, i) => <button key={o + i} type="button" disabled={picked !== null} onClick={() => { setPicked(i); if (i === q.answer) setScore((s) => s + 1); }} className={`karwa-quiz-option ${picked === i ? (i === q.answer ? "is-right" : "is-wrong") : ""} ${picked !== null && i === q.answer ? "is-right" : ""}`}>{o}{picked !== null && i === q.answer && <Check size={18} />}</button>)}
-          </div>
-          {picked !== null && <p role="status" className="karwa-hint">{picked === q.answer ? "Bilkul sahi! 💛" : "Oops… sahi jawaab upar chamak raha hai ✨"}</p>}
-          <Button variant="hero" disabled={picked === null} onClick={() => { if (qi < questions.length - 1) { setQi(qi + 1); setPicked(null); } else next(); }}>{qi < questions.length - 1 ? "Agla sawaal" : "Result dekho"} <ArrowRight /></Button>
-        </div>}
-
-        {step === 3 && <>
-          <div className="karwa-bg karwa-kenburns" style={{ backgroundImage: `url(${karwaMedia.thali})` }} />
-          <div className="karwa-content karwa-content-low">
-            <p className="karwa-eyebrow">Tumhara score</p>
-            <h2 className="karwa-heading">{score} / {questions.length}<span>{score === questions.length ? "Tum mujhe sabse achhe se jaanti ho" : "Har jawaab mein bas pyaar hai"}</span></h2>
-            <Button variant="hero" onClick={next}>Hamari yaadein <ArrowRight /></Button>
-          </div>
-        </>}
-
-        {step === 4 && <div className="karwa-content">
-          <p className="karwa-eyebrow">Hamari yaadein</p>
-          <div className="karwa-gallery">
-            {photos.map((src, i) => <img key={src + i} src={src} alt={`Memory ${i + 1}`} className={i === slide ? "is-active" : ""} />)}
-          </div>
-          <div className="karwa-dots">{photos.map((_, i) => <button key={i} type="button" aria-label={`Photo ${i + 1}`} className={i === slide ? "is-active" : ""} onClick={() => setSlide(i)} />)}</div>
-          <Button variant="hero" onClick={next}>Saat vaade <ArrowRight /></Button>
-        </div>}
-
-        {step === 5 && <>
-          <div className="karwa-bg karwa-bg-dim" style={{ backgroundImage: `url(${karwaMedia.mehendi})` }} />
+        {step === 2 && q && (
           <div className="karwa-content">
-            <p className="karwa-eyebrow">Saat janam ke</p>
-            <h2 className="karwa-heading">Saat vaade<span>sirf tumse</span></h2>
-            <ol className="karwa-vows">{VOWS.slice(0, vows).map((v, i) => <li key={v}><b>{i + 1}</b>{v}</li>)}</ol>
-            {vows >= VOWS.length && <Button variant="hero" onClick={next}>Ek chitthi tumhare liye <Heart /></Button>}
+            <div className="karwa-card">
+              <p className="karwa-eyebrow">Sawaal {qi + 1} / {questions.length}</p>
+              <h2 className="karwa-question">{q.question}</h2>
+              <div className="karwa-quiz">
+                {q.options.map((o, i) => (
+                  <button key={o + i} type="button" disabled={picked !== null}
+                    onClick={() => { setPicked(i); if (i === q.answer) setScore((s) => s + 1); }}
+                    className={`karwa-quiz-option ${picked !== null && i === q.answer ? "is-right" : picked === i ? "is-wrong" : ""}`}>
+                    <span>{o}</span>{picked !== null && i === q.answer && <Check size={18} />}
+                  </button>
+                ))}
+              </div>
+              <p role="status" className="karwa-hint karwa-status">{picked === null ? "" : picked === q.answer ? "Bilkul sahi! 💛" : "Koi baat nahi — sahi jawaab chamak raha hai ✨"}</p>
+              <Button variant="hero" className="w-full" disabled={picked === null} onClick={() => { if (qi < questions.length - 1) { setQi(qi + 1); setPicked(null); } else next(); }}>
+                {qi < questions.length - 1 ? "Agla sawaal" : "Result dekho"} <ArrowRight />
+              </Button>
+            </div>
           </div>
-        </>}
+        )}
 
-        {step === 6 && <>
-          <div className="karwa-bg karwa-bg-dim karwa-kenburns" style={{ backgroundImage: `url(${photos[1] ?? karwaMedia.couple2})` }} />
+        {step === 3 && (
+          <div className="karwa-content">
+            <div className="karwa-card">
+              <p className="karwa-eyebrow">Tumhara score</p>
+              <p className="karwa-score">{score}<small>/{questions.length}</small></p>
+              <p className="karwa-lead">{score === questions.length ? "Tum mujhe sabse achhe se jaanti ho 💛" : "Har jawaab mein bas pyaar hai 💛"}</p>
+              <Button variant="hero" className="w-full" onClick={next}>Hamari yaadein <ArrowRight /></Button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="karwa-content">
+            <p className="karwa-eyebrow">Hamari yaadein</p>
+            <div className="karwa-gallery">
+              {photos.map((src, i) => <img key={src + i} src={src} alt={`Memory ${i + 1}`} className={i === slide ? "is-active" : ""} />)}
+            </div>
+            <div className="karwa-dots">{photos.map((_, i) => <button key={i} type="button" aria-label={`Photo ${i + 1}`} className={i === slide ? "is-active" : ""} onClick={() => setSlide(i)} />)}</div>
+            <Button variant="hero" onClick={next}>Saat vaade <ArrowRight /></Button>
+          </div>
+        )}
+
+        {step === 5 && (
+          <div className="karwa-content">
+            <div className="karwa-card">
+              <p className="karwa-eyebrow">Saat janam ke</p>
+              <h2 className="karwa-heading">Saat vaade<span>sirf tumse</span></h2>
+              <ol className="karwa-vows">{VOWS.map((v, i) => <li key={v} className={i < vows ? "is-shown" : ""}><b>{i + 1}</b>{v}</li>)}</ol>
+              <Button variant="hero" className="w-full" disabled={vows < VOWS.length} onClick={next}>Ek chitthi tumhare liye <Heart /></Button>
+            </div>
+          </div>
+        )}
+
+        {step === 6 && (
           <div className="karwa-content">
             <article className="karwa-letter">
               <p className="karwa-letter-greet">Dear {name},</p>
@@ -138,7 +163,7 @@ export function KarwaChauthExperience(p: ExperienceProps) {
             </article>
             <Button variant="glass" onClick={restart}><RotateCcw /> Phir se dekho</Button>
           </div>
-        </>}
+        )}
       </main>
     </section>
   );

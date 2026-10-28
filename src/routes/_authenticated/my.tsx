@@ -12,7 +12,7 @@ import { formatINR } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/my")({
   loader: ({ context }) => context.queryClient.ensureQueryData(customerQuery()),
-  head: () => ({ meta: [{ title: "My surprises — Always4you" }, { name: "description", content: "Your surprises, approved credit and deposit requests." }, { property: "og:title", content: "My surprises — Always4you" }, { property: "og:description", content: "Your surprises, approved credit and deposit requests." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
+  head: () => ({ meta: [{ title: "My surprises — RJX4You" }, { name: "description", content: "Your surprises, approved credit and deposit requests." }, { property: "og:title", content: "My surprises — RJX4You" }, { property: "og:description", content: "Your surprises, approved credit and deposit requests." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: Page,
 });
 function Page() {

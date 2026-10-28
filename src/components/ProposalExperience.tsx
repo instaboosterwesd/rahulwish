@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Heart, Music2, Pause, RotateCcw, Sparkles
 import { Button } from "@/components/ui/button";
 import type { ExperienceProps } from "@/components/SurpriseExperience";
 import garden from "@/assets/proposal-garden.jpg";
-import ring from "@/assets/proposal-luxury-ring.png";
+import ring from "@/assets/proposal-luxury-ring.webp";
 import { WrittenLetter, ScratchMemory, EmergingRing } from "@/components/ProposalMoments";
 import { TemplateAudio } from "@/components/TemplateAudio";
 import { uploadedMedia } from "@/lib/uploaded-templates";
