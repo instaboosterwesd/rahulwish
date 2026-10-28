@@ -53,7 +53,7 @@ export const startFamPayment = createServerFn({ method: "POST" })
     });
     const body = await res.text();
     if (!res.ok) { console.error(`FamGateway create-order [${res.status}]: ${body}`); throw new Error("Could not start payment. Please try again."); }
-    const json = JSON.parse(body) as { status: string; message?: string; data?: Record<string, string> };
+    const json = JSON.parse(body) as { status: string; message?: string; data?: { order_id: string; qr_url: string; checkout_url: string; upi_intent: string; upi_id: string; amount: string; payable_amount?: string; expires_at_ist?: string } };
     if (json.status !== "success" || !json.data) { console.error("FamGateway create-order:", body); throw new Error(json.message || "Could not start payment"); }
     const d = json.data;
     const { error: e2 } = await (context.supabase as any).rpc("start_fam_payment", { _template: t.id, _order_id: d.order_id, _amount: t.price_inr, _key: server });
