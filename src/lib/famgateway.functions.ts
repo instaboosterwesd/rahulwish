@@ -1,0 +1,54 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const BASE = "https://famgateway.in";
+
+function apiKey() {
+  const key = process.env["FAMGATEWAY_API_KEY"];
+  if (!key) throw new Error("Payment gateway is not configured");
+  return key;
+}
+
+export type FamCheckout = { orderId: string; qrUrl: string; checkoutUrl: string; upiIntent: string; upiId: string; amount: number; expiresAt: string };
+
+export const startFamPayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ template: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }): Promise<FamCheckout> => {
+    const key = apiKey();
+    const { data: t, error } = await context.supabase.from("templates").select("id,price_inr,active").eq("id", data.template).single();
+    if (error || !t || !t.active) throw new Error("Template unavailable");
+    if (t.price_inr <= 0) throw new Error("This template is free");
+    const email = (context.claims as { email?: string }).email;
+    const res = await fetch(`${BASE}/api/create-order`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Api-Key": key },
+      body: JSON.stringify({ api_key: key, amount: t.price_inr, customer_email: email }),
+    });
+    const body = await res.text();
+    if (!res.ok) { console.error(`FamGateway create-order [${res.status}]: ${body}`); throw new Error("Could not start payment. Please try again."); }
+    const json = JSON.parse(body) as { status: string; message?: string; data?: Record<string, string> };
+    if (json.status !== "success" || !json.data) { console.error("FamGateway create-order:", body); throw new Error(json.message || "Could not start payment"); }
+    const d = json.data;
+    const { error: e2 } = await (context.supabase as any).rpc("start_fam_payment", { _template: t.id, _order_id: d.order_id, _amount: t.price_inr, _key: key });
+    if (e2) { console.error("start_fam_payment:", e2.message); throw new Error("Payment setup is not finished on the database yet."); }
+    return { orderId: d.order_id, qrUrl: d.qr_url, checkoutUrl: d.checkout_url, upiIntent: d.upi_intent, upiId: d.upi_id, amount: Number(d.payable_amount ?? d.amount), expiresAt: d.expires_at_ist ?? "" };
+  });
+
+export const checkFamPayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ orderId: z.string().min(4).max(64).regex(/^[A-Za-z0-9_]+$/) }).parse(d))
+  .handler(async ({ data, context }): Promise<{ status: "pending" | "success" | "expired"; surpriseId?: string }> => {
+    const key = apiKey();
+    const url = `${BASE}/api/verify-order.php?api_key=${encodeURIComponent(key)}&order_id=${encodeURIComponent(data.orderId)}`;
+    const res = await fetch(url, { headers: { "X-Api-Key": key } });
+    const body = await res.text();
+    if (!res.ok) { console.error(`FamGateway verify [${res.status}]: ${body}`); return { status: "pending" }; }
+    const json = JSON.parse(body) as { status: string; amount?: string | number; utr?: string; order_id?: string };
+    if (json.status === "expired") return { status: "expired" };
+    if (json.status !== "success") return { status: "pending" };
+    const { data: sid, error } = await (context.supabase as any).rpc("complete_fam_payment", { _order_id: data.orderId, _paid_amount: Number(json.amount ?? 0), _utr: json.utr ?? "", _key: key });
+    if (error) { console.error("complete_fam_payment:", error.message); throw new Error(error.message); }
+    return { status: "success", surpriseId: sid as string };
+  });
