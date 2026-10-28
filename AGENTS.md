@@ -21,3 +21,4 @@
 - Bundle supplied template media as project asset imports for portable deployments; resolve legacy catalog cover pointers to bundled defaults while preserving admin replacements.
 - Store admin cover uploads in private template-covers storage through role-checked server functions; resolve only database-selected cover paths to expiring signed URLs, since public buckets are blocked.
 - Use the shared reduced-motion-aware celebration helper for template bursts so all presentations respect accessibility preferences.
+- FamGateway UPI payments: server functions create and verify orders with the secret key; database RPCs check a hash of that key so only the server can record payments, and a paid order becomes an approved deposit plus a paid surprise in one locked step.
