@@ -1,3 +1,4 @@
+import { karwaMedia } from '@/lib/karwa-media';
 import proposalSong from '@/assets/templates/proposal-website-song.mp3';
 import proposalVoice from '@/assets/templates/proposal-website-voice-note.mp3';
 import birthdaySong from '@/assets/templates/birthday-template-happy-birthday.mp3';
@@ -20,7 +21,8 @@ export function demoPhotos(category: string, cover: string) {
     case 'proposal': return uploadedMedia.proposalPhotos;
     case 'birthday': return [uploadedMedia.birthdayCover];
     case 'gift': return [uploadedMedia.giftPhoto];
+    case 'karwa': return karwaMedia.demoPhotos;
     default: return [cover];
   }
 }
-export function uploadedExperienceKind(category: string) { const c=category.toLowerCase(); if(c==='proposal') return 'proposal'; if(c==='birthday') return 'birthday'; if(c==='love') return 'love'; if(c==='your-surprise') return 'gift'; return null; }
+export function uploadedExperienceKind(category: string) { const c=category.toLowerCase(); if(c==='proposal') return 'proposal'; if(c==='birthday') return 'birthday'; if(c==='love') return 'love'; if(c==='your-surprise') return 'gift'; if(c==='karwa-chauth') return 'karwa'; return null; }
