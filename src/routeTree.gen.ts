@@ -19,6 +19,7 @@ import { Route as SurpriseCodeRouteImport } from './routes/surprise.$code'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as TemplatesSlugRouteImport } from './routes/templates.$slug'
 import { Route as AuthenticatedCustomizeIdRouteImport } from './routes/_authenticated/customize.$id'
+import { Route as ApiPublicPushGithubRouteImport } from './routes/api/public/push-github'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -70,6 +71,11 @@ const AuthenticatedCustomizeIdRoute =
     path: '/customize/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicPushGithubRoute = ApiPublicPushGithubRouteImport.update({
+  id: '/api/public/push-github',
+  path: '/api/public/push-github',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
   '/customize/$id': typeof AuthenticatedCustomizeIdRoute
+  '/api/public/push-github': typeof ApiPublicPushGithubRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates': typeof TemplatesIndexRoute
   '/customize/$id': typeof AuthenticatedCustomizeIdRoute
+  '/api/public/push-github': typeof ApiPublicPushGithubRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -105,6 +113,7 @@ export interface FileRoutesById {
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
   '/_authenticated/customize/$id': typeof AuthenticatedCustomizeIdRoute
+  '/api/public/push-github': typeof ApiPublicPushGithubRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/templates/$slug'
     | '/templates/'
     | '/customize/$id'
+    | '/api/public/push-github'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/templates/$slug'
     | '/templates'
     | '/customize/$id'
+    | '/api/public/push-github'
   id:
     | '__root__'
     | '/'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/templates/$slug'
     | '/templates/'
     | '/_authenticated/customize/$id'
+    | '/api/public/push-github'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   SurpriseCodeRoute: typeof SurpriseCodeRoute
   TemplatesSlugRoute: typeof TemplatesSlugRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
+  ApiPublicPushGithubRoute: typeof ApiPublicPushGithubRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCustomizeIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/push-github': {
+      id: '/api/public/push-github'
+      path: '/api/public/push-github'
+      fullPath: '/api/public/push-github'
+      preLoaderRoute: typeof ApiPublicPushGithubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -251,6 +271,7 @@ const rootRouteChildren: RootRouteChildren = {
   SurpriseCodeRoute: SurpriseCodeRoute,
   TemplatesSlugRoute: TemplatesSlugRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
+  ApiPublicPushGithubRoute: ApiPublicPushGithubRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

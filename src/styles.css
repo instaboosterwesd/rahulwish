@@ -520,3 +520,10 @@
 @keyframes karwa-sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
 @keyframes karwa-flicker { from { opacity: .55; transform: scale(.94); } to { opacity: 1; transform: scale(1.06); } }
 @media (prefers-reduced-motion: reduce) { .karwa-kenburns, .karwa-glows span, .karwa-sieve, .karwa-flame { animation: none; } }
+
+.karwa-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.karwa-quiz { display: grid; gap: 10px; width: min(440px, 100%); }
+.karwa-quiz-option { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 50px; padding: 12px 18px; text-align: left; border-radius: 16px; color: var(--karwa-ink); background: oklch(1 0 0 / .08); border: 1px solid oklch(0.82 0.14 80 / .35); backdrop-filter: blur(6px); transition: transform .2s, border-color .2s; }
+.karwa-quiz-option:not(:disabled):hover { transform: translateY(-2px); border-color: oklch(0.82 0.14 80 / .8); }
+.karwa-quiz-option.is-right { border-color: oklch(0.82 0.14 80); background: oklch(0.82 0.14 80 / .2); }
+.karwa-quiz-option.is-wrong { border-color: var(--karwa-sindoor); opacity: .7; }
