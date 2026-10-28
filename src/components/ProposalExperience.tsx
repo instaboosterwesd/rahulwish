@@ -69,7 +69,7 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
       <img src={garden} width={1024} height={1536} alt="Roses framing a lakeside garden at sunset" className="proposal-backdrop" />
       <div className="proposal-veil" aria-hidden="true" />
       <header className="proposal-header">
-        <span className="proposal-wordmark"><Heart size={15} /> always4you</span>
+        <span className="proposal-wordmark"><Heart size={15} /> RGX4YOU</span>
         <div className="flex items-center gap-2">
           {step > 1 && <Button variant="ghost" size="icon" title="Previous chapter" aria-label="Previous chapter" onClick={() => setStep(step - 1)}><ArrowLeft /></Button>}
           <Button variant="glass" size="icon" title={playing ? "Pause our song" : "Play our song"} aria-label={playing ? "Pause music" : "Play music"} onClick={toggleMusic}>{playing ? <Pause /> : <Music2 />}</Button>

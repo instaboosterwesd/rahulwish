@@ -6,9 +6,9 @@ import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/templates/")({
   head: () => ({ meta: [
-    { title: "Templates — RJX4You" },
+    { title: "Templates — RGX4YOU" },
     { name: "description", content: "Birthday, proposal, invitation and flipbook surprise website templates." },
-    { property: "og:title", content: "Templates — RJX4You" },
+    { property: "og:title", content: "Templates — RGX4YOU" },
     { property: "og:description", content: "Birthday, proposal, invitation and flipbook surprise website templates." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },

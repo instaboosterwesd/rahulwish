@@ -11,13 +11,13 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "RJX4You — Surprise Websites for People You Love" },
+      { title: "RGX4YOU — Surprise Websites for People You Love" },
       {
         name: "description",
         content:
           "Create a magical personalised surprise website — birthday, proposal, invitation or love letter — with photos, music and a secret link. Starting at ₹0.",
       },
-      { property: "og:title", content: "RJX4You — Surprise Websites for People You Love" },
+      { property: "og:title", content: "RGX4YOU — Surprise Websites for People You Love" },
       {
         property: "og:description",
         content:

@@ -1,4 +1,4 @@
-# Always4you — project context
+# RGX4YOU — project context
 
 Updated: 2026-10-19 UTC. This document contains project context, not credentials. Refresh it when behavior or verification changes. `AGENTS.md` remains the authoritative architecture/security rules file; `roadmap.md` tracks outstanding work.
 
@@ -12,7 +12,7 @@ Updated: 2026-10-19 UTC. This document contains project context, not credentials
 
 ## Product and preferences
 
-- Product name: Always4you. It sells personalized surprise websites, with INR pricing and romantic/celebration presentations.
+- Product name: RGX4YOU. It sells personalized surprise websites, with INR pricing and romantic/celebration presentations.
 - The user communicates primarily in Hindi/Hinglish and asks for direct practical action; explanations should be short and accessible.
 - Use the existing visual system and supplied/generated project assets rather than replacing the design without a request.
 - No other explicit personal visual preferences have been established in this conversation. Do not invent them.
@@ -59,7 +59,7 @@ Updated: 2026-10-19 UTC. This document contains project context, not credentials
 
 ## Verification established earlier
 
-- The home page rendered Always4you, and `/templates/proposal` rendered `Proposal Surprise` with INR 499 after rebinding the new Supabase.
+- The home page rendered RGX4YOU, and `/templates/proposal` rendered `Proposal Surprise` with INR 499 after rebinding the new Supabase.
 - Signed-out checks blocked profile/deposit/surprise/role table access and purchases. Existing Bun/Vitest tests were previously run; the preview build was reported OK.
 - Unit tests cover routing, INR formatting, approved-credit arithmetic, announcement cooldown, and Proposal reveal/quiz/config validation. A route unit test deliberately does not exercise network loaders.
 - These prior checks are not proof of authenticated admin, OAuth, private storage migration, or buyer-to-recipient save/read flows. Re-verify those separately before claiming they work.

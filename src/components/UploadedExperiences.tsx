@@ -15,7 +15,7 @@ import envelope from '@/assets/templates/your-surprise-template-envelope.webp';
 import camera from '@/assets/templates/your-surprise-template-camera.webp';
 import music from '@/assets/templates/your-surprise-template-music.png';
 
-function Brand() { return <div className="template-brand"><Heart size={15} /> RJX4You</div>; }
+function Brand() { return <div className="template-brand"><Heart size={15} /> RGX4YOU</div>; }
 
 const noMessages = ['Please select one…', 'Hmm… are you sure?', 'One more little thought?', 'My heart was hoping for a yes.', 'You’re making this little bear blush.', 'Is that your final answer?'];
 export function LoveExperience(p: ExperienceProps) {

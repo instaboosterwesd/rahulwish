@@ -17,7 +17,7 @@ import { uploadedExperienceKind } from "@/lib/uploaded-templates";
 
 export const Route = createFileRoute("/_authenticated/customize/$id")({
   loader: async ({ context, params }) => { const data = await context.queryClient.ensureQueryData(customerQuery()); if (!data.surprises.some((s) => s.id === params.id && ["paid", "delivered"].includes(s.status))) throw notFound(); },
-  head: () => ({ meta: [{ title: "Customize your surprise — RJX4You" }, { name: "description", content: "Add names, photos and questions, then preview your surprise live." }, { property: "og:title", content: "Customize your surprise — RJX4You" }, { property: "og:description", content: "Add names, photos and questions, then preview your surprise live." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: Page,
+  head: () => ({ meta: [{ title: "Customize your surprise — RGX4YOU" }, { name: "description", content: "Add names, photos and questions, then preview your surprise live." }, { property: "og:title", content: "Customize your surprise — RGX4YOU" }, { property: "og:description", content: "Add names, photos and questions, then preview your surprise live." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }), component: Page,
 });
 function Page() {
   const { id } = Route.useParams(); const { data } = useSuspenseQuery(customerQuery()); const s = data.surprises.find((s) => s.id === id); if (!s) return null; return <Editor key={id} surprise={s} />;

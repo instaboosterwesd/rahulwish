@@ -20,9 +20,9 @@ export const Route = createFileRoute("/templates/$slug")({
     return t;
   },
   head: ({ loaderData }) => ({ meta: [
-    { title: `${loaderData?.title ?? "Template"} — RJX4You` },
+    { title: `${loaderData?.title ?? "Template"} — RGX4YOU` },
     { name: "description", content: loaderData?.tagline ?? "Surprise website template" },
-    { property: "og:title", content: `${loaderData?.title ?? "Template"} — RJX4You` },
+    { property: "og:title", content: `${loaderData?.title ?? "Template"} — RGX4YOU` },
     { property: "og:description", content: loaderData?.tagline ?? "Surprise website template" },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },

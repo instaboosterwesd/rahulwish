@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { sendPhoneOtp, verifyPhoneOtp } from "@/lib/phone-auth.functions";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — RJX4You" }, { name: "description", content: "Mobile number aur code se RJX4You mein sign in karo." }, { property: "og:title", content: "Sign in — RJX4You" }, { property: "og:description", content: "Sign in to manage your RJX4You surprises." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
+  head: () => ({ meta: [{ title: "Sign in — RGX4YOU" }, { name: "description", content: "Mobile number aur code se RGX4YOU mein sign in karo." }, { property: "og:title", content: "Sign in — RGX4YOU" }, { property: "og:description", content: "Sign in to manage your RGX4YOU surprises." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" }] }),
   component: Page,
 });
 

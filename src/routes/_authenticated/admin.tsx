@@ -43,10 +43,10 @@ import { AdminTemplatePhoto } from '@/components/AdminTemplatePhoto';
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Admin — RJX4You" },
+      { title: "Admin — RGX4YOU" },
       { name: "description", content: "Manage templates, users, deposits and settings." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Admin — RJX4You" },
+      { property: "og:title", content: "Admin — RGX4YOU" },
       { property: "og:description", content: "Manage templates, users, deposits and settings." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
