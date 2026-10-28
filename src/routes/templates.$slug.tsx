@@ -4,6 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { purchaseTemplate } from "@/lib/customer.functions";
+import { useState } from "react";
+import { startFamPayment, type FamCheckout } from "@/lib/famgateway.functions";
+import { FamPayDialog } from "@/components/FamPayDialog";
 import { Eye, ShoppingBag } from "lucide-react";
 import { templateQuery } from "@/lib/templates.functions";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
@@ -34,6 +37,9 @@ export const Route = createFileRoute("/templates/$slug")({
 function Page() {
   const { slug } = Route.useParams();
   const { user } = useAuth(); const navigate = useNavigate(); const qc = useQueryClient(); const buy = useServerFn(purchaseTemplate);
+  const startPay = useServerFn(startFamPayment);
+  const [checkout, setCheckout] = useState<FamCheckout | null>(null);
+  const pay = useMutation({ mutationFn: (template: string) => startPay({ data: { template } }), onSuccess: setCheckout, onError: (e) => toast.error(e.message) });
   const purchase = useMutation({ mutationFn: (template: string) => buy({ data: { template } }), onSuccess: (id) => { qc.invalidateQueries({ queryKey: ["customer-dashboard"] }); if (id) navigate({ to: "/customize/$id", params: { id } }); }, onError: () => toast.error("Approved credit required. Send a deposit request from My surprises.") });
   const { data: t } = useSuspenseQuery(templateQuery(slug));
   if (!t) return null;
@@ -50,7 +56,10 @@ function Page() {
             {t.original_price_inr > t.price_inr && <span className="ml-3 text-base text-primary">{discountPercent(t.price_inr, t.original_price_inr)}% off</span>}
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            {user ? <Button variant="hero" size="lg" disabled={purchase.isPending} onClick={() => purchase.mutate(t.id)}><ShoppingBag /> Buy / Customize</Button> : <Button asChild variant="hero" size="lg"><Link to="/auth"><ShoppingBag /> Sign in to customize</Link></Button>}
+            {user ? (t.price_inr > 0
+              ? <><Button variant="hero" size="lg" disabled={pay.isPending} onClick={() => pay.mutate(t.id)}><ShoppingBag /> {pay.isPending ? "Starting…" : `Pay ${formatINR(t.price_inr)} with UPI`}</Button><Button variant="glass" size="lg" disabled={purchase.isPending} onClick={() => purchase.mutate(t.id)}>Use my credit</Button></>
+              : <Button variant="hero" size="lg" disabled={purchase.isPending} onClick={() => purchase.mutate(t.id)}><ShoppingBag /> Get free / Customize</Button>)
+              : <Button asChild variant="hero" size="lg"><Link to="/auth"><ShoppingBag /> Sign in to buy</Link></Button>}
             {user && <Button asChild variant="glass"><Link to="/my">My credit / Deposit</Link></Button>}
             <Button asChild variant="outline" size="lg">
               <Link to="/demo/$slug" params={{ slug }}>
@@ -60,6 +69,7 @@ function Page() {
           </div>
         </div>
       </main>
+      <FamPayDialog checkout={checkout} onClose={() => setCheckout(null)} />
       <SiteFooter />
     </div>
   );
