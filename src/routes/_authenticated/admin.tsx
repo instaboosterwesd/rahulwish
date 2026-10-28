@@ -17,6 +17,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
+import { AdminFamKey } from "@/components/AdminFamKey";
 import { Button } from "@/components/ui/button";
 import {
   adminEditUser,
@@ -480,6 +481,7 @@ function AdminPage() {
         {/* Settings */}
         {tab === "settings" && (
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <AdminFamKey />
             <div className="clay p-8">
               <h3 className="flex items-center gap-2 text-xl font-semibold">
                 <Wrench className="h-5 w-5 text-primary" /> Maintenance Mode
