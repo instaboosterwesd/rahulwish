@@ -463,3 +463,60 @@
 .proposal-jewel-trigger { touch-action:none; user-select:none; }
 @keyframes disc-spin { to { transform:rotate(360deg); } }
 @media(prefers-reduced-motion:reduce) { .birthday-lanterns span,.template-disc,.gift-discoveries { animation:none; } .love-no,.love-yes { transition:none; } }
+
+/* ---------- Karwa Chauth template ---------- */
+:root {
+  --karwa-night: oklch(0.16 0.05 275);
+  --karwa-sindoor: oklch(0.55 0.21 25);
+  --karwa-gold: oklch(0.82 0.14 80);
+  --karwa-glow: oklch(0.88 0.13 75);
+  --karwa-ink: oklch(0.97 0.02 85);
+}
+.karwa-experience { position: relative; min-height: 100vh; overflow: hidden; background: radial-gradient(circle at 70% 15%, oklch(0.3 0.07 275), var(--karwa-night) 65%); color: var(--karwa-ink); }
+.karwa-stage { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 64px 20px; animation: karwa-in 1.2s ease both; }
+.karwa-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.karwa-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, oklch(0.12 0.05 275 / .35), oklch(0.1 0.04 275 / .85)); }
+.karwa-bg-dim::after { background: oklch(0.1 0.04 275 / .78); }
+.karwa-kenburns { animation: karwa-kenburns 22s ease-in-out infinite alternate; }
+.karwa-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; max-width: 640px; width: 100%; }
+.karwa-content-low { margin-top: 38vh; }
+.karwa-eyebrow { letter-spacing: .28em; text-transform: uppercase; font-size: 12px; color: var(--karwa-gold); }
+.karwa-title, .karwa-heading { font-family: var(--font-sans); font-weight: 600; line-height: 1.1; text-shadow: 0 4px 30px oklch(0 0 0 / .5); overflow-wrap: anywhere; }
+.karwa-title { font-size: clamp(42px, 9vw, 76px); }
+.karwa-heading { font-size: clamp(28px, 6vw, 44px); }
+.karwa-title span, .karwa-heading span { display: block; font-family: var(--font-script); font-weight: 400; color: var(--karwa-glow); font-size: .8em; margin-top: 8px; }
+.karwa-hint { font-size: 13px; opacity: .7; }
+.karwa-mute { position: fixed; top: 18px; right: 18px; z-index: 40; width: 44px; height: 44px; border-radius: 999px; display: grid; place-items: center; background: oklch(1 0 0 / .12); backdrop-filter: blur(8px); color: var(--karwa-ink); }
+.karwa-glows { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.karwa-glows span { position: absolute; border-radius: 999px; background: var(--karwa-glow); box-shadow: 0 0 14px 4px oklch(0.85 0.15 75 / .7); opacity: 0; animation: karwa-float 9s ease-in-out infinite; }
+.karwa-sieve { position: relative; width: min(78vw, 340px); aspect-ratio: 1; border-radius: 999px; overflow: hidden; cursor: pointer; box-shadow: 0 0 80px 10px oklch(0.85 0.13 80 / .35); animation: karwa-sway 6s ease-in-out infinite; }
+.karwa-sieve img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 2.4s ease, transform 3s ease; }
+.karwa-sieve-moon { object-position: 68% 38%; transform: scale(2.2); }
+.karwa-sieve-face { opacity: 0; transform: scale(1.15); }
+.karwa-sieve.is-revealed .karwa-sieve-moon { opacity: 0; transform: scale(2.6); }
+.karwa-sieve.is-revealed .karwa-sieve-face { opacity: 1; transform: scale(1); }
+.karwa-sieve-mesh { position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, oklch(0.85 0.1 80 / .22) 0 1px, transparent 1px 6px), repeating-linear-gradient(90deg, oklch(0.85 0.1 80 / .22) 0 1px, transparent 1px 6px); transition: opacity 2s ease; }
+.karwa-sieve.is-revealed .karwa-sieve-mesh { opacity: .35; }
+.karwa-sieve-rim { position: absolute; inset: 0; border-radius: 999px; border: 14px solid var(--karwa-gold); box-shadow: inset 0 0 0 4px var(--karwa-sindoor), inset 0 0 30px oklch(0 0 0 / .5); }
+.karwa-flame { position: absolute; z-index: 1; width: 220px; height: 220px; border-radius: 999px; background: radial-gradient(circle, oklch(0.85 0.16 70 / .55), transparent 65%); animation: karwa-flicker 1.6s ease-in-out infinite alternate; pointer-events: none; }
+.karwa-flame-a { left: 2%; top: 45%; }
+.karwa-flame-b { right: 15%; top: 60%; animation-delay: .5s; }
+.karwa-gallery { position: relative; width: min(86vw, 420px); aspect-ratio: 4 / 5; border-radius: 28px; overflow: hidden; border: 3px solid var(--karwa-gold); box-shadow: 0 30px 80px oklch(0 0 0 / .55); }
+.karwa-gallery img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.12); transition: opacity 1.6s ease, transform 6s ease; }
+.karwa-gallery img.is-active { opacity: 1; transform: scale(1); }
+.karwa-dots { display: flex; gap: 8px; }
+.karwa-dots button { width: 9px; height: 9px; border-radius: 99px; background: oklch(1 0 0 / .35); transition: all .3s; }
+.karwa-dots button.is-active { width: 26px; background: var(--karwa-gold); }
+.karwa-vows { display: grid; gap: 10px; width: 100%; text-align: left; }
+.karwa-vows li { display: flex; gap: 14px; align-items: center; padding: 12px 16px; border-radius: 16px; background: oklch(1 0 0 / .08); border: 1px solid oklch(0.82 0.14 80 / .35); backdrop-filter: blur(6px); animation: karwa-in .9s ease both; }
+.karwa-vows b { flex: none; width: 30px; height: 30px; border-radius: 999px; display: grid; place-items: center; background: var(--karwa-sindoor); color: var(--karwa-ink); font-size: 14px; }
+.karwa-letter { width: 100%; padding: 32px 28px; border-radius: 24px; text-align: left; background: oklch(0.97 0.03 85 / .95); color: oklch(0.25 0.05 30); box-shadow: 0 30px 90px oklch(0 0 0 / .6); border-top: 6px solid var(--karwa-sindoor); }
+.karwa-letter-greet { font-family: var(--font-script); font-size: 34px; color: var(--karwa-sindoor); }
+.karwa-letter-sign { margin-top: 20px; text-align: right; }
+.karwa-letter-sign span { display: block; font-family: var(--font-script); font-size: 32px; color: var(--karwa-sindoor); overflow-wrap: anywhere; }
+@keyframes karwa-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes karwa-kenburns { from { transform: scale(1); } to { transform: scale(1.12) translate(-1.5%, -1%); } }
+@keyframes karwa-float { 0% { opacity: 0; transform: translateY(0); } 25% { opacity: .9; } 100% { opacity: 0; transform: translateY(-55vh); } }
+@keyframes karwa-sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+@keyframes karwa-flicker { from { opacity: .55; transform: scale(.94); } to { opacity: 1; transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .karwa-kenburns, .karwa-glows span, .karwa-sieve, .karwa-flame { animation: none; } }
