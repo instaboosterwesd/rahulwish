@@ -92,3 +92,11 @@ export const templateQuery = (slug: string) =>
   queryOptions({ queryKey: ["template", slug], queryFn: () => getTemplate({ data: { slug } }) });
 export const surpriseQuery = (code: string) =>
   queryOptions({ queryKey: ["surprise", code], queryFn: () => getSurprise({ data: { code } }) });
+
+export const recordSurpriseView = createServerFn({ method: "POST" })
+  .inputValidator((d: { code: string }) => z.object({ code: z.string().min(4).max(32) }).parse(d))
+  .handler(async ({ data }) => {
+    const { error } = await (publicClient() as any).rpc("record_surprise_view", { _code: data.code });
+    if (error) console.error("record_surprise_view:", error.message);
+    return { ok: true };
+  });
