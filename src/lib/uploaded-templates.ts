@@ -17,7 +17,9 @@ import p4 from '@/assets/templates/proposal-website-p4.jpg';
 import p5 from '@/assets/templates/proposal-website-p5.jpg';
 import p6 from '@/assets/templates/proposal-website-p6.jpg';
 export const uploadedMedia = { proposalSong: proposalSong, proposalVoice: proposalVoice, birthdaySong: birthdaySong, giftSong: giftSong, proposalCover: proposalCover, birthdayCover: birthdayCover, giftCover: giftCover, giftPhoto: giftPhoto, loveHappy: loveHappy, loveSad: loveSad, proposalPhotos: [p1,p2,p3,p4,p5,p6] };
+import { newTemplateDemoPhotos } from '@/lib/new-templates';
 export function demoPhotos(category: string, cover: string) {
+  const extra = newTemplateDemoPhotos(category); if (extra) return extra;
   switch (uploadedExperienceKind(category)) {
     case 'proposal': return uploadedMedia.proposalPhotos;
     case 'birthday': return [uploadedMedia.birthdayCover];

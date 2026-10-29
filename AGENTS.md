@@ -22,3 +22,7 @@
 - Store admin cover uploads in private template-covers storage through role-checked server functions; resolve only database-selected cover paths to expiring signed URLs, since public buckets are blocked.
 - Use the shared reduced-motion-aware celebration helper for template bursts so all presentations respect accessibility preferences.
 - FamGateway UPI payments: server functions create and verify orders with the secret key; database RPCs check a hash of that key so only the server can record payments, and a paid order becomes an approved deposit plus a paid surprise in one locked step.
+
+- Uploaded canvas templates (Animated Garden, 3D Hearts) run as ported engines in `src/lib/engines/`, scoped to a root element, loaded via dynamic import in `useEffect`, and return a cleanup — so they never touch the global page and stay SSR-safe.
+- Uploaded categories beyond the original four map to presentations in `src/lib/new-templates.ts`; that file owns their media, covers, demo photos and the Secret Birthday passcode rule.
+- The 5 uploaded templates (sweet-birthday, apology, secret-birthday, garden, heart-universe) are served unchanged from public/templates-src/<slug>/ in a full-screen iframe, because the owner wants the original code used as-is; the React ports in NewExperiences/CanvasExperiences are no longer dispatched.

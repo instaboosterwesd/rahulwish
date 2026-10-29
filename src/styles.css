@@ -534,3 +534,261 @@
 .diwali-diya.is-lit .diwali-flame { opacity: 1; transform: translate(-50%, -100%) scale(1); animation: diwali-flicker 1.2s ease-in-out infinite alternate; }
 @keyframes diwali-flicker { from { transform: translate(-50%, -100%) scale(1) rotate(-3deg); } to { transform: translate(-50%, -100%) scale(1.08, .95) rotate(3deg); } }
 @media (prefers-reduced-motion: reduce) { .diwali-diya.is-lit .diwali-flame { animation: none; } }
+
+/* ── Animated Garden template (scoped) ── */
+
+/* ============ CONFIG / TOKENS ============ */
+.garden-root{
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-spring: cubic-bezier(.34, 1.45, .4, 1);
+  --serif: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+  --sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+.garden-root[data-theme="midnight"]{
+  --bg0: #040711; --bg1: #09122a; --bg2: #121e42;
+  --ink: #f8edd9; --ink-dim: rgba(248, 237, 217, 0.72); --ink-faint: rgba(248, 237, 217, 0.42);
+  --accent: #f0be72; --accent2: #ff8aa1;
+  --veil: radial-gradient(ellipse 75% 55% at 50% 48%, rgba(4, 7, 17, 0.76), rgba(4, 7, 17, 0.32) 55%, transparent 75%);
+  --grain-op: .06; --particle: #ffd9a0; --glow: rgba(240, 190, 114, 0.4);
+  --panel: #0d152c; --line: rgba(248, 237, 217, 0.16);
+  --card-bg: rgba(11, 19, 41, 0.75); --card-border: rgba(240, 190, 114, 0.3);
+  --card-shadow: 0 24px 64px rgba(0,0,0,0.55), 0 0 45px rgba(240, 190, 114, 0.14);
+  --hz: rgba(240, 158, 82, 0.55);
+}
+.garden-root[data-theme="morning"]{
+  --bg0: #fcf6ec; --bg1: #f8e6ce; --bg2: #f0d3b6;
+  --ink: #44241d; --ink-dim: rgba(68, 36, 29, 0.75); --ink-faint: rgba(68, 36, 29, 0.45);
+  --accent: #d66e4a; --accent2: #e59a60;
+  --veil: radial-gradient(ellipse 75% 55% at 50% 48%, rgba(252, 246, 236, 0.82), rgba(252, 246, 236, 0.36) 55%, transparent 75%);
+  --grain-op: .08; --particle: #e2955d; --glow: rgba(226, 149, 93, 0.32);
+  --panel: #fffaf3; --line: rgba(68, 36, 29, 0.15);
+  --card-bg: rgba(255, 250, 244, 0.84); --card-border: rgba(214, 110, 74, 0.3);
+  --card-shadow: 0 20px 50px rgba(135, 75, 55, 0.18), 0 0 35px rgba(226, 149, 93, 0.15);
+  --hz: rgba(229, 160, 96, 0.52);
+}
+.garden-root[data-theme="vintage"]{
+  --bg0: #ebdcc1; --bg1: #f2e6d0; --bg2: #ddc9a4;
+  --ink: #421621; --ink-dim: rgba(66, 22, 33, 0.76); --ink-faint: rgba(66, 22, 33, 0.48);
+  --accent: #832c3d; --accent2: #aa6133;
+  --veil: radial-gradient(ellipse 75% 55% at 50% 48%, rgba(235, 220, 193, 0.84), rgba(235, 220, 193, 0.42) 55%, transparent 75%);
+  --grain-op: .12; --particle: #832c3d; --glow: rgba(131, 44, 61, 0.25);
+  --panel: #f6eee0; --line: rgba(66, 22, 33, 0.18);
+  --card-bg: rgba(248, 241, 230, 0.86); --card-border: rgba(131, 44, 61, 0.26);
+  --card-shadow: 0 22px 55px rgba(90, 45, 40, 0.22), 0 0 30px rgba(131, 44, 61, 0.12);
+  --hz: rgba(182, 116, 66, 0.5);
+}
+.garden-root[data-theme="enchanted"]{
+  --bg0: #030f0d; --bg1: #08241e; --bg2: #103c32;
+  --ink: #ecf8e8; --ink-dim: rgba(236, 248, 232, 0.72); --ink-faint: rgba(236, 248, 232, 0.42);
+  --accent: #8de4b3; --accent2: #c09aff;
+  --veil: radial-gradient(ellipse 75% 55% at 50% 48%, rgba(3, 15, 13, 0.8), rgba(3, 15, 13, 0.35) 55%, transparent 75%);
+  --grain-op: .07; --particle: #a9f5c7; --glow: rgba(141, 228, 179, 0.36);
+  --panel: #081c17; --line: rgba(236, 248, 232, 0.15);
+  --card-bg: rgba(8, 26, 22, 0.76); --card-border: rgba(141, 228, 179, 0.3);
+  --card-shadow: 0 24px 64px rgba(0,0,0,0.55), 0 0 45px rgba(141, 228, 179, 0.16);
+  --hz: rgba(255, 198, 122, 0.42);
+}
+
+.garden-root, .garden-root *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+.garden-root{position:relative; height:100svh; min-height:520px; width:100%; margin:0; padding:0}
+.garden-root{
+  background:var(--bg0); color:var(--ink); font-family:var(--sans);
+  overflow:hidden; overscroll-behavior:none; -webkit-font-smoothing:antialiased;
+}
+
+.garden-root #stage{
+  position:absolute; inset:0; height:100%; width:100%; overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 110%, var(--bg2), transparent 60%),
+             radial-gradient(140% 100% at 50% -10%, var(--bg2), transparent 55%),
+             linear-gradient(var(--bg1), var(--bg0));
+  transition:background 1.2s ease;
+}
+
+.garden-root #camera{
+  position:absolute; inset:0; width:100%; height:100%;
+  transform:scale(1.55); transform-origin:50% 50%;
+  transition:transform 3s var(--ease-out); will-change:transform;
+}
+
+.garden-root #horizon{
+  position:absolute; inset:0;
+  pointer-events:none; opacity:0; transition:opacity 3.5s ease;
+  background:radial-gradient(ellipse 80% 45% at 50% 48%, var(--hz), transparent 70%);
+}
+.garden-root #horizon.on{opacity:1}
+
+.garden-root #sky{
+  position:absolute; inset:-8%; pointer-events:none;
+  background:radial-gradient(65% 45% at 68% 20%, var(--glow), transparent 72%);
+  animation:skyDrift 28s ease-in-out infinite alternate;
+}
+@keyframes skyDrift{from{transform:translate3d(-1.5%,1%,0)}to{transform:translate3d(1.5%,-1%,0)}}
+
+.garden-root #garden{
+  position:absolute; inset:0; width:100%; height:100%;
+  overflow:visible; pointer-events:none;
+}
+
+.garden-root #veil{
+  position:absolute; inset:0; background:var(--veil); opacity:0;
+  transition:opacity 2.4s ease; pointer-events:none;
+}
+.garden-root #veil.on{opacity:1}
+
+.garden-root #vignette{
+  position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(120% 100% at 50% 45%, transparent 56%, rgba(0,0,0,.44) 100%);
+}
+.garden-root[data-theme="morning"] #vignette,.garden-root[data-theme="vintage"] #vignette{
+  background:radial-gradient(120% 100% at 50% 45%, transparent 60%, rgba(68,36,29,.22) 100%);
+}
+
+.garden-root #grain{display:none}
+.garden-root #dust{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+
+/* Animation helpers */
+.garden-root .not-bloomed, .not-bloomed *{animation-play-state:paused !important}
+.garden-root .breathe{animation:breathe var(--bd,6s) ease-in-out infinite; animation-delay:var(--bdel,0s); transform-box:fill-box; transform-origin:center}
+@keyframes breathe{0%,100%{transform:scale(1) rotate(var(--br,0deg))}50%{transform:scale(1.038) rotate(var(--br,0deg))}}
+.garden-root .sway{animation:sway var(--sd,7.5s) ease-in-out infinite; animation-delay:var(--sdel,0s); transform-box:fill-box; transform-origin:bottom center}
+@keyframes sway{0%,100%{transform:rotate(-1.8deg)}50%{transform:rotate(1.8deg)}}
+.garden-root .leafSway{animation:leafSway var(--ld,5.2s) ease-in-out infinite; animation-delay:var(--ldel,0s); transform-box:fill-box; transform-origin:0% 50%}
+@keyframes leafSway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg)}}
+.garden-root .flower-hit{cursor:pointer; pointer-events:all}
+
+/* ================= TOAST & ROSE BANNER ================= */
+.garden-root #toast{
+  position:absolute; left:50%; bottom:calc(76px + env(safe-area-inset-bottom));
+  transform:translateX(-50%) translateY(8px); z-index:40;
+  font-family:var(--serif); font-style:italic; font-size:19px; color:var(--ink);
+  background:color-mix(in srgb, var(--panel) 90%, transparent);
+  border:1px solid var(--accent); padding:12px 24px; border-radius:999px;
+  opacity:0; transition:opacity .45s ease, transform .45s var(--ease-out);
+  pointer-events:none; white-space:nowrap; max-width:92vw; overflow:hidden;
+  text-overflow:ellipsis; box-shadow:0 14px 36px rgba(0,0,0,.45), 0 0 24px var(--glow);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+}
+.garden-root #toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+@media (prefers-reduced-motion:reduce){
+  .garden-root #sky, .breathe, .sway, .leafSway{animation:none !important}
+  .garden-root #camera{transition:none}
+}
+
+/* Styles for the five uploaded templates: Sweet Birthday, Apology Card, Secret Birthday Gift, 3D Hearts. */
+
+/* ── Sweet Birthday ── */
+.sweet-experience { --sw-bg: oklch(0.95 0.04 350); --sw-deep: oklch(0.55 0.19 355); --sw-ink: oklch(0.32 0.08 350); position: relative; min-height: 100svh; overflow: hidden; background: radial-gradient(circle at 20% 10%, oklch(0.97 0.03 80), transparent 45%), radial-gradient(circle at 80% 90%, oklch(0.9 0.07 340), transparent 50%), var(--sw-bg); color: var(--sw-ink); isolation: isolate; }
+.sweet-sparkles span { position: absolute; top: -20px; z-index: -1; font-size: 22px; color: var(--sw-deep); opacity: .5; animation: sweet-fall 9s linear infinite; }
+@keyframes sweet-fall { to { transform: translateY(110svh) rotate(240deg); } }
+.sweet-page { min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 48px 20px; text-align: center; animation: sweet-in .6s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes sweet-in { from { opacity: 0; transform: translateY(24px) scale(.96); } }
+.sweet-eyebrow { font-size: 13px; letter-spacing: .25em; text-transform: uppercase; color: var(--sw-deep); font-weight: 700; }
+.sweet-title { font-family: var(--font-display); font-size: clamp(3rem, 10vw, 5.5rem); line-height: .95; color: var(--sw-deep); }
+.sweet-title span { display: block; font-size: .32em; letter-spacing: .3em; color: var(--sw-ink); margin-top: 10px; }
+.sweet-name { font-family: var(--font-script); font-size: 2.6rem; color: var(--sw-deep); }
+.sweet-heading { font-family: var(--font-display); font-size: clamp(1.4rem, 5vw, 2.3rem); letter-spacing: .08em; color: var(--sw-deep); }
+.sweet-copy { max-width: 32rem; font-size: 1.05rem; }
+.sweet-gif { width: 220px; height: 220px; object-fit: contain; border-radius: 28px; background: oklch(1 0 0 / .6); padding: 10px; box-shadow: 0 18px 40px oklch(0.55 0.19 355 / .2); }
+.sweet-gif.is-small { width: 120px; height: 120px; }
+.sweet-player { display: flex; align-items: center; gap: 12px; width: min(320px, 90vw); background: oklch(1 0 0 / .75); border-radius: 999px; padding: 8px 16px 8px 8px; box-shadow: 0 8px 24px oklch(0.55 0.19 355 / .15); }
+.sweet-player button { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--sw-deep); color: oklch(1 0 0); }
+.sweet-track { flex: 1; height: 6px; border-radius: 99px; background: oklch(0.55 0.19 355 / .15); overflow: hidden; }
+.sweet-track span { display: block; height: 100%; background: var(--sw-deep); transition: width .3s linear; }
+.sweet-player small { font-size: 12px; color: var(--sw-deep); }
+.sweet-cake { position: relative; display: flex; flex-direction: column; align-items: center; }
+.sweet-cake img { width: 230px; height: 230px; object-fit: contain; }
+.sweet-candles, .secret-candles { display: flex; gap: 22px; margin-bottom: -18px; z-index: 1; }
+.sweet-candle { position: relative; width: 14px; height: 52px; border-radius: 4px; background: repeating-linear-gradient(45deg, oklch(0.75 0.15 350) 0 6px, oklch(0.98 0.01 350) 6px 12px); cursor: pointer; }
+.sweet-flame { position: absolute; left: 50%; top: -22px; width: 14px; height: 22px; margin-left: -7px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: radial-gradient(circle at 50% 70%, oklch(0.98 0.1 95), oklch(0.8 0.18 60) 60%, transparent 70%); opacity: 0; transform: scale(.4); transition: all .3s; }
+.sweet-candle.is-lit .sweet-flame { opacity: 1; transform: scale(1); animation: sweet-flicker .4s ease-in-out infinite alternate; }
+@keyframes sweet-flicker { to { transform: scale(1.08) rotate(3deg); } }
+.sweet-polaroids { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; }
+.sweet-polaroid { width: 190px; background: oklch(1 0 0); padding: 10px 10px 14px; border-radius: 6px; box-shadow: 0 14px 30px oklch(0.32 0.08 350 / .2); transform: rotate(var(--r)); transition: transform .3s; }
+.sweet-polaroid:hover { transform: rotate(0) scale(1.05); }
+.sweet-polaroid img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 3px; }
+.sweet-polaroid figcaption { display: flex; flex-direction: column; margin-top: 8px; font-size: 13px; }
+.sweet-polaroid b { font-family: var(--font-script); font-size: 1.4rem; color: var(--sw-deep); font-weight: 400; }
+.sweet-balloons { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+.sweet-balloon { font-size: 46px; animation: sweet-bob 2.4s ease-in-out infinite alternate; transition: transform .2s; }
+.sweet-balloon.is-popped { animation: none; transform: scale(1.3); opacity: .6; }
+@keyframes sweet-bob { to { transform: translateY(-14px); } }
+.sweet-wishes { max-width: 30rem; text-align: left; display: grid; gap: 8px; background: oklch(1 0 0 / .7); border-radius: 22px; padding: 18px 22px; }
+.sweet-gift { display: flex; flex-direction: column; align-items: center; font-size: 110px; line-height: 1; animation: sweet-bob 1.2s ease-in-out infinite alternate; }
+.sweet-gift span { font-family: var(--font-script); font-size: 1.8rem; color: var(--sw-deep); }
+.sweet-card { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 34rem; background: oklch(1 0 0 / .85); border-radius: 28px; padding: 28px 24px; box-shadow: 0 24px 60px oklch(0.55 0.19 355 / .25); animation: sweet-in .7s; }
+.sweet-card h3 { font-family: var(--font-script); font-size: 3rem; color: var(--sw-deep); }
+.sweet-card img { width: 140px; height: 140px; object-fit: contain; }
+.sweet-letter { white-space: pre-wrap; overflow-wrap: anywhere; }
+.sweet-from { font-family: var(--font-script); font-size: 1.8rem; color: var(--sw-deep); }
+
+/* ── Apology Card ── */
+.apology-experience { --ap-bg: oklch(0.95 0.03 300); --ap-ink: oklch(0.3 0.07 320); --ap-deep: oklch(0.55 0.2 0); position: relative; min-height: 100svh; display: grid; place-items: center; padding: 40px 18px; overflow: hidden; background: linear-gradient(160deg, oklch(0.96 0.03 320), var(--ap-bg)); color: var(--ap-ink); transition: background 1s; isolation: isolate; }
+.apology-experience.is-sad, .apology-experience.is-begging { background: linear-gradient(160deg, oklch(0.88 0.04 250), oklch(0.8 0.05 260)); }
+.apology-experience.is-forgiven { background: linear-gradient(160deg, oklch(0.95 0.06 20), oklch(0.92 0.08 350)); }
+.apology-decor span { position: absolute; top: -30px; z-index: -1; font-size: 30px; opacity: .6; animation: sweet-fall 8s linear infinite; }
+.apology-card { width: min(440px, 100%); display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; background: oklch(1 0 0 / .85); border-radius: 30px; padding: 30px 22px; box-shadow: 0 24px 60px oklch(0.3 0.07 320 / .18); animation: sweet-in .55s cubic-bezier(.2,.9,.3,1.2); }
+.apology-gif { width: 170px; height: 170px; object-fit: contain; }
+.apology-card h1 { font-family: var(--font-display); font-size: 1.9rem; line-height: 1.15; color: var(--ap-deep); }
+.apology-eyebrow { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--ap-deep); }
+.apology-message { white-space: pre-wrap; overflow-wrap: anywhere; }
+.apology-from { font-family: var(--font-script); font-size: 1.8rem; color: var(--ap-deep); }
+.apology-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 6px; }
+.apology-actions button { transition: transform .25s ease; }
+.apology-drop { position: absolute; top: -30px; z-index: 5; font-weight: 700; color: var(--ap-deep); pointer-events: none; white-space: nowrap; animation: sweet-fall 3.6s ease-in forwards; }
+
+/* ── Secret Birthday Gift ── */
+.secret-experience { --sc-bg: oklch(0.18 0.05 15); --sc-ink: oklch(0.95 0.03 60); --sc-gold: oklch(0.82 0.13 80); --sc-rose: oklch(0.65 0.2 5); position: relative; min-height: 100svh; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, oklch(0.3 0.09 10), var(--sc-bg) 70%); color: var(--sc-ink); isolation: isolate; }
+.secret-motes span { position: absolute; bottom: -10px; width: 6px; height: 6px; border-radius: 50%; background: var(--sc-gold); box-shadow: 0 0 10px var(--sc-gold); opacity: .6; z-index: -1; animation: secret-rise 8s linear infinite; }
+@keyframes secret-rise { to { transform: translateY(-105svh); opacity: 0; } }
+.secret-stage { min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 48px 18px; text-align: center; animation: sweet-in .6s; }
+.secret-stage h1 { font-family: var(--font-display); font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--sc-gold); max-width: 30rem; }
+.secret-eyebrow { font-size: 13px; letter-spacing: .3em; color: var(--sc-gold); font-weight: 700; }
+.secret-clock { font-family: var(--font-display); font-size: clamp(2.6rem, 11vw, 5rem); color: var(--sc-gold); text-shadow: 0 0 30px oklch(0.82 0.13 80 / .5); font-variant-numeric: tabular-nums; }
+.secret-copy { color: oklch(0.95 0.03 60 / .85); max-width: 30rem; }
+.secret-card { width: min(380px, 100%); display: flex; flex-direction: column; align-items: center; gap: 12px; background: oklch(0.25 0.06 12 / .9); border: 1px solid oklch(0.82 0.13 80 / .35); border-radius: 28px; padding: 26px 20px; box-shadow: 0 30px 70px oklch(0 0 0 / .45); }
+.secret-card.is-shake { animation: secret-shake .4s; }
+@keyframes secret-shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+.secret-hero { width: 150px; height: 150px; object-fit: contain; }
+.secret-dots { display: flex; gap: 10px; }
+.secret-dots span { width: 44px; height: 50px; display: grid; place-items: center; border-radius: 12px; border: 1px solid oklch(0.82 0.13 80 / .4); font-size: 1.3rem; font-weight: 700; }
+.secret-dots span.is-on { background: oklch(0.82 0.13 80 / .15); border-color: var(--sc-gold); }
+.secret-keypad { display: grid; grid-template-columns: repeat(3, 64px); gap: 10px; }
+.secret-keypad button { height: 54px; display: grid; place-items: center; border-radius: 16px; background: oklch(1 0 0 / .08); font-size: 1.3rem; font-weight: 700; transition: transform .1s, background .2s; }
+.secret-keypad button:active { transform: scale(.92); background: oklch(0.82 0.13 80 / .3); }
+.secret-hint { font-size: 12px; opacity: .7; }
+.secret-arch { font-family: var(--font-script) !important; font-size: clamp(2.2rem, 7vw, 3.4rem) !important; }
+.secret-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; }
+.secret-wobble { animation: secret-shake .4s; }
+.secret-boxes { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+.secret-box { width: 130px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 10px; border-radius: 22px; background: linear-gradient(160deg, oklch(0.4 0.14 10), oklch(0.28 0.09 12)); border: 1px solid oklch(0.82 0.13 80 / .4); font-weight: 700; box-shadow: 0 14px 30px oklch(0 0 0 / .35); transition: transform .2s; }
+.secret-box:hover { transform: translateY(-6px) rotate(-2deg); }
+.secret-box span { font-size: 46px; }
+.secret-modal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 18px; background: oklch(0 0 0 / .6); backdrop-filter: blur(6px); }
+.secret-modal-card { position: relative; width: min(460px, 100%); max-height: 90svh; overflow: auto; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; background: oklch(0.97 0.02 60); color: oklch(0.25 0.06 12); border-radius: 26px; padding: 30px 20px 24px; animation: sweet-in .45s; }
+.secret-modal-card h2 { font-family: var(--font-display); font-size: 1.6rem; color: var(--sc-rose); }
+.secret-modal-card .secret-copy { color: inherit; }
+.secret-close { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: oklch(0 0 0 / .06); }
+.secret-line { width: 100%; height: 2px; background: oklch(0.45 0.05 50); }
+.secret-photo { margin-top: -10px; width: 230px; background: oklch(1 0 0); padding: 10px 10px 12px; border-radius: 4px; box-shadow: 0 14px 30px oklch(0 0 0 / .2); transform-origin: top center; animation: secret-sway 3s ease-in-out infinite alternate; }
+@keyframes secret-sway { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+.secret-photo img { width: 100%; aspect-ratio: 4/5; object-fit: cover; }
+.secret-photo figcaption { margin-top: 8px; font-family: var(--font-script); font-size: 1.4rem; }
+.secret-cake { display: flex; flex-direction: column; align-items: center; }
+.secret-cake-body { width: 220px; height: 110px; display: grid; place-items: center; border-radius: 18px 18px 26px 26px; background: linear-gradient(oklch(0.85 0.1 350) 0 30%, oklch(0.7 0.13 40) 30%); color: oklch(1 0 0); font-weight: 800; letter-spacing: .12em; box-shadow: 0 16px 30px oklch(0 0 0 / .2); }
+.secret-letter { white-space: pre-wrap; overflow-wrap: anywhere; text-align: left; line-height: 1.7; min-height: 12rem; cursor: pointer; }
+.secret-caret { animation: secret-blink 1s steps(1) infinite; }
+@keyframes secret-blink { 50% { opacity: 0; } }
+
+/* ── 3D Hearts Universe ── */
+.heart-root { position: relative; height: 100svh; min-height: 520px; width: 100%; overflow: hidden; background: oklch(0 0 0); color: oklch(1 0 0); user-select: none; touch-action: none; }
+.heart-canvas { position: absolute; inset: 0; }
+.heart-canvas canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.heart-canvas canvas:active { cursor: grabbing; }
+.heart-float { position: absolute; inset: 0; pointer-events: none; z-index: 10; overflow: hidden; }
+.floating-love-text { position: absolute; transform: translate(-50%, -50%); font-family: var(--font-display); font-size: 1.55rem; font-weight: 700; color: oklch(1 0 0); letter-spacing: .8px; white-space: nowrap; pointer-events: none; text-shadow: 0 2px 10px oklch(0 0 0 / .95), 0 0 8px oklch(1 0 0 / .95), 0 0 16px oklch(0.8 0.12 230 / .65); animation: heart-float-up 3s cubic-bezier(.16,1,.3,1) forwards; }
+@keyframes heart-float-up { 0% { opacity: 0; transform: translate(-50%, 0) scale(.85); } 10% { opacity: 1; transform: translate(-50%, -25%) scale(1.05); } 80% { opacity: 1; transform: translate(-50%, -70%); } 100% { opacity: 0; transform: translate(-50%, -100%); } }
+.heart-hint { position: absolute; left: 50%; bottom: 96px; z-index: 11; transform: translateX(-50%); text-align: center; pointer-events: none; font-size: 14px; opacity: .85; animation: sweet-in 1s; }
+.heart-name { font-family: var(--font-script); font-size: 2.4rem; text-shadow: 0 0 18px oklch(0.65 0.22 10); }
+@media (max-width: 600px) { .floating-love-text { font-size: 1.25rem; } }
+@media (prefers-reduced-motion: reduce) { .sweet-sparkles span, .apology-decor span, .secret-motes span, .sweet-balloon, .sweet-gift, .secret-photo { animation: none; } }

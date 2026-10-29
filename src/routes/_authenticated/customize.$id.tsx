@@ -14,6 +14,7 @@ import { proposalQuiz, proposalQuestionSchema, readProposalConfig, type Proposal
 import { diwaliQuiz } from "@/lib/diwali";
 import { karwaQuiz } from "@/lib/karwa";
 import { uploadedExperienceKind } from "@/lib/uploaded-templates";
+import { newTemplateKind } from "@/lib/new-templates";
 
 export const Route = createFileRoute("/_authenticated/customize/$id")({
   loader: async ({ context, params }) => { const data = await context.queryClient.ensureQueryData(customerQuery()); if (!data.surprises.some((s) => s.id === params.id && ["paid", "delivered"].includes(s.status))) throw notFound(); },
@@ -33,6 +34,8 @@ function Editor({ surprise: s }: { surprise: Surprise }) {
   const [form, setForm] = useState({ id: s.id, recipient: s.recipient_name, sender: s.sender_name, headline: s.headline, message: s.message });
   const [quiz, setQuiz] = useState<ProposalQuestion[]>(existing.quiz?.length ? existing.quiz : defaults.map((q) => ({ ...q, options: [...q.options] })));
   const [preview, setPreview] = useState(false);
+  const extraKind = newTemplateKind(category);
+  const [passcode, setPasscode] = useState(existing.passcode ?? "");
   const save = useServerFn(saveSurprise); const persistPhotos = useServerFn(savePhotos); const saveConfig = useServerFn(saveProposalConfig); const qc = useQueryClient();
   const [photoPaths, setPhotoPaths] = useState(s.photos);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
@@ -57,9 +60,11 @@ function Editor({ surprise: s }: { surprise: Surprise }) {
     mutationFn: async () => {
       const questions = cleanQuiz();
       for (const [i, q] of questions.entries()) { const r = proposalQuestionSchema.safeParse(q); if (!r.success) throw new Error(`Question ${i + 1}: har sawaal ke kam se kam 2 options aur sahi jawaab chuniye`); }
-      if (!questions.length) throw new Error("Kam se kam ek sawaal likhiye");
+      if (!extraKind && !questions.length) throw new Error("Kam se kam ek sawaal likhiye");
+      if (extraKind === "secret" && passcode && !/^\d{4}$/.test(passcode)) throw new Error("Passcode 4 digit ka hona chahiye");
       await save({ data: form });
-      await saveConfig({ data: { id: s.id, config: { ...existing, quiz: questions } } });
+      const config = { ...existing, ...(questions.length ? { quiz: questions } : {}), ...(extraKind === "secret" && passcode ? { passcode } : {}) };
+      await saveConfig({ data: { id: s.id, config } });
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["customer-dashboard"] }); qc.invalidateQueries({ queryKey: ["surprise", s.code] }); toast.success("Surprise saved"); },
     onError: (e) => toast.error(e.message),
@@ -69,20 +74,21 @@ function Editor({ surprise: s }: { surprise: Surprise }) {
   return <div className="min-h-screen bg-night"><SiteHeader /><main className="mx-auto max-w-6xl px-5 pb-12 pt-32">
     <Link to="/my" className="text-sm text-primary">← My surprises</Link><h1 className="mt-4 text-4xl">{s.templates?.title}</h1>
     <div className="mt-7 flex flex-wrap gap-3"><Button variant="outline" onClick={() => setPreview(!preview)}><Eye />{preview ? "Edit details" : "Live preview"}</Button><Button variant="outline" onClick={async () => { await navigator.clipboard.writeText(`${window.location.origin}/surprise/${s.code}`); toast.success("Link copied"); }}><Share2 />Copy link</Button></div>
-    {preview ? <div className="mt-8"><SurpriseExperience {...form} category={category} photos={photoUrls} cover={s.templates?.cover_image ?? ""} proposalConfig={{ ...existing, quiz: cleanQuiz() }} /></div> :
+    {preview ? <div className="mt-8"><SurpriseExperience {...form} category={category} photos={photoUrls} cover={s.templates?.cover_image ?? ""} proposalConfig={{ ...existing, quiz: cleanQuiz(), ...(passcode ? { passcode } : {}) }} /></div> :
     <form className="mt-8 max-w-2xl space-y-6" onSubmit={(e) => { e.preventDefault(); mutation.mutate(); }}>
       <h2 className="text-2xl">1. Naam</h2>
       <label className="block">Jiske liye surprise hai<Input className="mt-2" value={form.recipient} required maxLength={100} onChange={(e) => setForm({ ...form, recipient: e.target.value })} /></label>
       <label className="block">Aapka naam<Input className="mt-2" value={form.sender} required maxLength={100} onChange={(e) => setForm({ ...form, sender: e.target.value })} /></label>
       <h2 className="text-2xl">2. Photos</h2>
       <label className="block"><input aria-label="Upload photos" type="file" accept="image/*" multiple disabled={uploading} className="block w-full text-sm" onChange={(e) => upload(e.target.files)} /><span className="mt-2 block text-sm text-muted-foreground">{uploading ? "Uploading…" : `${photoPaths.length} photos saved`}</span></label>
-      <h2 className="text-2xl">3. Sawaal aur sahi jawaab</h2>
+      {extraKind === "secret" && <label className="block">Secret passcode (4 digit, jaise unki birthday 0512)<Input className="mt-2" inputMode="numeric" pattern="\d{4}" maxLength={4} placeholder="2005" value={passcode} onChange={(e) => setPasscode(e.target.value.replace(/\D/g, "").slice(0, 4))} /></label>}
+      {!extraKind && <><h2 className="text-2xl">3. Sawaal aur sahi jawaab</h2>
       {quiz.map((q, i) => <fieldset key={i} className="clay space-y-3 p-5">
         <div className="flex items-center gap-2"><Input aria-label={`Question ${i + 1}`} placeholder={`Sawaal ${i + 1}`} value={q.question} maxLength={300} onChange={(e) => setQ(i, { ...q, question: e.target.value })} />{quiz.length > 1 && <Button type="button" size="icon" variant="ghost" aria-label="Remove question" onClick={() => setQuiz(quiz.filter((_, j) => j !== i))}><Trash2 /></Button>}</div>
         {q.options.map((o, k) => <label key={k} className="flex items-center gap-3"><input type="radio" name={`answer-${i}`} checked={q.answer === k} onChange={() => setQ(i, { ...q, answer: k })} aria-label={`Option ${k + 1} is correct`} /><Input placeholder={`Option ${k + 1}`} value={o} maxLength={200} onChange={(e) => setQ(i, { ...q, options: q.options.map((x, m) => (m === k ? e.target.value : x)) })} /></label>)}
         <p className="text-xs text-muted-foreground">Sahi jawaab ke saamne wala gola chuniye.</p>
       </fieldset>)}
-      {quiz.length < 10 && <Button type="button" variant="outline" onClick={() => setQuiz([...quiz, blankQuestion()])}><Plus /> Sawaal jodiye</Button>}
+      {quiz.length < 10 && <Button type="button" variant="outline" onClick={() => setQuiz([...quiz, blankQuestion()])}><Plus /> Sawaal jodiye</Button>}</>}
       <label className="block">Chitthi (optional)<textarea className="mt-2 w-full rounded-xl border bg-background p-4" rows={5} maxLength={5000} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} /></label>
       <Button type="submit" variant="hero" disabled={mutation.isPending}><Save />Save surprise</Button>
     </form>}

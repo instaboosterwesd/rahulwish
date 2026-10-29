@@ -8,7 +8,7 @@ export function matchesProposalSecret(value: string, recipient: string) {
 import { z } from "zod";
 
 export const proposalQuestionSchema = z.object({ question: z.string().trim().min(1).max(300), options: z.array(z.string().trim().min(1).max(200)).min(2).max(4), answer: z.number().int().min(0).max(3) }).refine((q) => q.answer < q.options.length, "Choose a correct option");
-export const proposalConfigSchema = z.object({ quiz: z.array(proposalQuestionSchema).min(1).max(10).optional(), audioPath: z.string().max(200).optional(), audioName: z.string().max(200).optional() });
+export const proposalConfigSchema = z.object({ quiz: z.array(proposalQuestionSchema).min(1).max(10).optional(), audioPath: z.string().max(200).optional(), audioName: z.string().max(200).optional(), passcode: z.string().regex(/^\d{4}$/).optional() });
 export type ProposalQuestion = z.infer<typeof proposalQuestionSchema>;
 export type ProposalConfig = z.infer<typeof proposalConfigSchema>;
 export function readProposalConfig(value: unknown): ProposalConfig { const parsed = proposalConfigSchema.safeParse(value); return parsed.success ? parsed.data : {}; }

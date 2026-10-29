@@ -8,6 +8,9 @@ import { LoveExperience, BirthdayExperience, GiftExperience } from "@/components
 import { KarwaChauthExperience } from "@/components/KarwaChauthExperience";
 import { DiwaliExperience } from "@/components/DiwaliExperience";
 import { uploadedExperienceKind } from "@/lib/uploaded-templates";
+import { newTemplateKind } from "@/lib/new-templates";
+import { SweetBirthdayExperience, ApologyExperience, SecretBirthdayExperience } from "@/components/NewExperiences";
+import { GardenExperience, HeartExperience } from "@/components/CanvasExperiences";
 import type { ProposalConfig } from "@/lib/proposal";
 
 export type ExperienceProps = {
@@ -55,6 +58,17 @@ export function SurpriseExperience(p: ExperienceProps) {
   if (kind === "gift") return <GiftExperience {...p} />;
   if (kind === "karwa") return <KarwaChauthExperience {...p} />;
   if (kind === "diwali") return <DiwaliExperience {...p} />;
+  const extra = newTemplateKind(p.category);
+  const original = extra ? ({ sweet: "sweet-birthday", apology: "apology", secret: "secret-birthday", garden: "garden", heart: "heart-universe" } as const)[extra] : null;
+  if (original) return (
+    <iframe
+      src={`/templates-src/${original}/index.html`}
+      title={p.category}
+      className="fixed inset-0 z-40 h-[100dvh] w-screen border-0"
+      allow="autoplay; fullscreen"
+      sandbox="allow-scripts allow-same-origin"
+    />
+  );
   return experienceKind(p.category) === "proposal" ? <ProposalExperience {...p} /> : <ClassicExperience {...p} />;
 }
 
