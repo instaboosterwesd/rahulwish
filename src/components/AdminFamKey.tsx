@@ -21,9 +21,9 @@ export function AdminFamKey() {
   return (
     <div className="clay p-8">
       <h3 className="flex items-center gap-2 text-xl font-semibold"><KeyRound className="h-5 w-5 text-primary" /> FamGateway API Key</h3>
-      <p className="mt-2 text-sm text-muted-foreground">UPI payments isi key se chalenge. Nayi key daal kar Save karein.</p>
+      <p className="mt-2 text-sm text-muted-foreground">UPI payments use this key. Enter a new key and save.</p>
       <p className="mt-3 text-sm">Current: <span className="font-mono">{hint.isError ? "setup pending" : hint.data?.hint ?? "default (built-in key)"}</span></p>
-      <form className="mt-4 flex flex-col gap-3 sm:flex-row" onSubmit={(e) => { e.preventDefault(); mut.mutate(); }}>
+      <form className="mt-4 flex flex-col gap-3 " onSubmit={(e) => { e.preventDefault(); mut.mutate(); }}>
         <Input aria-label="FamGateway API key" type="password" autoComplete="off" placeholder="fam_..." value={key} onChange={(e) => setKey(e.target.value)} minLength={10} maxLength={200} required />
         <Button type="submit" variant="hero" disabled={mut.isPending}>Save Key</Button>
       </form>

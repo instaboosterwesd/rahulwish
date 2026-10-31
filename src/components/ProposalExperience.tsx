@@ -142,7 +142,7 @@ export function ProposalExperience({ recipient, sender, headline, message, photo
           <article className="proposal-letter">
             <p className="proposal-letter-greeting">My dearest {recipient},</p>
             <h3>{headline || "You are my favourite forever."}</h3>
-            <WrittenLetter text={message || "Tumhare saath har chhota pal bhi khaas lagta hai. I don’t need a perfect life. I just want a life with you."} />
+            <WrittenLetter text={message || "Every little moment with you feels special. I don’t need a perfect life. I just want a life with you."} />
             <p className="proposal-letter-sign">Always yours,<br /><span>{sender}</span></p>
           </article>
           <Button variant="hero" size="lg" className="proposal-cta" onClick={next}>Do you know my heart? <ArrowRight /></Button>

@@ -35,31 +35,31 @@ const REVIEWS = [
   {
     name: "Ananya Sharma",
     city: "Mumbai",
-    text: "Maine apne boyfriend ke birthday ke liye banaya — jab usne link khola aur music baja, uski aankhein bhar aayi. Best gift ever, seriously.",
+    text: "I made this for my boyfriend's birthday — when he opened the link and the music started, his eyes filled with tears. Best gift ever, seriously.",
     rating: 5,
   },
   {
     name: "Rohan Mehta",
     city: "Delhi",
-    text: "Proposal template use kiya. Usne page ke aakhir mein 'Yes' dabaya aur hum dono ro pade. ₹449 mein itna khoobsurat moment — unbelievable.",
+    text: "I used the Proposal template. She pressed 'Yes' at the end and we both cried. Such a beautiful moment for ₹449 — unbelievable.",
     rating: 5,
   },
   {
     name: "Priya Nair",
     city: "Bengaluru",
-    text: "Shaadi ka invitation yahan se bheja. Sabne pucha kis designer se banwaya! Royal look, smooth music — guests ab bhi baat karte hain.",
+    text: "We sent our wedding invitation from here. Everyone asked which designer made it! Royal look, smooth music — guests still talk about it.",
     rating: 5,
   },
   {
     name: "Arjun Singh",
     city: "Jaipur",
-    text: "Behen ke liye Rakhi surprise banaya, 2 minute mein ready. Woh hostel mein thi aur video call par rote hue boli 'bhaiya best gift'. Worth every rupee.",
+    text: "I made a Rakhi surprise for my sister, ready in 2 minutes. She was at her hostel and cried on our video call: 'best gift ever'. Worth every rupee.",
     rating: 5,
   },
   {
     name: "Kavya Reddy",
     city: "Hyderabad",
-    text: "Anniversary ke liye Golden Anniversary template liya. Hamari 10 saal ki photos ke saath timeline dekh kar husband emotional ho gaye.",
+    text: "I used the Golden Anniversary template. Seeing the timeline with 10 years of our photos made my husband emotional.",
     rating: 5,
   },
 ];
@@ -97,7 +97,8 @@ function Home() {
     return () => clearInterval(id);
   }, []);
 
-  const review = REVIEWS[reviewIdx] ?? REVIEWS[0]!;
+  const review = REVIEWS[reviewIdx] ?? REVIEWS[0];
+  if (!review) return null;
 
   return (
     <div className="min-h-screen bg-night">
@@ -106,12 +107,12 @@ function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <Petals />
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 pb-24 pt-40 md:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 pb-24 pt-40 ">
           <div className="relative z-10">
             <p className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-blush">
               <Sparkles className="h-3.5 w-3.5 text-gold" /> Made for moments that matter
             </p>
-            <h1 className="mt-6 font-display text-6xl font-semibold leading-[1.05] md:text-7xl">
+            <h1 className="mt-6 font-display text-6xl font-semibold leading-[1.05] ">
               Gift them a <span className="text-rose-gradient">website</span>, not just a message.
             </h1>
             <p className="mt-6 max-w-md text-lg text-muted-foreground">
@@ -151,10 +152,10 @@ function Home() {
 
       {/* Proof stats */}
       <section className="border-y border-border/60 bg-card/40">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-12 md:grid-cols-4">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-12 ">
           {PROOF.map((p) => (
             <div key={p.label} className="text-center">
-              <p className="font-display text-4xl font-semibold text-gold md:text-5xl">{p.value}</p>
+              <p className="font-display text-4xl font-semibold text-gold ">{p.value}</p>
               <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">{p.label}</p>
             </div>
           ))}
@@ -172,7 +173,7 @@ function Home() {
               loading="lazy"
               width={1024}
               height={1024}
-              className="h-52 w-52 rounded-3xl object-cover shadow-card md:h-64 md:w-64"
+              className="h-52 w-52 rounded-3xl object-cover shadow-card  "
             />
           ))}
         </div>
@@ -193,7 +194,7 @@ function Home() {
             </Link>
           </Button>
         </div>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-6  ">
           {featured.map((t) => (
             <TemplateCard key={t.id} t={t} />
           ))}
@@ -202,7 +203,7 @@ function Home() {
 
       {/* Trending */}
       <section className="mx-auto max-w-6xl px-6 py-12">
-        <p className="text-xs uppercase tracking-[0.3em] text-blush/80">Sabse zyada pasand</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-blush/80">Most loved</p>
         <h2 className="mt-2 font-display text-4xl font-semibold">Trending <span className="text-rose-gradient">now</span></h2>
         <div className="mt-8 flex snap-x gap-5 overflow-x-auto pb-4">
           {trending.map((t) => (
@@ -213,7 +214,7 @@ function Home() {
 
       {/* By category */}
       <section className="mx-auto max-w-6xl px-6 py-12">
-        <p className="text-xs uppercase tracking-[0.3em] text-blush/80">Har mauke ke liye</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-blush/80">For every occasion</p>
         <h2 className="mt-2 font-display text-4xl font-semibold">Browse by <span className="text-rose-gradient">occasion</span></h2>
         <div className="mt-6 flex flex-wrap gap-2">
           {categories.map((c) => (
@@ -223,7 +224,7 @@ function Home() {
             </button>
           ))}
         </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-6  ">
           {byCat.map((t) => <TemplateCard key={t.id} t={t} />)}
         </div>
       </section>
@@ -239,11 +240,11 @@ function Home() {
           </div>
 
           {/* Spotlight review */}
-          <div className="clay relative mx-auto mt-12 max-w-3xl p-10 text-center md:p-14">
+          <div className="clay relative mx-auto mt-12 max-w-3xl p-10 text-center ">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-gradient text-primary-foreground shadow-glow">
               <Quote className="h-6 w-6" />
             </div>
-            <p className="mt-6 min-h-28 font-display text-2xl leading-relaxed md:text-3xl">
+            <p className="mt-6 min-h-28 font-display text-2xl leading-relaxed ">
               “{review.text}”
             </p>
             <div className="mt-6 flex items-center justify-center gap-1">
@@ -286,7 +287,7 @@ function Home() {
           </div>
 
           {/* All reviews as clay cards */}
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-5  ">
             {REVIEWS.map((r, i) => (
               <button
                 key={r.name}
@@ -315,7 +316,7 @@ function Home() {
           <h2 className="text-center font-display text-5xl font-semibold">
             Three steps to their <span className="font-script text-6xl text-gold">smile</span>
           </h2>
-          <div className="mt-14 grid gap-6 md:grid-cols-3">
+          <div className="mt-14 grid gap-6 ">
             {[
               {
                 icon: Gift,
@@ -350,8 +351,8 @@ function Home() {
 
       {/* CTA */}
       <section className="mx-auto max-w-6xl px-6 pb-24">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-rose-gradient p-12 text-center text-primary-foreground md:p-20">
-          <h2 className="font-display text-5xl font-semibold md:text-6xl">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-rose-gradient p-12 text-center text-primary-foreground ">
+          <h2 className="font-display text-5xl font-semibold ">
             Someone is waiting to smile.
           </h2>
           <p className="mx-auto mt-4 max-w-md text-primary-foreground/85">

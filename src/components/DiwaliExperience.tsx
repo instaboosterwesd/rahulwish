@@ -6,7 +6,7 @@ import { celebrate } from "@/lib/celebration";
 import type { ExperienceProps } from "@/components/SurpriseExperience";
 import { diwaliMedia, diwaliQuiz } from "@/lib/diwali";
 
-const STEPS = ["Shuruaat", "Diya", "Sawaal", "Yaadein", "Shubhkaamna"];
+const STEPS = ["Beginning", "Diya", "Questions", "Memories", "Wishes"];
 const BACKGROUNDS = [diwaliMedia.cover, diwaliMedia.diya, diwaliMedia.sweets, diwaliMedia.cover, diwaliMedia.fireworks];
 
 export function DiwaliExperience(p: ExperienceProps) {
@@ -21,8 +21,8 @@ export function DiwaliExperience(p: ExperienceProps) {
   const photos = p.photos?.length ? p.photos : diwaliMedia.demoPhotos;
   const questions = p.proposalConfig?.quiz?.length ? p.proposalConfig.quiz : diwaliQuiz;
   const q = questions[qi];
-  const name = p.recipient || "Meri Jaan";
-  const from = p.sender || "Tumhara apna";
+  const name = p.recipient || "My love";
+  const from = p.sender || "Yours truly";
 
   useEffect(() => {
     const a = new Audio(p.audioUrl || diwaliMedia.song); a.loop = true; a.volume = 0.5; audio.current = a;
@@ -58,29 +58,29 @@ export function DiwaliExperience(p: ExperienceProps) {
       <main key={step} className="karwa-stage">
         {step === 0 && (
           <div className="karwa-content">
-            <p className="karwa-eyebrow">Shubh Deepavali</p>
-            <h1 className="karwa-title">{name}<span>is Diwali, roshni tumhare naam</span></h1>
-            <Button variant="hero" size="lg" onClick={() => { audio.current?.play().catch(() => {}); next(); }}>Surprise kholo <ArrowRight /></Button>
-            <p className="karwa-hint">Sound on rakhiye 🎶</p>
+            <p className="karwa-eyebrow">Happy Diwali</p>
+            <h1 className="karwa-title">{name}<span>this Diwali, the light is for you</span></h1>
+            <Button variant="hero" size="lg" onClick={() => { audio.current?.play().catch(() => {}); next(); }}>Open surprise <ArrowRight /></Button>
+            <p className="karwa-hint">Turn sound on 🎶</p>
           </div>
         )}
 
         {step === 1 && (
           <div className="karwa-content">
-            <p className="karwa-eyebrow">Pehla diya</p>
-            <h2 className="karwa-heading">{lit ? <>Ghar roshan ho gaya<span>tumhari tarah</span></> : <>Ek diya jalao<span>hamare liye</span></>}</h2>
+            <p className="karwa-eyebrow">The first diya</p>
+            <h2 className="karwa-heading">{lit ? <>The home is glowing<span>just like you</span></> : <>Light a diya<span>for us</span></>}</h2>
             <button type="button" className={`diwali-diya ${lit ? "is-lit" : ""}`} onClick={() => { setLit(true); celebrate(false); }} aria-label="Light the diya">
               <img src={diwaliMedia.diya} alt="Clay diya" width={896} height={1152} />
               <span className="diwali-flame" aria-hidden />
             </button>
-            {lit ? <Button variant="hero" onClick={next}>Aage chalo <ArrowRight /></Button> : <p className="karwa-hint">Diya par tap karo 🪔</p>}
+            {lit ? <Button variant="hero" onClick={next}>Continue <ArrowRight /></Button> : <p className="karwa-hint">Tap the diya 🪔</p>}
           </div>
         )}
 
         {step === 2 && q && (
           <div className="karwa-content">
             <div className="karwa-card">
-              <p className="karwa-eyebrow">Sawaal {qi + 1} / {questions.length}</p>
+              <p className="karwa-eyebrow">Question {qi + 1} / {questions.length}</p>
               <h2 className="karwa-question">{q.question}</h2>
               <div className="karwa-quiz">
                 {q.options.map((o, i) => (
@@ -91,9 +91,9 @@ export function DiwaliExperience(p: ExperienceProps) {
                   </button>
                 ))}
               </div>
-              <p role="status" className="karwa-hint karwa-status">{picked === null ? "" : picked === q.answer ? "Ekdum sahi! ✨" : "Koi baat nahi — sahi jawaab chamak raha hai 🪔"}</p>
+              <p role="status" className="karwa-hint karwa-status">{picked === null ? "" : picked === q.answer ? "Exactly right! ✨" : "That's okay — the right answer is glowing 🪔"}</p>
               <Button variant="hero" className="w-full" disabled={picked === null} onClick={() => { if (qi < questions.length - 1) { setQi(qi + 1); setPicked(null); } else next(); }}>
-                {qi < questions.length - 1 ? "Agla sawaal" : `Score ${score}/${questions.length} · Yaadein dekho`} <ArrowRight />
+                {qi < questions.length - 1 ? "Next question" : `Score ${score}/${questions.length} · See memories`} <ArrowRight />
               </Button>
             </div>
           </div>
@@ -101,12 +101,12 @@ export function DiwaliExperience(p: ExperienceProps) {
 
         {step === 3 && (
           <div className="karwa-content">
-            <p className="karwa-eyebrow">Roshan yaadein</p>
+            <p className="karwa-eyebrow">Glowing memories</p>
             <div className="karwa-gallery">
               {photos.map((src, i) => <img key={src + i} src={src} alt={`Memory ${i + 1}`} loading={i === 0 ? undefined : "lazy"} className={i === slide ? "is-active" : ""} />)}
             </div>
             <div className="karwa-dots">{photos.map((_, i) => <button key={i} type="button" aria-label={`Photo ${i + 1}`} className={i === slide ? "is-active" : ""} onClick={() => setSlide(i)} />)}</div>
-            <Button variant="hero" onClick={next}>Ek chitthi <Sparkles /></Button>
+            <Button variant="hero" onClick={next}>A letter <Sparkles /></Button>
           </div>
         )}
 
@@ -114,10 +114,10 @@ export function DiwaliExperience(p: ExperienceProps) {
           <div className="karwa-content">
             <article className="karwa-letter">
               <p className="karwa-letter-greet">Dear {name},</p>
-              <WrittenLetter text={p.message || "Har saal diye jalte hain, par mere ghar ki asli roshni tum ho. Is Diwali bas yahi dua hai — tumhari zindagi khushiyon, mithaas aur pyaar se jagmagati rahe. Happy Diwali!"} />
-              <p className="karwa-letter-sign">Dher saara pyaar,<span>{from}</span></p>
+              <WrittenLetter text={p.message || "Diyas are lit every year, but you are the true light of my home. This Diwali, I wish your life shines with joy, sweetness and love. Happy Diwali!"} />
+              <p className="karwa-letter-sign">With lots of love,<span>{from}</span></p>
             </article>
-            <Button variant="glass" onClick={restart}><RotateCcw /> Phir se dekho</Button>
+            <Button variant="glass" onClick={restart}><RotateCcw /> Watch again</Button>
           </div>
         )}
       </main>

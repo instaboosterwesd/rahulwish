@@ -52,6 +52,64 @@ export type Database = {
           },
         ]
       }
+      fam_payments: {
+        Row: {
+          amount_inr: number
+          created_at: string
+          order_id: string
+          status: string
+          surprise_id: string | null
+          template_id: string
+          updated_at: string
+          user_id: string
+          utr: string | null
+        }
+        Insert: {
+          amount_inr: number
+          created_at?: string
+          order_id: string
+          status?: string
+          surprise_id?: string | null
+          template_id: string
+          updated_at?: string
+          user_id: string
+          utr?: string | null
+        }
+        Update: {
+          amount_inr?: number
+          created_at?: string
+          order_id?: string
+          status?: string
+          surprise_id?: string | null
+          template_id?: string
+          updated_at?: string
+          user_id?: string
+          utr?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fam_payments_surprise_id_fkey"
+            columns: ["surprise_id"]
+            isOneToOne: false
+            referencedRelation: "surprises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fam_payments_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fam_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           banned: boolean
@@ -60,7 +118,9 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          phone: string | null
           updated_at: string
+          username: string | null
         }
         Insert: {
           banned?: boolean
@@ -69,7 +129,9 @@ export type Database = {
           email?: string
           full_name?: string
           id: string
+          phone?: string | null
           updated_at?: string
+          username?: string | null
         }
         Update: {
           banned?: boolean
@@ -78,7 +140,9 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          phone?: string | null
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -119,6 +183,7 @@ export type Database = {
           template_id: string
           updated_at: string
           user_id: string
+          views: number
         }
         Insert: {
           amount_inr: number
@@ -135,6 +200,7 @@ export type Database = {
           template_id: string
           updated_at?: string
           user_id: string
+          views?: number
         }
         Update: {
           amount_inr?: number
@@ -151,6 +217,7 @@ export type Database = {
           template_id?: string
           updated_at?: string
           user_id?: string
+          views?: number
         }
         Relationships: [
           {
@@ -255,6 +322,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_fam_key_hint: { Args: never; Returns: string }
+      admin_set_fam_key: { Args: { _key: string }; Returns: undefined }
+      complete_fam_payment: {
+        Args: {
+          _key: string
+          _order_id: string
+          _paid_amount: number
+          _utr: string
+        }
+        Returns: string
+      }
+      fam_key_ok: { Args: { _key: string }; Returns: boolean }
+      get_fam_key: { Args: { _server: string }; Returns: string }
       get_proposal_config: { Args: { _code: string }; Returns: Json }
       get_surprise: {
         Args: { _code: string }
@@ -276,6 +356,7 @@ export type Database = {
         Returns: boolean
       }
       purchase_template: { Args: { _template: string }; Returns: string }
+      record_surprise_view: { Args: { _code: string }; Returns: undefined }
       request_deposit: {
         Args: { _amount: number; _note: string }
         Returns: string
@@ -296,6 +377,15 @@ export type Database = {
       }
       save_surprise_photos: {
         Args: { _id: string; _photos: string[] }
+        Returns: undefined
+      }
+      start_fam_payment: {
+        Args: {
+          _amount: number
+          _key: string
+          _order_id: string
+          _template: string
+        }
         Returns: undefined
       }
     }

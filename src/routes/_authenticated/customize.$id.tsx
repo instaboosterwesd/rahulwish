@@ -59,9 +59,9 @@ function Editor({ surprise: s }: { surprise: Surprise }) {
   const mutation = useMutation({
     mutationFn: async () => {
       const questions = cleanQuiz();
-      for (const [i, q] of questions.entries()) { const r = proposalQuestionSchema.safeParse(q); if (!r.success) throw new Error(`Question ${i + 1}: har sawaal ke kam se kam 2 options aur sahi jawaab chuniye`); }
-      if (!extraKind && !questions.length) throw new Error("Kam se kam ek sawaal likhiye");
-      if (extraKind === "secret" && passcode && !/^\d{4}$/.test(passcode)) throw new Error("Passcode 4 digit ka hona chahiye");
+      for (const [i, q] of questions.entries()) { const r = proposalQuestionSchema.safeParse(q); if (!r.success) throw new Error(`Question ${i + 1}: add at least 2 options and choose the correct answer`); }
+      if (!extraKind && !questions.length) throw new Error("Add at least one question");
+      if (extraKind === "secret" && passcode && !/^\d{4}$/.test(passcode)) throw new Error("Passcode must be 4 digits");
       await save({ data: form });
       const config = { ...existing, ...(questions.length ? { quiz: questions } : {}), ...(extraKind === "secret" && passcode ? { passcode } : {}) };
       await saveConfig({ data: { id: s.id, config } });
@@ -76,20 +76,20 @@ function Editor({ surprise: s }: { surprise: Surprise }) {
     <div className="mt-7 flex flex-wrap gap-3"><Button variant="outline" onClick={() => setPreview(!preview)}><Eye />{preview ? "Edit details" : "Live preview"}</Button><Button variant="outline" onClick={async () => { await navigator.clipboard.writeText(`${window.location.origin}/surprise/${s.code}`); toast.success("Link copied"); }}><Share2 />Copy link</Button></div>
     {preview ? <div className="mt-8"><SurpriseExperience {...form} category={category} photos={photoUrls} cover={s.templates?.cover_image ?? ""} proposalConfig={{ ...existing, quiz: cleanQuiz(), ...(passcode ? { passcode } : {}) }} /></div> :
     <form className="mt-8 max-w-2xl space-y-6" onSubmit={(e) => { e.preventDefault(); mutation.mutate(); }}>
-      <h2 className="text-2xl">1. Naam</h2>
-      <label className="block">Jiske liye surprise hai<Input className="mt-2" value={form.recipient} required maxLength={100} onChange={(e) => setForm({ ...form, recipient: e.target.value })} /></label>
-      <label className="block">Aapka naam<Input className="mt-2" value={form.sender} required maxLength={100} onChange={(e) => setForm({ ...form, sender: e.target.value })} /></label>
+      <h2 className="text-2xl">1. Names</h2>
+      <label className="block">Recipient name<Input className="mt-2" value={form.recipient} required maxLength={100} onChange={(e) => setForm({ ...form, recipient: e.target.value })} /></label>
+      <label className="block">Your name<Input className="mt-2" value={form.sender} required maxLength={100} onChange={(e) => setForm({ ...form, sender: e.target.value })} /></label>
       <h2 className="text-2xl">2. Photos</h2>
       <label className="block"><input aria-label="Upload photos" type="file" accept="image/*" multiple disabled={uploading} className="block w-full text-sm" onChange={(e) => upload(e.target.files)} /><span className="mt-2 block text-sm text-muted-foreground">{uploading ? "Uploading…" : `${photoPaths.length} photos saved`}</span></label>
-      {extraKind === "secret" && <label className="block">Secret passcode (4 digit, jaise unki birthday 0512)<Input className="mt-2" inputMode="numeric" pattern="\d{4}" maxLength={4} placeholder="2005" value={passcode} onChange={(e) => setPasscode(e.target.value.replace(/\D/g, "").slice(0, 4))} /></label>}
-      {!extraKind && <><h2 className="text-2xl">3. Sawaal aur sahi jawaab</h2>
+      {extraKind === "secret" && <label className="block">Secret passcode (4 digits, e.g. a birthday: 0512)<Input className="mt-2" inputMode="numeric" pattern="\d{4}" maxLength={4} placeholder="2005" value={passcode} onChange={(e) => setPasscode(e.target.value.replace(/\D/g, "").slice(0, 4))} /></label>}
+      {!extraKind && <><h2 className="text-2xl">3. Questions and correct answers</h2>
       {quiz.map((q, i) => <fieldset key={i} className="clay space-y-3 p-5">
-        <div className="flex items-center gap-2"><Input aria-label={`Question ${i + 1}`} placeholder={`Sawaal ${i + 1}`} value={q.question} maxLength={300} onChange={(e) => setQ(i, { ...q, question: e.target.value })} />{quiz.length > 1 && <Button type="button" size="icon" variant="ghost" aria-label="Remove question" onClick={() => setQuiz(quiz.filter((_, j) => j !== i))}><Trash2 /></Button>}</div>
+        <div className="flex items-center gap-2"><Input aria-label={`Question ${i + 1}`} placeholder={`Question ${i + 1}`} value={q.question} maxLength={300} onChange={(e) => setQ(i, { ...q, question: e.target.value })} />{quiz.length > 1 && <Button type="button" size="icon" variant="ghost" aria-label="Remove question" onClick={() => setQuiz(quiz.filter((_, j) => j !== i))}><Trash2 /></Button>}</div>
         {q.options.map((o, k) => <label key={k} className="flex items-center gap-3"><input type="radio" name={`answer-${i}`} checked={q.answer === k} onChange={() => setQ(i, { ...q, answer: k })} aria-label={`Option ${k + 1} is correct`} /><Input placeholder={`Option ${k + 1}`} value={o} maxLength={200} onChange={(e) => setQ(i, { ...q, options: q.options.map((x, m) => (m === k ? e.target.value : x)) })} /></label>)}
-        <p className="text-xs text-muted-foreground">Sahi jawaab ke saamne wala gola chuniye.</p>
+        <p className="text-xs text-muted-foreground">Select the circle next to the correct answer.</p>
       </fieldset>)}
-      {quiz.length < 10 && <Button type="button" variant="outline" onClick={() => setQuiz([...quiz, blankQuestion()])}><Plus /> Sawaal jodiye</Button>}</>}
-      <label className="block">Chitthi (optional)<textarea className="mt-2 w-full rounded-xl border bg-background p-4" rows={5} maxLength={5000} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} /></label>
+      {quiz.length < 10 && <Button type="button" variant="outline" onClick={() => setQuiz([...quiz, blankQuestion()])}><Plus /> Add question</Button>}</>}
+      <label className="block">Letter (optional)<textarea className="mt-2 w-full rounded-xl border bg-background p-4" rows={5} maxLength={5000} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} /></label>
       <Button type="submit" variant="hero" disabled={mutation.isPending}><Save />Save surprise</Button>
     </form>}
   </main></div>;

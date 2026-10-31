@@ -11,6 +11,7 @@ import { uploadedExperienceKind } from "@/lib/uploaded-templates";
 import { newTemplateKind } from "@/lib/new-templates";
 import { SweetBirthdayExperience, ApologyExperience, SecretBirthdayExperience } from "@/components/NewExperiences";
 import { GardenExperience, HeartExperience } from "@/components/CanvasExperiences";
+import { LoveQuestionExperience } from "@/components/LoveQuestionExperience";
 import type { ProposalConfig } from "@/lib/proposal";
 
 export type ExperienceProps = {
@@ -36,7 +37,7 @@ export function experienceKind(category: string): Kind {
   return "celebrate";
 }
 
-const NO_LINES = ["Pakka? 🥺", "Ek baar aur socho 😢", "Dil toot jayega 💔", "Galat button hai 😜", "Try again 🙈", "Yes dabao na 😍"];
+const NO_LINES = ["Are you sure? 🥺", "Think again 😢", "My heart will break 💔", "Wrong button 😜", "Try again 🙈", "Please press Yes 😍"];
 
 function Confetti() {
   const [bits, setBits] = useState<{ l: number; d: number; c: string; s: number }[]>([]);
@@ -59,7 +60,10 @@ export function SurpriseExperience(p: ExperienceProps) {
   if (kind === "karwa") return <KarwaChauthExperience {...p} />;
   if (kind === "diwali") return <DiwaliExperience {...p} />;
   const extra = newTemplateKind(p.category);
-  const original = extra ? ({ sweet: "sweet-birthday", apology: "apology", secret: "secret-birthday", garden: "garden", heart: "heart-universe" } as const)[extra] : null;
+  if (extra === "love-question") return <LoveQuestionExperience {...p} />;
+  if (extra === "heart") return <HeartExperience {...p} />;
+  if (extra === "garden") return <GardenExperience {...p} />;
+  const original = extra ? ({ sweet: "sweet-birthday", apology: "apology", secret: "secret-birthday" } as const)[extra] : null;
   if (original) return (
     <iframe
       src={`/templates-src/${original}/index.html`}
@@ -91,21 +95,21 @@ function ClassicExperience(p: ExperienceProps) {
   const party = () => { setCelebrate(true); setTimeout(() => setCelebrate(false), 4000); next(); };
 
   const intro = <Screen key="intro">
-      <p className="text-sm uppercase tracking-[0.3em] text-primary/80">Ek surprise sirf aapke liye</p>
-      <h1 className="mt-4 font-display text-5xl font-semibold md:text-6xl">Hey <span className="text-rose-gradient">{p.recipient}</span> 💌</h1>
+      <p className="text-sm uppercase tracking-[0.3em] text-primary/80">A surprise just for you</p>
+      <h1 className="mt-4 font-display text-5xl font-semibold ">Hey <span className="text-rose-gradient">{p.recipient}</span> 💌</h1>
       <button aria-label="Open surprise" onClick={() => { toggleMusic(true); next(); }} className="clay mt-10 grid h-40 w-40 place-items-center animate-wobble">
         <Gift className="h-20 w-20 text-primary" />
       </button>
-      <p className="mt-6 text-muted-foreground">Gift par tap karein 🎁 (sound on rakhein)</p>
+      <p className="mt-6 text-muted-foreground">Tap the gift 🎁 (turn sound on)</p>
     </Screen>;
   const memories = <Memories key="mem" photos={photos} onNext={next} />;
   const letter = <Screen key="letter">
       <div className="clay w-full max-w-lg p-8 text-left">
         <Heart className="mx-auto mb-4 h-8 w-8 animate-heartbeat fill-primary text-primary" />
         <h2 className="text-center font-display text-3xl">{p.headline || "You mean the world to me"}</h2>
-        <Typewriter text={p.message || "Har pal tumhare saath ek celebration hai."} />
+        <Typewriter text={p.message || "Every moment with you is a celebration."} />
       </div>
-      <Button variant="hero" size="lg" className="mt-8" onClick={next}>Aage dekho <ChevronRight /></Button>
+      <Button variant="hero" size="lg" className="mt-8" onClick={next}>Continue <ChevronRight /></Button>
     </Screen>;
   const finale = <Screen key="end">
       <img src={p.cover} alt="Surprise" className="clay aspect-[4/3] w-full max-w-sm object-cover" />
@@ -141,12 +145,12 @@ function ClassicExperience(p: ExperienceProps) {
 function RingReveal({ onNext }: { onNext: () => void }) {
   const [open, setOpen] = useState(false);
   return <Screen>
-    <h2 className="font-display text-4xl">Ek chhoti si cheez... 💝</h2>
-    <p className="mt-3 text-muted-foreground">{open ? "Ye sirf tumhare liye hai" : "Box par tap karke kholo"}</p>
+    <h2 className="font-display text-4xl">A little something... 💝</h2>
+    <p className="mt-3 text-muted-foreground">{open ? "This is just for you" : "Tap the box to open it"}</p>
     <button aria-label="Open ring box" onClick={() => setOpen(true)} className={`clay mt-10 grid h-44 w-44 place-items-center transition-transform duration-700 ${open ? "scale-110" : "animate-wobble"}`}>
       <span className={`text-7xl ${open ? "animate-heartbeat" : ""}`}>{open ? "💍" : "🎁"}</span>
     </button>
-    {open && <Button variant="hero" size="lg" className="mt-10 animate-rise" onClick={onNext}>Ek sawaal hai... <ChevronRight /></Button>}
+    {open && <Button variant="hero" size="lg" className="mt-10 animate-rise" onClick={onNext}>I have a question... <ChevronRight /></Button>}
   </Screen>;
 }
 
@@ -160,7 +164,7 @@ function Interactive({ kind, recipient, onDone }: { kind: Kind; recipient: strin
     const left = candles.filter(Boolean).length;
     return <Screen>
       <h2 className="font-display text-4xl">Happy Birthday {recipient}! 🎂</h2>
-      <p className="mt-3 text-muted-foreground">Candles par tap karke wish karo aur bujhao</p>
+      <p className="mt-3 text-muted-foreground">Tap the candles to make a wish and blow them out</p>
       <div className="mt-10 flex flex-col items-center">
         <div className="flex gap-6">{candles.map((on, i) => <button key={i} aria-label={`Candle ${i + 1}`} onClick={() => { const c = [...candles]; c[i] = false; setCandles(c); if (c.every((x) => !x)) setTimeout(onDone, 700); }} className="flex flex-col items-center">
           <span className={`text-3xl transition-opacity ${on ? "animate-heartbeat" : "opacity-0"}`}>🔥</span>
@@ -169,22 +173,22 @@ function Interactive({ kind, recipient, onDone }: { kind: Kind; recipient: strin
         <div className="clay -mt-1 h-24 w-64 bg-rose-gradient" />
         <div className="clay h-6 w-72" />
       </div>
-      <p className="mt-6 text-sm text-primary">{left ? `${left} candle baaki` : "Wish poori hogi ✨"}</p>
+      <p className="mt-6 text-sm text-primary">{left ? `${left} candles remaining` : "May your wish come true ✨"}</p>
     </Screen>;
   }
 
   if (kind === "celebrate") {
     return <Screen>
-      <h2 className="font-display text-4xl">Tumhare liye ek letter ✉️</h2>
+      <h2 className="font-display text-4xl">A letter for you ✉️</h2>
       <button aria-label="Open envelope" onClick={() => { setOpened(true); setTimeout(onDone, 900); }} className={`clay mt-10 grid h-44 w-64 place-items-center text-7xl transition-transform ${opened ? "scale-110" : "animate-wobble"}`}>{opened ? "💌" : "✉️"}</button>
-      <p className="mt-6 text-muted-foreground">Envelope kholne ke liye tap karein</p>
+      <p className="mt-6 text-muted-foreground">Tap to open the envelope</p>
     </Screen>;
   }
 
   const question = kind === "proposal" ? "Will you marry me? 💍" : "Do you love me? 🥰";
   return <Screen>
     {kind === "proposal" && <div className="mb-6 text-7xl animate-heartbeat">💍</div>}
-    <h2 className="font-display text-4xl md:text-5xl">{recipient}, {question}</h2>
+    <h2 className="font-display text-4xl ">{recipient}, {question}</h2>
     <p className="mt-4 h-6 text-primary">{noCount > 0 ? NO_LINES[(noCount - 1) % NO_LINES.length] : ""}</p>
     <div className="relative mt-8 flex h-40 w-full items-start justify-center gap-6">
       <Button variant="hero" size="lg" style={{ transform: `scale(${1 + noCount * 0.15})` }} onClick={onDone}>Yes 💖</Button>
@@ -198,7 +202,7 @@ function Interactive({ kind, recipient, onDone }: { kind: Kind; recipient: strin
 function Memories({ photos, onNext }: { photos: string[]; onNext: () => void }) {
   const [i, setI] = useState(0);
   return <Screen>
-    <h2 className="font-display text-4xl">Hamari yaadein 📸</h2>
+    <h2 className="font-display text-4xl">Our memories 📸</h2>
     <div className="relative mt-8 w-full max-w-sm">
       {photos.map((src, k) => <img key={src + k} src={src} alt={`Memory ${k + 1}`} className={`clay aspect-[3/4] w-full object-cover transition-all duration-500 ${k === i ? "relative rotate-0 opacity-100" : "absolute inset-0 rotate-6 opacity-0"}`} />)}
     </div>
@@ -207,7 +211,7 @@ function Memories({ photos, onNext }: { photos: string[]; onNext: () => void }) 
       <span className="text-sm text-muted-foreground">{i + 1} / {photos.length}</span>
       {photos.length > 1 && <Button size="icon" variant="glass" aria-label="Next photo" onClick={() => setI((i + 1) % photos.length)}><ChevronRight /></Button>}
     </div>
-    <Button variant="hero" size="lg" className="mt-6" onClick={onNext}>Ek letter bhi hai <ChevronRight /></Button>
+    <Button variant="hero" size="lg" className="mt-6" onClick={onNext}>There's a letter too <ChevronRight /></Button>
   </Screen>;
 }
 

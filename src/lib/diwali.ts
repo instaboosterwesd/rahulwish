@@ -13,7 +13,7 @@ export const diwaliMedia = {
 };
 
 export const diwaliQuiz = [
-  { question: "Diwali par meri favourite mithai kaunsi hai?", options: ["Kaju katli", "Gulab jamun", "Laddoo"], answer: 0 },
-  { question: "Hamari pehli Diwali saath mein kahan mani thi?", options: ["Ghar par", "Dosto ke saath", "Ghoomne gaye the"], answer: 0 },
-  { question: "Is Diwali mujhe sabse zyada kya chahiye?", options: ["Naye kapde", "Patakhe", "Bas tum"], answer: 2 },
+  { question: "What is my favourite Diwali sweet?", options: ["Kaju katli", "Gulab jamun", "Laddoo"], answer: 0 },
+  { question: "Where did we celebrate our first Diwali together?", options: ["At home", "With friends", "On a trip"], answer: 0 },
+  { question: "What do I want most this Diwali?", options: ["New clothes", "Fireworks", "Just you"], answer: 2 },
 ];

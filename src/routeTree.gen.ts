@@ -14,6 +14,9 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedMyRouteImport } from './routes/_authenticated/my'
+import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as DemoSlugRouteImport } from './routes/demo.$slug'
 import { Route as SurpriseCodeRouteImport } from './routes/surprise.$code'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
@@ -42,6 +45,21 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 const AuthenticatedMyRoute = AuthenticatedMyRouteImport.update({
   id: '/my',
   path: '/my',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const DemoSlugRoute = DemoSlugRouteImport.update({
@@ -76,6 +94,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/my': typeof AuthenticatedMyRoute
+  '/orders': typeof AuthenticatedOrdersRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/demo/$slug': typeof DemoSlugRoute
   '/surprise/$code': typeof SurpriseCodeRoute
   '/templates/$slug': typeof TemplatesSlugRoute
@@ -87,6 +108,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/my': typeof AuthenticatedMyRoute
+  '/orders': typeof AuthenticatedOrdersRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/demo/$slug': typeof DemoSlugRoute
   '/surprise/$code': typeof SurpriseCodeRoute
   '/templates/$slug': typeof TemplatesSlugRoute
@@ -100,6 +124,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/my': typeof AuthenticatedMyRoute
+  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/demo/$slug': typeof DemoSlugRoute
   '/surprise/$code': typeof SurpriseCodeRoute
   '/templates/$slug': typeof TemplatesSlugRoute
@@ -113,6 +140,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/my'
+    | '/orders'
+    | '/profile'
+    | '/wallet'
     | '/demo/$slug'
     | '/surprise/$code'
     | '/templates/$slug'
@@ -124,6 +154,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/my'
+    | '/orders'
+    | '/profile'
+    | '/wallet'
     | '/demo/$slug'
     | '/surprise/$code'
     | '/templates/$slug'
@@ -136,6 +169,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/_authenticated/my'
+    | '/_authenticated/orders'
+    | '/_authenticated/profile'
+    | '/_authenticated/wallet'
     | '/demo/$slug'
     | '/surprise/$code'
     | '/templates/$slug'
@@ -190,6 +226,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/orders': {
+      id: '/_authenticated/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof AuthenticatedOrdersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/wallet': {
+      id: '/_authenticated/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AuthenticatedWalletRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/demo/$slug': {
       id: '/demo/$slug'
       path: '/demo/$slug'
@@ -231,12 +288,18 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedMyRoute: typeof AuthenticatedMyRoute
+  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
   AuthenticatedCustomizeIdRoute: typeof AuthenticatedCustomizeIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedMyRoute: AuthenticatedMyRoute,
+  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedWalletRoute: AuthenticatedWalletRoute,
   AuthenticatedCustomizeIdRoute: AuthenticatedCustomizeIdRoute,
 }
 

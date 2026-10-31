@@ -1,3 +1,9 @@
+- [x] Reset copied migration history to an empty set after confirming no applied entries; retain reference copies and refresh the remix connection.
+- [x] Add all six uploaded templates to the catalog; verify desktop/mobile previews, the love answer animation and 3D heart canvas.
+- [x] Finish English-only wording across site screens and default surprise text; all 32 tests pass.
+- [x] Remove Home navigation, keep Templates as the first tab, and verify all three landing-page actions open Templates.
+- [x] Add wallet + button, amount dialog and Pay action; verified signed-in on desktop/mobile with unchanged balance.
+- [ ] Connect wallet FamPay payment link and verified-success balance credit — waiting for payment documentation.
 - [x] Write root agent_memory.md with current project context and limitations.
 - [x] Bundle all 22 supplied media files, resolve catalog covers, add protected admin photo uploads, preserve on/off and user controls, remove favicon and Lovable Twitter metadata; 19 tests and public demo media verified.
 - [ ] Verify photo upload and template/user controls signed in as admin — external unmanaged Supabase has no browser test session.
@@ -20,3 +26,4 @@
 - [ ] Persist buyer-created quiz choices and audio; wrong answers continue and score appears at the end.
 - [ ] Verify saved buyer details through the recipient experience.- [x] Clear copied database setup history and start a fresh one for the new backend.
 - [x] Add 5 uploaded templates (Sweet Bday, Apology Card, Secret Birthday Gift, Animated Garden, 3D Heart) with names, media, demos and catalog rows.
+- [x] Add a search bar to the Templates page: live filtering, result count, clear button and no-match state; 38 tests pass and preview verified.

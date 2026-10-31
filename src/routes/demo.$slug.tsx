@@ -36,12 +36,12 @@ function DemoPage() {
   if (!t) return null;
   return (
     <div className="relative">
-      <SurpriseExperience demo category={t.category} recipient="Jaan" sender="Your Name" headline={t.title}
-        message={"Tumhare saath har chhota pal bhi khaas lagta hai. Tumhari muskurahat, tumhari baatein, aur tumhara saath — yahi meri favourite kahaani hai.\n\nI don't need a perfect life. I just want a life with you. Aaj, kal, aur hamesha."}
+      <SurpriseExperience demo category={t.category} recipient="My Love" sender="Your Name" headline={t.title}
+        message={"Every little moment with you feels special. Your smile, your words, and your company — that is my favourite story.\n\nI don't need a perfect life. I just want a life with you. Today, tomorrow, and always."}
         cover={t.cover_image} photos={demoPhotos(t.category, t.cover_image)} />
       <div className="demo-actions fixed inset-x-0 bottom-4 z-40 flex justify-center gap-3 px-4">
         <Button asChild variant="glass" size="sm"><Link to="/templates/$slug" params={{ slug }}><ArrowLeft />Back</Link></Button>
-        <Button asChild variant="hero" size="sm"><Link to="/templates/$slug" params={{ slug }}><ShoppingBag />Ye template lein</Link></Button>
+        <Button asChild variant="hero" size="sm"><Link to="/templates/$slug" params={{ slug }}><ShoppingBag />Use this template</Link></Button>
       </div>
     </div>
   );

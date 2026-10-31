@@ -13,7 +13,7 @@ export function SurpriseView({ recipient, sender, headline, message, cover, phot
     <div className="relative z-10 mx-auto max-w-2xl">
       <Heart className="mx-auto mb-5 h-9 w-9 fill-primary text-primary" />
       <p className="text-sm text-muted-foreground">For {recipient}</p>
-      <h1 className="mt-4 break-words font-display text-4xl md:text-5xl">{headline || "You mean the world to me"}</h1>
+      <h1 className="mt-4 break-words font-display text-4xl ">{headline || "You mean the world to me"}</h1>
       <img src={cover} alt="Your surprise" className="mx-auto mt-8 aspect-[4/3] w-full max-w-md rounded-3xl object-cover shadow-card" />
       <p className="mt-8 whitespace-pre-wrap break-words text-lg leading-relaxed">{message || "Every moment with you is something worth celebrating."}</p>
       {photos.length > 0 && <div className="mt-8 grid grid-cols-2 gap-3">{photos.map((photo) => <img key={photo} src={photo} alt="A special memory" className="aspect-square rounded-xl object-cover" />)}</div>}

@@ -86,7 +86,7 @@ function AdminPage() {
     onSuccess: () => {
       refresh();
       setPriceEdit(null);
-      toast.success("Price update ho gaya");
+      toast.success("Price updated");
     },
     onError: (e) => toast.error(e.message),
   });
@@ -170,8 +170,8 @@ function AdminPage() {
 
         {/* Tab bar — desktop shows all, mobile shows first 3 + More */}
         <nav className="clay-sm mt-8 flex flex-wrap items-center gap-1 p-2">
-          <span className="hidden md:contents">{TABS.map(tabBtn)}</span>
-          <span className="contents md:hidden">
+          <span className="hidden ">{TABS.map(tabBtn)}</span>
+          <span className="contents ">
             {visibleTabs.map(tabBtn)}
             <span className="relative">
               <Button variant="ghost"
@@ -195,7 +195,7 @@ function AdminPage() {
         {/* Dashboard */}
         {tab === "dashboard" && (
           <>
-            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="mt-8 grid gap-5  ">
               {[
                 { label: "Templates", value: stats.templates },
                 { label: "Surprises", value: stats.surprises },
@@ -214,7 +214,7 @@ function AdminPage() {
             <div className="clay mt-5 overflow-x-auto">
               {surprises.length === 0 ? (
                 <p className="p-8 text-sm text-muted-foreground">
-                  Abhi koi surprise nahi bana — pehla surprise aate hi yahan dikhega.
+                  No surprises yet — the first one will appear here.
                 </p>
               ) : (
                 <table className="w-full text-left text-sm">
@@ -273,7 +273,7 @@ function AdminPage() {
           <div className="clay mt-8 overflow-x-auto">
             {users.length === 0 ? (
               <p className="p-8 text-sm text-muted-foreground">
-                Abhi koi user nahi — pehla signup hote hi yahan dikhega.
+                No users yet — the first signup will appear here.
               </p>
             ) : (
               <table className="w-full text-left text-sm">
@@ -328,7 +328,7 @@ function AdminPage() {
           <div className="clay mt-8 overflow-x-auto">
             {deposits.length === 0 ? (
               <p className="p-8 text-sm text-muted-foreground">
-                Abhi koi deposit request nahi — user payment request bhejte hi yahan aayegi. Approve karte hi user ko credit mil jayega.
+                No deposit requests yet — they will appear here when users submit them. Approving one credits the user.
               </p>
             ) : (
               <table className="w-full text-left text-sm">
@@ -398,7 +398,7 @@ function AdminPage() {
               {new Set(templates.map((t) => t.category)).size} categories · Total {templates.length} templates · {templates.filter((t) => t.active).length} live ·{" "}
               {templates.filter((t) => t.featured).length} featured
             </p>
-            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-5 grid gap-5  ">
               {templates.map((t) => (
                 <div key={t.id} className="clay overflow-x-auto">
                   <img src={t.cover_image} alt={t.title} loading="lazy" className="h-40 w-full object-cover" />
@@ -480,14 +480,14 @@ function AdminPage() {
 
         {/* Settings */}
         {tab === "settings" && (
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <div className="mt-8 grid gap-6 ">
             <AdminFamKey />
             <div className="clay p-8">
               <h3 className="flex items-center gap-2 text-xl font-semibold">
                 <Wrench className="h-5 w-5 text-primary" /> Maintenance Mode
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                On karne par visitors ko maintenance page dikhega. Admin panel hamesha khula rahega.
+                Visitors see the maintenance page when this is enabled. The admin panel stays accessible.
               </p>
               <div className="mt-5">
                 <Button
@@ -510,14 +510,14 @@ function AdminPage() {
                 <Megaphone className="h-5 w-5 text-primary" /> Announcement Message
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Ye message har visitor ko website kholte hi ek baar dikhega (24 ghante mein ek baar).
+                Visitors will see this message when they open the website (once every 24 hours).
               </p>
               <textarea
                 value={announcement}
                 onChange={(e) => setAnnouncement(e.target.value)}
                 rows={3}
                 className="clay-pressed mt-4 w-full rounded-2xl bg-muted p-4 text-sm outline-none focus:ring-2 focus:ring-ring"
-                placeholder="Apna message likhiye…"
+                placeholder="Write your message…"
               />
               <Button
                 className="mt-4"

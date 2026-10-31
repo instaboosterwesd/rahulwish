@@ -1,4 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useRouterState } from "@tanstack/react-router";
+import { BottomNav } from "@/components/SiteHeader";
+import { useNavigate } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Outlet,
   Link,
@@ -123,11 +127,31 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const path = useRouterState({ select: (s) => s.location.pathname });
+  const fullScreen = path.startsWith("/surprise/") || path.startsWith("/demo/");
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const gateLanding = path === "/" && !loading && !user;
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="app-stage">
+        <div
+          className="app-frame"
+          onClickCapture={(e) => {
+            if (!gateLanding) return;
+            const el = (e.target as HTMLElement).closest("a,button");
+            if (!el) return;
+            e.preventDefault();
+            e.stopPropagation();
+            navigate({ to: "/auth" });
+          }}
+        >
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          {!fullScreen && path !== "/" && path !== "/auth" && <BottomNav />}
+        </div>
+      </div>
       <Announcement />
       <Toaster />
     </QueryClientProvider>

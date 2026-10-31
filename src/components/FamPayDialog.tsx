@@ -43,7 +43,7 @@ export function FamPayDialog({ checkout, onClose }: { checkout: FamCheckout | nu
         {checkout && <>
           <img src={checkout.qrUrl} alt="UPI payment QR code" className="mx-auto aspect-square w-60 rounded-2xl bg-card p-2" />
           <p className="text-xs text-muted-foreground">UPI ID: {checkout.upiId}</p>
-          <Button asChild variant="hero" className="sm:hidden"><a href={checkout.upiIntent}><Smartphone /> Open UPI app</a></Button>
+          <Button asChild variant="hero" className=""><a href={checkout.upiIntent}><Smartphone /> Open UPI app</a></Button>
           <Button asChild variant="outline"><a href={checkout.checkoutUrl} target="_blank" rel="noreferrer">Open payment page</a></Button>
           {state === "pending" ? <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Waiting for payment…</p> : <p className="text-sm text-destructive">This payment expired. Close and try again.</p>}
         </>}

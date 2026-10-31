@@ -46,7 +46,7 @@ function Page() {
   return (
     <div className="min-h-screen bg-night">
       <SiteHeader />
-      <main className="mx-auto grid max-w-6xl gap-10 px-6 pb-20 pt-32 md:grid-cols-2">
+      <main className="mx-auto grid max-w-6xl gap-10 px-6 pb-20 pt-32 ">
         <img src={t.cover_image} alt={t.title} className="w-full rounded-3xl shadow-card" />
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-blush/80">{t.category}</p>

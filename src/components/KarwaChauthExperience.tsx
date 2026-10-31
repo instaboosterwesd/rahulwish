@@ -8,16 +8,16 @@ import { karwaMedia } from "@/lib/karwa-media";
 import { karwaQuiz } from "@/lib/karwa";
 
 const VOWS = [
-  "Har subah tumhari muskaan se shuru ho",
-  "Har mushkil mein tumhara haath thaamenge",
-  "Tumhari khushi meri sabse badi dua",
-  "Har chaand raat tumhare saath",
-  "Ladaai ho, par maafi pehle meri",
-  "Budhaape tak tumhe hasaate rahenge",
-  "Saat janam — sirf tum",
+  "May every morning begin with your smile",
+  "I will hold your hand through every challenge",
+  "Your happiness is my greatest wish",
+  "Every moonlit night with you",
+  "If we argue, I will be first to say sorry",
+  "I will keep making you laugh as we grow old",
+  "Seven lifetimes — only you",
 ];
 
-const STEPS = ["Shuruaat", "Chalni", "Sawaal", "Score", "Yaadein", "Vaade", "Chitthi"];
+const STEPS = ["Beginning", "Sieve", "Questions", "Score", "Memories", "Promises", "Letter"];
 const BACKGROUNDS = [karwaMedia.moon, karwaMedia.chalni, karwaMedia.diyas, karwaMedia.thali, karwaMedia.cover, karwaMedia.mehendi, karwaMedia.diyas];
 
 export function KarwaChauthExperience(p: ExperienceProps) {
@@ -55,8 +55,8 @@ export function KarwaChauthExperience(p: ExperienceProps) {
 
   const begin = () => { audio.current?.play().catch(() => {}); setStep(1); };
   const next = () => setStep((s) => s + 1);
-  const name = p.recipient || "Meri Jaan";
-  const from = p.sender || "Tumhara";
+  const name = p.recipient || "My love";
+  const from = p.sender || "Yours";
   const restart = () => { setRevealed(false); setSlide(0); setQi(0); setPicked(null); setScore(0); setStep(1); };
 
   return (
@@ -78,31 +78,31 @@ export function KarwaChauthExperience(p: ExperienceProps) {
       <main key={step} className="karwa-stage">
         {step === 0 && (
           <div className="karwa-content">
-            <p className="karwa-eyebrow">Karwa Chauth · Ek chaand raat</p>
-            <h1 className="karwa-title">{name}<span>ye raat sirf tumhare liye</span></h1>
-            <Button variant="hero" size="lg" onClick={begin}>Surprise kholo <ArrowRight /></Button>
-            <p className="karwa-hint">Sound on rakhiye 🎶</p>
+            <p className="karwa-eyebrow">Karwa Chauth · A moonlit night</p>
+            <h1 className="karwa-title">{name}<span>this night is just for you</span></h1>
+            <Button variant="hero" size="lg" onClick={begin}>Open surprise <ArrowRight /></Button>
+            <p className="karwa-hint">Turn sound on 🎶</p>
           </div>
         )}
 
         {step === 1 && (
           <div className="karwa-content">
-            <p className="karwa-eyebrow">Chalni ki rasm</p>
-            <h2 className="karwa-heading">{revealed ? <>Pehle chaand dekha…<span>phir mera chaand</span></> : <>Chalni se dekho<span>aaj ka chaand</span></>}</h2>
+            <p className="karwa-eyebrow">The sieve ritual</p>
+            <h2 className="karwa-heading">{revealed ? <>First the moon…<span>then my moon</span></> : <>Look through the sieve<span>at tonight's moon</span></>}</h2>
             <button type="button" className={`karwa-sieve ${revealed ? "is-revealed" : ""}`} onClick={() => setRevealed(true)} aria-label="Look through the sieve">
               <img src={karwaMedia.moon} alt="Full moon" className="karwa-sieve-moon" />
               <img src={partner} alt={name} className="karwa-sieve-face" />
               <span className="karwa-sieve-mesh" aria-hidden />
               <span className="karwa-sieve-rim" aria-hidden />
             </button>
-            {revealed ? <Button variant="hero" onClick={next}>Aage chalo <ArrowRight /></Button> : <p className="karwa-hint">Chalni par tap karo</p>}
+            {revealed ? <Button variant="hero" onClick={next}>Continue <ArrowRight /></Button> : <p className="karwa-hint">Tap the sieve</p>}
           </div>
         )}
 
         {step === 2 && q && (
           <div className="karwa-content">
             <div className="karwa-card">
-              <p className="karwa-eyebrow">Sawaal {qi + 1} / {questions.length}</p>
+              <p className="karwa-eyebrow">Question {qi + 1} / {questions.length}</p>
               <h2 className="karwa-question">{q.question}</h2>
               <div className="karwa-quiz">
                 {q.options.map((o, i) => (
@@ -113,9 +113,9 @@ export function KarwaChauthExperience(p: ExperienceProps) {
                   </button>
                 ))}
               </div>
-              <p role="status" className="karwa-hint karwa-status">{picked === null ? "" : picked === q.answer ? "Bilkul sahi! 💛" : "Koi baat nahi — sahi jawaab chamak raha hai ✨"}</p>
+              <p role="status" className="karwa-hint karwa-status">{picked === null ? "" : picked === q.answer ? "Exactly right! 💛" : "That's okay — the right answer is glowing ✨"}</p>
               <Button variant="hero" className="w-full" disabled={picked === null} onClick={() => { if (qi < questions.length - 1) { setQi(qi + 1); setPicked(null); } else next(); }}>
-                {qi < questions.length - 1 ? "Agla sawaal" : "Result dekho"} <ArrowRight />
+                {qi < questions.length - 1 ? "Next question" : "See result"} <ArrowRight />
               </Button>
             </div>
           </div>
@@ -124,32 +124,32 @@ export function KarwaChauthExperience(p: ExperienceProps) {
         {step === 3 && (
           <div className="karwa-content">
             <div className="karwa-card">
-              <p className="karwa-eyebrow">Tumhara score</p>
+              <p className="karwa-eyebrow">Your score</p>
               <p className="karwa-score">{score}<small>/{questions.length}</small></p>
-              <p className="karwa-lead">{score === questions.length ? "Tum mujhe sabse achhe se jaanti ho 💛" : "Har jawaab mein bas pyaar hai 💛"}</p>
-              <Button variant="hero" className="w-full" onClick={next}>Hamari yaadein <ArrowRight /></Button>
+              <p className="karwa-lead">{score === questions.length ? "You know me best 💛" : "Every answer is full of love 💛"}</p>
+              <Button variant="hero" className="w-full" onClick={next}>Our memories <ArrowRight /></Button>
             </div>
           </div>
         )}
 
         {step === 4 && (
           <div className="karwa-content">
-            <p className="karwa-eyebrow">Hamari yaadein</p>
+            <p className="karwa-eyebrow">Our memories</p>
             <div className="karwa-gallery">
               {photos.map((src, i) => <img key={src + i} src={src} alt={`Memory ${i + 1}`} className={i === slide ? "is-active" : ""} />)}
             </div>
             <div className="karwa-dots">{photos.map((_, i) => <button key={i} type="button" aria-label={`Photo ${i + 1}`} className={i === slide ? "is-active" : ""} onClick={() => setSlide(i)} />)}</div>
-            <Button variant="hero" onClick={next}>Saat vaade <ArrowRight /></Button>
+            <Button variant="hero" onClick={next}>Seven promises <ArrowRight /></Button>
           </div>
         )}
 
         {step === 5 && (
           <div className="karwa-content">
             <div className="karwa-card">
-              <p className="karwa-eyebrow">Saat janam ke</p>
-              <h2 className="karwa-heading">Saat vaade<span>sirf tumse</span></h2>
+              <p className="karwa-eyebrow">For seven lifetimes</p>
+              <h2 className="karwa-heading">Seven promises<span>only to you</span></h2>
               <ol className="karwa-vows">{VOWS.map((v, i) => <li key={v} className={i < vows ? "is-shown" : ""}><b>{i + 1}</b>{v}</li>)}</ol>
-              <Button variant="hero" className="w-full" disabled={vows < VOWS.length} onClick={next}>Ek chitthi tumhare liye <Heart /></Button>
+              <Button variant="hero" className="w-full" disabled={vows < VOWS.length} onClick={next}>A letter for you <Heart /></Button>
             </div>
           </div>
         )}
@@ -158,10 +158,10 @@ export function KarwaChauthExperience(p: ExperienceProps) {
           <div className="karwa-content">
             <article className="karwa-letter">
               <p className="karwa-letter-greet">Dear {name},</p>
-              <WrittenLetter text={p.message || "Aaj tumne mere liye pura din vrat rakha… bina paani, bina khaane. Main bas itna kehna chahta hoon — tum meri har dua ka jawaab ho. Chaand toh roz aata hai, par mera chaand sirf tum ho. Happy Karwa Chauth, meri jaan."} />
-              <p className="karwa-letter-sign">Hamesha tumhara,<span>{from}</span></p>
+              <WrittenLetter text={p.message || "Today you fasted all day for me… without water, without food. I just want to say — you are the answer to all my prayers. The moon comes every night, but you are my only moon. Happy Karwa Chauth, my love."} />
+              <p className="karwa-letter-sign">Forever yours,<span>{from}</span></p>
             </article>
-            <Button variant="glass" onClick={restart}><RotateCcw /> Phir se dekho</Button>
+            <Button variant="glass" onClick={restart}><RotateCcw /> Watch again</Button>
           </div>
         )}
       </main>

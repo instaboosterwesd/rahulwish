@@ -1,74 +1,54 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, LogOut, Menu } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
+import { Heart, LayoutGrid, Package, User, Wallet } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 
 export function SiteHeader() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
-      <div className="mx-auto mt-4 flex max-w-6xl items-center justify-between rounded-full glass px-5 py-2.5">
+    <header className="app-fixed top-0 z-50 px-4 pt-3">
+      <div className="flex items-center justify-between rounded-full glass px-4 py-2.5">
         <Link to="/" className="flex items-center gap-2">
           <Heart className="h-5 w-5 fill-primary text-primary animate-heartbeat" />
-          <span className="font-display text-2xl font-semibold tracking-tight">
+          <span className="font-display text-xl font-semibold tracking-tight">
             RGX<span className="text-rose-gradient">4</span>YOU
           </span>
         </Link>
-        <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
-          <Link to="/templates" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>
-            Templates
+        {user ? (
+          <Link to="/profile" aria-label="Profile" className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground">
+            <User className="h-4 w-4" />
           </Link>
-          {user && (
-            <Link to="/my" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>
-              My Surprises
-            </Link>
-          )}
-          <Link to="/admin" className="text-gold hover:brightness-110" activeProps={{ className: "text-gold brightness-110" }}>
-            Admin
-          </Link>
-        </nav>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="md:hidden" aria-label="Navigation" aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><Menu /></Button>
-          {user ? (
-            <Button
-              variant="glass"
-              size="sm"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                navigate({ to: "/" });
-              }}
-            >
-              <LogOut /> Sign out
-            </Button>
-          ) : (
-            <Button asChild variant="hero" size="sm">
-              <Link to="/auth">Sign in</Link>
-            </Button>
-          )}
-        </div>
+        ) : (
+          <Link to="/auth" className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground">Sign in</Link>
+        )}
       </div>
-      {menuOpen && <nav className="glass mx-4 mt-2 flex flex-col gap-1 rounded-2xl p-3 md:hidden"><Button asChild variant="ghost"><Link to="/templates" onClick={() => setMenuOpen(false)}>Templates</Link></Button>{user && <Button asChild variant="ghost"><Link to="/my" onClick={() => setMenuOpen(false)}>My surprises</Link></Button>}<Button asChild variant="ghost"><Link to="/admin" onClick={() => setMenuOpen(false)}>Admin</Link></Button></nav>}
     </header>
   );
 }
 
-export function SiteFooter() {
+const tabs = [
+  { to: "/templates", label: "Templates", icon: LayoutGrid },
+  { to: "/orders", label: "Orders", icon: Package },
+  { to: "/wallet", label: "Wallet", icon: Wallet },
+  { to: "/profile", label: "Profile", icon: User },
+] as const;
+
+export function BottomNav() {
   return (
-    <footer className="relative z-10 border-t border-border py-12">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 text-sm text-muted-foreground md:flex-row">
-        <p className="font-display text-xl text-foreground">
-          RGX<span className="text-rose-gradient">4</span>YOU
-        </p>
-        <p>Made with ❤ in India · Bring smiles to faces you love</p>
-        <div className="flex gap-5">
-          <Link to="/templates" className="hover:text-foreground">Templates</Link>
-          <Link to="/auth" className="hover:text-foreground">Account</Link>
-        </div>
+    <nav aria-label="Main" className="app-fixed bottom-0 z-50 px-3 pb-3">
+      <div className="grid grid-cols-4 rounded-3xl glass px-1 py-1.5">
+        {tabs.map(({ to, label, icon: Icon }) => (
+          <Link key={to} to={to}
+            className="flex flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[11px] text-muted-foreground"
+            activeProps={{ className: "bg-primary/15 text-primary font-semibold" }}>
+            <Icon className="h-5 w-5" />
+            {label}
+          </Link>
+        ))}
       </div>
-    </footer>
+    </nav>
   );
+}
+
+export function SiteFooter() {
+  return <div className="h-24" aria-hidden />;
 }

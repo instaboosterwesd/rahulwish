@@ -792,3 +792,8 @@
 .heart-name { font-family: var(--font-script); font-size: 2.4rem; text-shadow: 0 0 18px oklch(0.65 0.22 10); }
 @media (max-width: 600px) { .floating-love-text { font-size: 1.25rem; } }
 @media (prefers-reduced-motion: reduce) { .sweet-sparkles span, .apology-decor span, .secret-motes span, .sweet-balloon, .sweet-gift, .secret-photo { animation: none; } }
+
+/* ── Mobile app frame: the whole site renders at phone width, also on desktop ── */
+.app-stage { min-height: 100dvh; background: var(--muted); }
+.app-frame { position: relative; margin-inline: auto; width: 100%; max-width: 440px; min-height: 100dvh; background: var(--background); box-shadow: 0 0 60px oklch(0 0 0 / .12); overflow-x: clip; }
+.app-fixed { position: fixed; left: 50%; transform: translateX(-50%); width: 100%; max-width: 440px; }

@@ -41,8 +41,7 @@ export function Announcement() {
           </div>
           <h1 className="mt-6 font-display text-4xl font-semibold">Thoda sa intezaar…</h1>
           <p className="mt-3 text-muted-foreground">
-            Hum website ko aur bhi khoobsurat bana rahe hain. Jald hi wapas aa rahe hain — tab tak ke
-            liye shukriya!
+            We are making the website even more beautiful. We will be back soon — thank you for your patience!
           </p>
         </div>
       </div>

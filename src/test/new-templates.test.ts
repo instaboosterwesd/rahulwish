@@ -10,8 +10,8 @@ describe("uploaded template rules", () => {
     expect(matchesSecretPasscode("0512", "0512")).toBe(true);
     expect(matchesSecretPasscode("2005", "0512")).toBe(false);
   });
-  it("each of the five catalog categories opens its own presentation", () => {
-    expect(["sweet-birthday", "apology", "secret-birthday", "garden", "heart-universe"].map(newTemplateKind)).toEqual(["sweet", "apology", "secret", "garden", "heart"]);
+  it("each of the six uploaded categories opens its own presentation", () => {
+    expect(["sweet-birthday", "apology", "secret-birthday", "garden", "heart-universe", "love-question"].map(newTemplateKind)).toEqual(["sweet", "apology", "secret", "garden", "heart", "love-question"]);
   });
   it("garden message keeps at most 4 lines and drops messages over 140 characters", () => {
     expect(gardenMessage("a\nb\nc\nd\ne")).toBe("a|b|c|d");

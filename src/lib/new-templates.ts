@@ -24,6 +24,7 @@ import m4 from "@/assets/secret-gift/memory4.jpg";
 import m5 from "@/assets/secret-gift/memory5.jpg";
 import gardenCover from "@/assets/garden/cover.jpg";
 import heartCover from "@/assets/heart/cover.jpg";
+import loveQuestionCover from "@/assets/love-question/cover.jpg.asset.json";
 
 export const sweetMedia = { cat: sweetCat, cake: sweetCake, bunny: sweetBunny, party: sweetParty, song: sweetSong, photos: [sweet1, sweet2, sweet3], cover: sweet1 };
 export const apologyMedia = { pleading: apologyPleading, corgi: apologyCorgi, crying: apologyCrying, begging: apologyBegging, love: apologyLove, cover: apologyLove };
@@ -31,13 +32,14 @@ export const secretMedia = { cover: secretCover, dance: secretDance, excited: se
 export const gardenMedia = { cover: gardenCover };
 export const heartMedia = { cover: heartCover };
 
-/** Category → presentation kind for the five uploaded templates. */
+/** Category → presentation kind for the uploaded templates. */
 export const NEW_TEMPLATE_KINDS = {
   "sweet-birthday": "sweet",
   apology: "apology",
   "secret-birthday": "secret",
   garden: "garden",
   "heart-universe": "heart",
+  "love-question": "love-question",
 } as const;
 export type NewTemplateKind = (typeof NEW_TEMPLATE_KINDS)[keyof typeof NEW_TEMPLATE_KINDS];
 
@@ -52,6 +54,7 @@ export function newTemplateCover(category: string): string | null {
     case "secret": return secretMedia.cover;
     case "garden": return gardenMedia.cover;
     case "heart": return heartMedia.cover;
+    case "love-question": return loveQuestionCover.url;
     default: return null;
   }
 }
