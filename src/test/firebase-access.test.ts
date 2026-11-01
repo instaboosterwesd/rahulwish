@@ -31,3 +31,16 @@ describe("Firebase migration security", () => {
     });
   });
 });
+import { firebaseGoogleIdentity } from "@/lib/firebase-access";
+describe("Firebase Google sign-in", () => {
+  const google = { firebase: { sign_in_provider: "google.com" }, email: "Rahul@Gmail.com", email_verified: true, name: "Rahul" };
+  it("accepts a verified Google account and normalises the email", () => {
+    expect(firebaseGoogleIdentity(google)).toEqual({ email: "rahul@gmail.com", name: "Rahul", picture: null });
+  });
+  it("rejects sign-ins that did not come from Google", () => {
+    expect(() => firebaseGoogleIdentity({ ...google, firebase: { sign_in_provider: "password" } })).toThrow("Please sign in with Google");
+  });
+  it("rejects unverified Google emails", () => {
+    expect(() => firebaseGoogleIdentity({ ...google, email_verified: false })).toThrow("not verified");
+  });
+});

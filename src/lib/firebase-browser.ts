@@ -9,3 +9,18 @@ export async function getFirebaseServices() {
   const app = getApps().find((item) => item.name === "rgx4you-firebase") ?? initializeApp(firebaseConfig, "rgx4you-firebase");
   return { app, auth: getAuth(app), database: getDatabase(app), storage: getStorage(app) };
 }
+
+export async function firebaseGoogleIdToken() {
+  const { auth } = await getFirebaseServices();
+  const { GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  const result = await signInWithPopup(auth, provider);
+  return result.user.getIdToken();
+}
+
+export async function firebaseSignOut() {
+  const { auth } = await getFirebaseServices();
+  const { signOut } = await import("firebase/auth");
+  await signOut(auth);
+}

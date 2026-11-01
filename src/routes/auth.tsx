@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Heart, Sparkles, Link2, Wallet } from "lucide-react";
-import { lovable } from "@/integrations/lovable";
+import { supabase } from "@/integrations/supabase/client";
+import { firebaseGoogleIdToken } from "@/lib/firebase-browser";
+import { firebaseGoogleSignIn } from "@/lib/firebase-signin.functions";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/auth")({
@@ -34,18 +36,24 @@ function Page() {
     setMsg("");
     setBusy(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        setMsg("Could not start Google sign-in. Please try again.");
+      let idToken: string;
+      try {
+        idToken = await firebaseGoogleIdToken();
+      } catch (e) {
+        const code = (e as { code?: string })?.code ?? "";
+        if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") setMsg("");
+        else if (code === "auth/popup-blocked") setMsg("Your browser blocked the Google window. Please allow pop-ups and try again.");
+        else if (code === "auth/unauthorized-domain") setMsg("Google sign-in is not enabled for this website address yet.");
+        else setMsg("Could not open Google sign-in. Please try again.");
         setBusy(false);
         return;
       }
-      if (result.redirected) return; // browser is leaving for Google
+      const { tokenHash } = await firebaseGoogleSignIn({ data: { idToken } });
+      const { error } = await supabase.auth.verifyOtp({ type: "magiclink", token_hash: tokenHash });
+      if (error) throw error;
       window.location.href = "/templates";
-    } catch {
-      setMsg("Something went wrong. Please try again.");
+    } catch (e) {
+      setMsg(e instanceof Error && e.message ? e.message : "Something went wrong. Please try again.");
       setBusy(false);
     }
   };

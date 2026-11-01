@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { customerQuery } from "@/lib/customer.functions";
 import { formatMoneyINR } from "@/lib/format";
 import { useAuth } from "@/hooks/useAuth";
+import { firebaseSignOut } from "@/lib/firebase-browser";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -48,7 +49,7 @@ function Page() {
             </li>
           ))}
         </ul>
-        <Button variant="outline" className="w-full" onClick={async () => { const { error } = await supabase.auth.signOut(); if (error) return; queryClient.clear(); nav({ to: "/" }); }}>
+        <Button variant="outline" className="w-full" onClick={async () => { const { error } = await supabase.auth.signOut(); if (error) return; await firebaseSignOut().catch(() => undefined); queryClient.clear(); nav({ to: "/" }); }}>
           <LogOut /> Log out
         </Button>
       </main>

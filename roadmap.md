@@ -38,3 +38,5 @@
 - [ ] Transfer private accounts/orders/wallet to Firebase — blocked until database permissions protect ownership and balances; unrestricted reads/writes are not used for private records.
 - [x] Restore six uploaded template entries in Firebase and the verified checkout catalog with matching IDs; six loaded covers, birthday search, all detail/demo pages and love-answer animation checked.
 - [x] Verify signed-in free customization and saved orders after remix using a temporary test account; free purchase opens customization and reads back in Orders, Wallet shows ₹0, mobile has no overflow.
+- [x] Switch the sign-in button to Firebase Google sign-in linked to existing accounts; Google window opens on the Firebase project; push to GitHub.
+- [ ] Allow the preview/published web addresses in Firebase Authorized domains — only the user can add them in the Firebase console.
