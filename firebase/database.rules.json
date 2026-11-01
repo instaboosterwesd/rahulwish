@@ -1,0 +1,21 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "catalog": { ".read": true },
+    "publicSettings": { ".read": true },
+    "profiles": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid && root.child('profiles').child($uid).child('banned').val() !== true && !root.child('profiles').child($uid).child('deleted_at').exists()"
+      }
+    },
+    "roles": {
+      "$uid": { ".read": "auth != null && auth.uid === $uid && root.child('profiles').child($uid).child('banned').val() !== true && !root.child('profiles').child($uid).child('deleted_at').exists()" }
+    },
+    "accounts": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid && root.child('profiles').child($uid).child('banned').val() !== true && !root.child('profiles').child($uid).child('deleted_at').exists()"
+      }
+    }
+  }
+}

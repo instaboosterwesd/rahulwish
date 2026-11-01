@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { ChevronRight, LogOut, Package, Phone, Shield, User, Wallet } from "lucide-react";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { ChevronRight, LogOut, Package, Shield, User, Wallet } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { customerQuery } from "@/lib/customer.functions";
-import { formatINR } from "@/lib/format";
+import { formatMoneyINR } from "@/lib/format";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -18,10 +18,11 @@ function Page() {
   const { data } = useSuspenseQuery(customerQuery());
   const { isAdmin } = useAuth();
   const nav = useNavigate();
+  const queryClient = useQueryClient();
   const p = data.profile as typeof data.profile & { phone?: string | null; username?: string | null };
   const rows = [
     { to: "/orders", label: "My orders", icon: Package, extra: String(data.surprises.length) },
-    { to: "/wallet", label: "Wallet", icon: Wallet, extra: formatINR(data.balance) },
+    { to: "/wallet", label: "Wallet", icon: Wallet, extra: formatMoneyINR(data.balance) },
     ...(isAdmin ? [{ to: "/admin", label: "Admin panel", icon: Shield, extra: "" }] : []),
   ] as const;
   return (
@@ -32,7 +33,7 @@ function Page() {
           <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground"><User className="h-7 w-7" /></div>
           <div className="min-w-0">
             <h1 className="truncate text-2xl">{p.full_name || "RGX4YOU user"}</h1>
-            <p className="flex items-center gap-1 text-sm text-muted-foreground">@{p.username ?? "—"}</p>
+            <p className="truncate text-sm text-muted-foreground">{p.username ? `@${p.username}` : p.email}</p>
           </div>
         </section>
         <ul className="divide-y divide-border rounded-3xl glass">
@@ -47,7 +48,7 @@ function Page() {
             </li>
           ))}
         </ul>
-        <Button variant="outline" className="w-full" onClick={async () => { await supabase.auth.signOut(); nav({ to: "/" }); }}>
+        <Button variant="outline" className="w-full" onClick={async () => { const { error } = await supabase.auth.signOut(); if (error) return; queryClient.clear(); nav({ to: "/" }); }}>
           <LogOut /> Log out
         </Button>
       </main>

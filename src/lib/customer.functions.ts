@@ -14,6 +14,8 @@ export const saveProposalConfig = createServerFn({ method: "POST" }).middleware(
   });
 
 export const customerDashboard = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  const { error: setupError } = await context.supabase.rpc("ensure_customer_profile");
+  if (setupError) throw new Error("Could not prepare your account. Please try again.");
   const [profile, deposits, surprises] = await Promise.all([
     context.supabase.from("profiles").select("*").eq("id", context.userId).single(),
     context.supabase.from("deposits").select("*").eq("user_id", context.userId).order("created_at", { ascending: false }),

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { customerQuery } from "@/lib/customer.functions";
-import { formatINR } from "@/lib/format";
+import { formatMoneyINR } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
   loader: ({ context }) => context.queryClient.ensureQueryData(customerQuery()),
@@ -32,7 +32,7 @@ function Page() {
             </Button>
           </div>
           <p className="mt-3 text-sm opacity-90">Wallet balance</p>
-          <p className="text-4xl font-bold">{formatINR(data.balance)}</p>
+          <p className="text-4xl font-bold">{formatMoneyINR(data.balance)}</p>
         </section>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="w-[calc(100%-2rem)] max-w-[400px] rounded-lg">
@@ -58,7 +58,7 @@ function Page() {
             {data.deposits.map((d) => (
               <li key={d.id} className="flex items-center justify-between gap-3 p-4 text-sm">
                 <span className="min-w-0 truncate text-muted-foreground">{d.note || "Deposit"}</span>
-                <span className="shrink-0 text-right"><b>{formatINR(d.amount_inr)}</b><br /><span className="text-xs capitalize text-primary">{d.status}</span></span>
+                <span className="shrink-0 text-right"><b>{formatMoneyINR(d.amount_inr)}</b><br /><span className="text-xs capitalize text-primary">{d.status}</span></span>
               </li>
             ))}
             {data.deposits.length === 0 && <li className="p-4 text-sm text-muted-foreground">No transactions yet.</li>}

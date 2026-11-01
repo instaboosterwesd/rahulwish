@@ -20,7 +20,9 @@ export function useAuth() {
     };
     supabase.auth.getUser().then(({ data }) => load(data.user));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      load(session?.user ?? null);
+      // Leave the auth callback before making another SDK request: its session lock
+      // is still held while callbacks run.
+      setTimeout(() => { void load(session?.user ?? null); }, 0);
     });
     return () => {
       active = false;

@@ -333,6 +333,7 @@ export type Database = {
         }
         Returns: string
       }
+      ensure_customer_profile: { Args: never; Returns: undefined }
       fam_key_ok: { Args: { _key: string }; Returns: boolean }
       get_fam_key: { Args: { _server: string }; Returns: string }
       get_proposal_config: { Args: { _code: string }; Returns: Json }

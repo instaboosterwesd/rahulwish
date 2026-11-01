@@ -4,6 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { readProposalConfig } from "@/lib/proposal";
+import { firebaseConfig } from "@/lib/firebase-config";
+import { readFirebaseCatalog } from "@/lib/firebase-catalog";
 
 export type Template = Database["public"]["Tables"]["templates"]["Row"];
 
@@ -25,6 +27,15 @@ function publicClient() {
 }
 
 export const listTemplates = createServerFn({ method: "GET" }).handler(async () => {
+  // Public catalog only. Private records and checkout stay on the verified backend.
+  // Empty/unavailable Firebase keeps the existing catalog working during migration.
+  try {
+    const catalog = await readFirebaseCatalog(firebaseConfig.databaseURL);
+    if (catalog !== null) {
+      const { resolveTemplateCover } = await import('@/lib/template-cover.server');
+      return Promise.all(catalog.map(async row => ({ ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category) })));
+    }
+  } catch { /* Preserve the working catalog until Firebase data is ready. */ }
   const { data, error } = await publicClient()
     .from("templates")
     .select("*")
@@ -39,6 +50,15 @@ export const listTemplates = createServerFn({ method: "GET" }).handler(async () 
 export const getTemplate = createServerFn({ method: "GET" })
   .inputValidator((d: { slug: string }) => z.object({ slug: z.string().min(1).max(100) }).parse(d))
   .handler(async ({ data }) => {
+    try {
+      const catalog = await readFirebaseCatalog(firebaseConfig.databaseURL);
+      if (catalog !== null) {
+        const row = catalog.find(item => item.slug === data.slug);
+        if (!row) return null;
+        const { resolveTemplateCover } = await import('@/lib/template-cover.server');
+        return { ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category) };
+      }
+    } catch { /* Preserve existing demos if Firebase is unavailable. */ }
     const { data: row, error } = await publicClient()
       .from("templates")
       .select("*")

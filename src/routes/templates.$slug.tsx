@@ -40,7 +40,7 @@ function Page() {
   const startPay = useServerFn(startFamPayment);
   const [checkout, setCheckout] = useState<FamCheckout | null>(null);
   const pay = useMutation({ mutationFn: (template: string) => startPay({ data: { template } }), onSuccess: setCheckout, onError: (e) => toast.error(e.message) });
-  const purchase = useMutation({ mutationFn: (template: string) => buy({ data: { template } }), onSuccess: (id) => { qc.invalidateQueries({ queryKey: ["customer-dashboard"] }); if (id) navigate({ to: "/customize/$id", params: { id } }); }, onError: () => toast.error("Approved credit required. Send a deposit request from My surprises.") });
+  const purchase = useMutation({ mutationFn: (template: string) => buy({ data: { template } }), onSuccess: (id) => { qc.invalidateQueries({ queryKey: ["customer-dashboard"] }); if (id) navigate({ to: "/customize/$id", params: { id } }); }, onError: (error) => toast.error(error.message) });
   const { data: t } = useSuspenseQuery(templateQuery(slug));
   if (!t) return null;
   return (
@@ -60,7 +60,7 @@ function Page() {
               ? <><Button variant="hero" size="lg" disabled={pay.isPending} onClick={() => pay.mutate(t.id)}><ShoppingBag /> {pay.isPending ? "Starting…" : `Pay ${formatINR(t.price_inr)} with UPI`}</Button><Button variant="glass" size="lg" disabled={purchase.isPending} onClick={() => purchase.mutate(t.id)}>Use my credit</Button></>
               : <Button variant="hero" size="lg" disabled={purchase.isPending} onClick={() => purchase.mutate(t.id)}><ShoppingBag /> Get free / Customize</Button>)
               : <Button asChild variant="hero" size="lg"><Link to="/auth"><ShoppingBag /> Sign in to buy</Link></Button>}
-            {user && <Button asChild variant="glass"><Link to="/my">My credit / Deposit</Link></Button>}
+            {user && <Button asChild variant="glass"><Link to="/wallet">My wallet</Link></Button>}
             <Button asChild variant="outline" size="lg">
               <Link to="/demo/$slug" params={{ slug }}>
                 <Eye /> Live Demo

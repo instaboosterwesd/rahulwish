@@ -1,3 +1,6 @@
+- [x] Fix wallet/account loading after remix: restore signup profile trigger and caller-only recovery, avoid auth callback lock, show monetary zero correctly, verify Wallet/Orders/Profile and a free order signed in; temporary test accounts removed.
+- [x] Update the remixed GitHub, Google API and Google Analytics secrets through the secure form; all three saved.
+- [x] Newest remix: copied setup history was empty and connection refreshed; restored signup profile setup and the six free templates, then re-verified Wallet/Orders/Profile and a free order signed in.
 - [x] Reset copied migration history to an empty set after confirming no applied entries; retain reference copies and refresh the remix connection.
 - [x] Add all six uploaded templates to the catalog; verify desktop/mobile previews, the love answer animation and 3D heart canvas.
 - [x] Finish English-only wording across site screens and default surprise text; all 32 tests pass.
@@ -27,3 +30,11 @@
 - [ ] Verify saved buyer details through the recipient experience.- [x] Clear copied database setup history and start a fresh one for the new backend.
 - [x] Add 5 uploaded templates (Sweet Bday, Apology Card, Secret Birthday Gift, Animated Garden, 3D Heart) with names, media, demos and catalog rows.
 - [x] Add a search bar to the Templates page: live filtering, result count, clear button and no-match state; 38 tests pass and preview verified.
+- [x] Add Firebase public configuration, lazy SDK initialization, token verification, initial locked-down rules and migration-security tests.
+- [ ] Migrate sign-in, app data, wallet permissions and uploads to Firebase — blocked on dedicated Firebase server credentials, verified provider/domains and deployed rules; preserve the working connection until safe cutover.
+- [x] Update the three copied GitHub/Google secrets through the secure form; all three replacement values saved.
+- [x] Verify the remixed project's migration scaffold is already empty: no copied SQL/snapshots and journal entries are empty; no database data deleted.
+- [x] Add Firebase public catalog reads with validation and existing-catalog fallback; all six uploaded templates now read back from Firebase.
+- [ ] Transfer private accounts/orders/wallet to Firebase — blocked until database permissions protect ownership and balances; unrestricted reads/writes are not used for private records.
+- [x] Restore six uploaded template entries in Firebase and the verified checkout catalog with matching IDs; six loaded covers, birthday search, all detail/demo pages and love-answer animation checked.
+- [x] Verify signed-in free customization and saved orders after remix using a temporary test account; free purchase opens customization and reads back in Orders, Wallet shows ₹0, mobile has no overflow.

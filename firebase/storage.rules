@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Initial migration posture: all access is through verified server operations.
+    // Do not enable client writes before account-ban and ownership checks are ported.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

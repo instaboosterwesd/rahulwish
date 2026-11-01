@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1793481519494,
-      "tag": "0000_migration",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1793481650626,
-      "tag": "0001_migration",
+      "when": 1793512697718,
+      "tag": "0000_restore_signup_profile_trigger",
       "breakpoints": true
     }
   ]

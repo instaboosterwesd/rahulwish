@@ -1,5 +1,9 @@
 export function formatINR(amount: number): string {
   if (amount <= 0) return "Free";
+  return formatMoneyINR(amount);
+}
+
+export function formatMoneyINR(amount: number): string {
   return "₹" + amount.toLocaleString("en-IN");
 }
 
