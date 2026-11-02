@@ -3,13 +3,14 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Eye, Plus, Save, Share2, Trash2 } from "lucide-react";
+import { Eye, Plus, Save, Share2, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SiteHeader } from "@/components/SiteHeader";
-import { supabase } from "@/integrations/supabase/client";
 import { SurpriseExperience } from "@/components/SurpriseExperience";
-import { customerQuery, saveSurprise, savePhotos, saveProposalConfig } from "@/lib/customer.functions";
+import { addSurprisePhoto, customerQuery, removeSurprisePhoto, saveSurprise, saveProposalConfig, MAX_SURPRISE_PHOTOS } from "@/lib/customer.functions";
+import { photoUrl, type CustomerOrder } from "@/lib/firebase-customer";
+import { compressImage } from "@/lib/compress-image";
 import { proposalQuiz, proposalQuestionSchema, readProposalConfig, type ProposalQuestion } from "@/lib/proposal";
 import { diwaliQuiz } from "@/lib/diwali";
 import { karwaQuiz } from "@/lib/karwa";
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/customize/$id")({
 function Page() {
   const { id } = Route.useParams(); const { data } = useSuspenseQuery(customerQuery()); const s = data.surprises.find((s) => s.id === id); if (!s) return null; return <Editor key={id} surprise={s} />;
 }
-type Surprise = Awaited<ReturnType<typeof import("@/lib/customer.functions").customerDashboard>>["surprises"][number];
+type Surprise = CustomerOrder;
 const blankQuestion = (): ProposalQuestion => ({ question: "", options: ["", "", ""], answer: 0 });
 
 function Editor({ surprise: s }: { surprise: Surprise }) {
@@ -36,25 +37,28 @@ function Editor({ surprise: s }: { surprise: Surprise }) {
   const [preview, setPreview] = useState(false);
   const extraKind = newTemplateKind(category);
   const [passcode, setPasscode] = useState(existing.passcode ?? "");
-  const save = useServerFn(saveSurprise); const persistPhotos = useServerFn(savePhotos); const saveConfig = useServerFn(saveProposalConfig); const qc = useQueryClient();
-  const [photoPaths, setPhotoPaths] = useState(s.photos);
-  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const save = useServerFn(saveSurprise); const addPhoto = useServerFn(addSurprisePhoto); const dropPhoto = useServerFn(removeSurprisePhoto); const saveConfig = useServerFn(saveProposalConfig); const qc = useQueryClient();
+  const [photoIds, setPhotoIds] = useState(s.photos);
+  const photoUrls = photoIds.map((p) => photoUrl(s.id, p));
   const [uploading, setUploading] = useState(false);
 
   const cleanQuiz = () => quiz.map((q) => ({ ...q, options: q.options.map((o) => o.trim()).filter(Boolean) })).filter((q) => q.question.trim());
   const upload = async (files: FileList | null) => {
-    if (!files) return; setUploading(true);
+    if (!files?.length) return; setUploading(true);
     try {
-      const { data } = await supabase.auth.getUser(); if (!data.user) throw new Error("Sign in required");
-      const paths = [...photoPaths]; const urls = [...photoUrls];
+      let ids = photoIds;
       for (const file of Array.from(files)) {
-        if (!file.type.startsWith("image/")) throw new Error("Please choose image files");
-        const path = `${data.user.id}/${crypto.randomUUID()}`;
-        const { error } = await supabase.storage.from("photos").upload(path, file, { contentType: file.type }); if (error) throw new Error(error.message);
-        paths.push(path); urls.push(URL.createObjectURL(file));
+        if (ids.length >= MAX_SURPRISE_PHOTOS) throw new Error(`You can add up to ${MAX_SURPRISE_PHOTOS} photos.`);
+        const image = await compressImage(file);
+        ids = (await addPhoto({ data: { id: s.id, image } })).photos;
+        setPhotoIds(ids);
       }
-      await persistPhotos({ data: { id: s.id, photos: paths } }); setPhotoPaths(paths); setPhotoUrls(urls); toast.success("Photos saved"); qc.invalidateQueries({ queryKey: ["customer-dashboard"] });
+      toast.success("Photos saved"); qc.invalidateQueries({ queryKey: ["customer-dashboard"] });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Photo upload failed"); } finally { setUploading(false); }
+  };
+  const removePhoto = async (photo: string) => {
+    try { setPhotoIds((await dropPhoto({ data: { id: s.id, photo } })).photos); qc.invalidateQueries({ queryKey: ["customer-dashboard"] }); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Could not remove photo"); }
   };
   const mutation = useMutation({
     mutationFn: async () => {
@@ -71,7 +75,7 @@ function Editor({ surprise: s }: { surprise: Surprise }) {
   });
   const setQ = (i: number, q: ProposalQuestion) => setQuiz(quiz.map((x, j) => (j === i ? q : x)));
 
-  return <div className="min-h-screen bg-night"><SiteHeader /><main className="mx-auto max-w-6xl px-5 pb-12 pt-32">
+  return <div className="min-h-screen bg-night"><SiteHeader /><main className="mx-auto max-w-6xl px-5 pb-36 pt-32">
     <Link to="/my" className="text-sm text-primary">← My surprises</Link><h1 className="mt-4 text-4xl">{s.templates?.title}</h1>
     <div className="mt-7 flex flex-wrap gap-3"><Button variant="outline" onClick={() => setPreview(!preview)}><Eye />{preview ? "Edit details" : "Live preview"}</Button><Button variant="outline" onClick={async () => { await navigator.clipboard.writeText(`${window.location.origin}/surprise/${s.code}`); toast.success("Link copied"); }}><Share2 />Copy link</Button></div>
     {preview ? <div className="mt-8"><SurpriseExperience {...form} category={category} photos={photoUrls} cover={s.templates?.cover_image ?? ""} proposalConfig={{ ...existing, quiz: cleanQuiz(), ...(passcode ? { passcode } : {}) }} /></div> :
@@ -80,7 +84,8 @@ function Editor({ surprise: s }: { surprise: Surprise }) {
       <label className="block">Recipient name<Input className="mt-2" value={form.recipient} required maxLength={100} onChange={(e) => setForm({ ...form, recipient: e.target.value })} /></label>
       <label className="block">Your name<Input className="mt-2" value={form.sender} required maxLength={100} onChange={(e) => setForm({ ...form, sender: e.target.value })} /></label>
       <h2 className="text-2xl">2. Photos</h2>
-      <label className="block"><input aria-label="Upload photos" type="file" accept="image/*" multiple disabled={uploading} className="block w-full text-sm" onChange={(e) => upload(e.target.files)} /><span className="mt-2 block text-sm text-muted-foreground">{uploading ? "Uploading…" : `${photoPaths.length} photos saved`}</span></label>
+      <label className="block"><input aria-label="Upload photos" type="file" accept="image/*" multiple disabled={uploading || photoIds.length >= MAX_SURPRISE_PHOTOS} className="block w-full text-sm" onChange={(e) => { upload(e.target.files); e.target.value = ""; }} /><span className="mt-2 block text-sm text-muted-foreground">{uploading ? "Uploading…" : `${photoIds.length} of ${MAX_SURPRISE_PHOTOS} photos saved`}</span></label>
+      {photoIds.length > 0 && <ul className="grid grid-cols-3 gap-3 sm:grid-cols-5">{photoIds.map((p, i) => <li key={p} className="relative overflow-hidden rounded-2xl bg-card"><img src={photoUrl(s.id, p)} alt={`Saved photo ${i + 1}`} loading="lazy" className="aspect-square w-full object-cover" /><Button type="button" size="icon" variant="secondary" aria-label={`Remove photo ${i + 1}`} className="absolute right-1 top-1 h-7 w-7 rounded-full" onClick={() => removePhoto(p)}><X className="h-4 w-4" /></Button></li>)}</ul>}
       {extraKind === "secret" && <label className="block">Secret passcode (4 digits, e.g. a birthday: 0512)<Input className="mt-2" inputMode="numeric" pattern="\d{4}" maxLength={4} placeholder="2005" value={passcode} onChange={(e) => setPasscode(e.target.value.replace(/\D/g, "").slice(0, 4))} /></label>}
       {!extraKind && <><h2 className="text-2xl">3. Questions and correct answers</h2>
       {quiz.map((q, i) => <fieldset key={i} className="clay space-y-3 p-5">

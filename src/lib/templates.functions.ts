@@ -1,109 +1,61 @@
 import { createServerFn } from "@tanstack/react-start";
 import { queryOptions } from "@tanstack/react-query";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import type { Database } from "@/integrations/supabase/types";
 import { readProposalConfig } from "@/lib/proposal";
 import { firebaseConfig } from "@/lib/firebase-config";
-import { readFirebaseCatalog } from "@/lib/firebase-catalog";
+import { readFirebaseCatalog, type CatalogRow } from "@/lib/firebase-catalog";
+import { portableTemplateCover } from "@/lib/template-cover";
+import { photoUrl } from "@/lib/firebase-customer";
 
-export type Template = Database["public"]["Tables"]["templates"]["Row"];
+export type Template = CatalogRow;
 
-function publicClient() {
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-  return createClient<Database>(process.env["SUPABASE_URL"]!, key, {
-    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
-    global: {
-      fetch: (input, init) => {
-        const headers = new Headers(init?.headers);
-        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) {
-          headers.delete("Authorization");
-        }
-        headers.set("apikey", key);
-        return fetch(input, { ...init, headers });
-      },
-    },
-  });
-}
+const withCover = (row: CatalogRow): Template => ({ ...row, cover_image: portableTemplateCover(row.cover_image, row.category) });
 
+// Public catalog straight from Firebase (catalog/ is publicly readable, display fields only).
 export const listTemplates = createServerFn({ method: "GET" }).handler(async () => {
-  // Public catalog only. Private records and checkout stay on the verified backend.
-  // Empty/unavailable Firebase keeps the existing catalog working during migration.
-  try {
-    const catalog = await readFirebaseCatalog(firebaseConfig.databaseURL);
-    if (catalog !== null) {
-      const { resolveTemplateCover } = await import('@/lib/template-cover.server');
-      return Promise.all(catalog.map(async row => ({ ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category) })));
-    }
-  } catch { /* Preserve the working catalog until Firebase data is ready. */ }
-  const { data, error } = await publicClient()
-    .from("templates")
-    .select("*")
-    .eq("active", true)
-    .order("featured", { ascending: false })
-    .order("created_at", { ascending: true });
-  if (error) throw new Error(error.message);
-  const { resolveTemplateCover } = await import('@/lib/template-cover.server');
-  return Promise.all((data ?? []).map(async row => ({ ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category) })));
+  const catalog = await readFirebaseCatalog(firebaseConfig.databaseURL);
+  return (catalog ?? []).map(withCover);
 });
 
 export const getTemplate = createServerFn({ method: "GET" })
   .inputValidator((d: { slug: string }) => z.object({ slug: z.string().min(1).max(100) }).parse(d))
   .handler(async ({ data }) => {
-    try {
-      const catalog = await readFirebaseCatalog(firebaseConfig.databaseURL);
-      if (catalog !== null) {
-        const row = catalog.find(item => item.slug === data.slug);
-        if (!row) return null;
-        const { resolveTemplateCover } = await import('@/lib/template-cover.server');
-        return { ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category) };
-      }
-    } catch { /* Preserve existing demos if Firebase is unavailable. */ }
-    const { data: row, error } = await publicClient()
-      .from("templates")
-      .select("*")
-      .eq("slug", data.slug)
-      .eq("active", true)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    if (!row) return null;
-    const { resolveTemplateCover } = await import('@/lib/template-cover.server');
-    return { ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category) };
+    const catalog = await readFirebaseCatalog(firebaseConfig.databaseURL);
+    const row = (catalog ?? []).find((item) => item.slug === data.slug);
+    return row ? withCover(row) : null;
   });
 
+const codeSchema = z.object({ code: z.string().min(4).max(32).regex(/^[A-Za-z0-9_-]+$/) });
+
+// Shared surprise page: only the display fields of a paid surprise, never the owner's account.
 export const getSurprise = createServerFn({ method: "GET" })
-  .inputValidator((d: { code: string }) => z.object({ code: z.string().min(4).max(32) }).parse(d))
+  .inputValidator((d: { code: string }) => codeSchema.parse(d))
   .handler(async ({ data }) => {
-    const { data: rows, error } = await publicClient().rpc("get_surprise", { _code: data.code });
-    if (error) throw new Error(error.message);
-    const row = rows?.[0];
-    if (!row) return null;
-    let photoUrls: string[] = [];
-    if (row.photos.length) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: signed } = await supabaseAdmin.storage
-        .from("photos")
-        .createSignedUrls(row.photos, 60 * 60 * 24);
-      photoUrls = (signed ?? []).map((s) => s.signedUrl).filter(Boolean) as string[];
-    }
-    const { data: config, error: configError } = await publicClient().rpc("get_proposal_config", { _code: data.code });
-    if (configError) throw new Error(configError.message);
-    const proposalConfig = readProposalConfig(config);
-    let audioUrl: string | undefined;
-    if (proposalConfig.audioPath) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: signed, error: audioError } = await supabaseAdmin.storage.from("proposal-audio").createSignedUrl(proposalConfig.audioPath, 3600);
-      if (audioError) throw new Error(audioError.message);
-      audioUrl = signed?.signedUrl;
-    }
-    const { resolveTemplateCover } = await import('@/lib/template-cover.server');
-    return { ...row, cover_image: await resolveTemplateCover(row.cover_image, row.category), photoUrls, proposalConfig, audioUrl };
+    const { dbGet } = await import("@/lib/firebase-db.server");
+    const link = await dbGet<{ uid?: string; orderId?: string }>(`surprises/${data.code}`);
+    if (!link?.uid || !link.orderId) return null;
+    const { ownedPaidOrder } = await import("@/lib/shop.server");
+    const order = await ownedPaidOrder(link.uid, link.orderId).catch(() => null);
+    if (!order) return null;
+    const category = order.templates?.category ?? "";
+    return {
+      category,
+      recipient_name: order.recipient_name ?? "",
+      sender_name: order.sender_name ?? "",
+      headline: order.headline ?? "",
+      message: order.message ?? "",
+      cover_image: portableTemplateCover(order.templates?.cover_image ?? "", category),
+      photoUrls: (Array.isArray(order.photos) ? order.photos : []).map((p) => photoUrl(link.orderId!, p)),
+      proposalConfig: readProposalConfig(order.proposal_config),
+      audioUrl: undefined as string | undefined,
+    };
   });
 
 export const getPublicSettings = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await publicClient().from("settings").select("key, value");
-  if (error) throw new Error(error.message);
-  return Object.fromEntries((data ?? []).map((r) => [r.key, r.value])) as Record<string, string>;
+  const response = await fetch(`${firebaseConfig.databaseURL}/publicSettings.json`, { signal: AbortSignal.timeout(5000) });
+  if (!response.ok) return {} as Record<string, string>;
+  const value = (await response.json()) as Record<string, unknown> | null;
+  return Object.fromEntries(Object.entries(value ?? {}).filter(([, v]) => typeof v === "string")) as Record<string, string>;
 });
 
 export const templatesQuery = () =>
@@ -114,9 +66,14 @@ export const surpriseQuery = (code: string) =>
   queryOptions({ queryKey: ["surprise", code], queryFn: () => getSurprise({ data: { code } }) });
 
 export const recordSurpriseView = createServerFn({ method: "POST" })
-  .inputValidator((d: { code: string }) => z.object({ code: z.string().min(4).max(32) }).parse(d))
+  .inputValidator((d: { code: string }) => codeSchema.parse(d))
   .handler(async ({ data }) => {
-    const { error } = await (publicClient() as any).rpc("record_surprise_view", { _code: data.code });
-    if (error) console.error("record_surprise_view:", error.message);
+    try {
+      const { dbGet, dbTransaction } = await import("@/lib/firebase-db.server");
+      const link = await dbGet<{ uid?: string; orderId?: string }>(`surprises/${data.code}`);
+      if (link?.uid && link.orderId) await dbTransaction<number>(`orders/${link.uid}/${link.orderId}/views`, (v) => (typeof v === "number" ? v : 0) + 1);
+    } catch (error) {
+      console.error("record view:", error);
+    }
     return { ok: true };
   });

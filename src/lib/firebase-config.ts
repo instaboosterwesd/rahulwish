@@ -7,4 +7,5 @@ export const firebaseConfig = {
   storageBucket: "rahul-wish.firebasestorage.app",
   messagingSenderId: "706025556053",
   appId: "1:706025556053:web:8b77188c4f541cd87cacdc",
+  measurementId: "G-9FQMXBTC59",
 } as const;

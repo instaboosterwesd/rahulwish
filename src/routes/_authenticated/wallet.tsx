@@ -1,12 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
+import { toast } from "sonner";
 import { ArrowRight, Plus, Wallet } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FamPayDialog } from "@/components/FamPayDialog";
 import { customerQuery } from "@/lib/customer.functions";
+import { startWalletTopUp, type FamCheckout } from "@/lib/famgateway.functions";
+import { TOP_UP_MAX, TOP_UP_MIN, validTopUpAmount } from "@/lib/shop-rules";
+import { friendlyActionError } from "@/lib/friendly-error";
 import { formatMoneyINR } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/wallet")({
@@ -19,7 +25,15 @@ function Page() {
   const { data } = useSuspenseQuery(customerQuery());
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState("");
-  const [paymentUnavailable, setPaymentUnavailable] = useState(false);
+  const [checkout, setCheckout] = useState<FamCheckout | null>(null);
+  const startTopUp = useServerFn(startWalletTopUp);
+  const topUp = useMutation({
+    mutationFn: (value: number) => startTopUp({ data: { amount: value } }),
+    onSuccess: (c) => { setOpen(false); setAmount(""); setCheckout(c); },
+    onError: (e) => toast.error(friendlyActionError(e)),
+  });
+  const value = Number(amount);
+  const valid = validTopUpAmount(value);
   return (
     <div className="min-h-[100dvh]">
       <SiteHeader />
@@ -27,7 +41,7 @@ function Page() {
         <section className="rounded-3xl bg-primary p-6 text-primary-foreground" aria-label="Wallet balance">
           <div className="flex items-center justify-between">
             <Wallet className="h-7 w-7" />
-            <Button variant="secondary" size="icon" aria-label="Add money" title="Add money" onClick={() => { setOpen(true); setPaymentUnavailable(false); }}>
+            <Button variant="secondary" size="icon" aria-label="Add money" title="Add money" onClick={() => setOpen(true)}>
               <Plus className="h-5 w-5" />
             </Button>
           </div>
@@ -38,20 +52,21 @@ function Page() {
           <DialogContent className="w-[calc(100%-2rem)] max-w-[400px] rounded-lg">
             <DialogHeader className="text-left">
               <DialogTitle className="tracking-normal">Add money</DialogTitle>
-              <DialogDescription>Wallet top-up · FamPay</DialogDescription>
+              <DialogDescription>Pay with any UPI app. Money is added as soon as the payment is confirmed.</DialogDescription>
             </DialogHeader>
-            <form onSubmit={(e) => { e.preventDefault(); setPaymentUnavailable(true); }} className="space-y-5">
+            <form onSubmit={(e) => { e.preventDefault(); if (valid) topUp.mutate(value); }} className="space-y-5">
               <div className="space-y-2">
                 <label htmlFor="top-up-amount" className="text-sm font-medium">Amount (₹)</label>
-                <Input id="top-up-amount" type="number" inputMode="numeric" min={1} step={1} required placeholder="Enter amount" value={amount} onChange={(e) => { setAmount(e.target.value); setPaymentUnavailable(false); }} className="h-14 text-xl" />
+                <Input id="top-up-amount" type="number" inputMode="numeric" min={TOP_UP_MIN} max={TOP_UP_MAX} step={1} required placeholder="Enter amount" value={amount} onChange={(e) => setAmount(e.target.value)} className="h-14 text-xl" />
+                {amount && !valid && <p className="text-sm text-destructive">Enter whole rupees from ₹{TOP_UP_MIN} to ₹{TOP_UP_MAX}.</p>}
               </div>
-              {paymentUnavailable && <p role="status" className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">FamPay payment is not available yet. No payment was taken.</p>}
-              <Button variant="hero" type="submit" className="w-full" disabled={!amount}>
-                {Number(amount) > 0 ? `Pay ₹${amount}` : "Pay"}<ArrowRight className="h-4 w-4" />
+              <Button variant="hero" type="submit" className="w-full" disabled={!valid || topUp.isPending}>
+                {topUp.isPending ? "Starting…" : valid ? `Pay ₹${value} with UPI` : "Pay"}<ArrowRight className="h-4 w-4" />
               </Button>
             </form>
           </DialogContent>
         </Dialog>
+        <FamPayDialog checkout={checkout} onClose={() => setCheckout(null)} />
         <section>
           <h2 className="text-xl">History</h2>
           <ul className="mt-3 divide-y divide-border rounded-3xl glass">

@@ -153,7 +153,7 @@ function RootComponent() {
         </div>
       </div>
       <Announcement />
-      <Toaster />
+      <Toaster position="top-center" offset={84} />
     </QueryClientProvider>
   );
 }

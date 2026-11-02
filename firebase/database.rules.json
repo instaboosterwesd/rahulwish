@@ -4,18 +4,24 @@
     ".write": false,
     "catalog": { ".read": true },
     "publicSettings": { ".read": true },
-    "profiles": {
+    "users": {
       "$uid": {
-        ".read": "auth != null && auth.uid === $uid && root.child('profiles').child($uid).child('banned').val() !== true && !root.child('profiles').child($uid).child('deleted_at').exists()"
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && root.child('accounts').child($uid).child('banned').val() !== true",
+        ".validate": "newData.hasChildren(['name', 'email', 'provider', 'createdAt', 'lastLoginAt']) && newData.child('email').val() === auth.token.email.toLowerCase()",
+        "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80" },
+        "email": { ".validate": "newData.isString()" },
+        "photo": { ".validate": "newData.isString() && newData.val().length <= 500" },
+        "provider": { ".validate": "newData.val() === 'password' || newData.val() === 'google.com'" },
+        "createdAt": { ".validate": "newData.isNumber()" },
+        "lastLoginAt": { ".validate": "newData.isNumber()" },
+        "role": { ".validate": "(!data.exists() && newData.val() === 'user') || newData.val() === data.val()" },
+        "$other": { ".validate": false }
       }
     },
-    "roles": {
-      "$uid": { ".read": "auth != null && auth.uid === $uid && root.child('profiles').child($uid).child('banned').val() !== true && !root.child('profiles').child($uid).child('deleted_at').exists()" }
-    },
-    "accounts": {
-      "$uid": {
-        ".read": "auth != null && auth.uid === $uid && root.child('profiles').child($uid).child('banned').val() !== true && !root.child('profiles').child($uid).child('deleted_at').exists()"
-      }
-    }
+    "accounts": { "$uid": { ".read": "auth != null && auth.uid === $uid" } },
+    "wallets": { "$uid": { ".read": "auth != null && auth.uid === $uid" } },
+    "deposits": { "$uid": { ".read": "auth != null && auth.uid === $uid" } },
+    "orders": { "$uid": { ".read": "auth != null && auth.uid === $uid" } }
   }
 }

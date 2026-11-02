@@ -32,7 +32,7 @@ function Page() {
       <main className="mx-auto max-w-6xl px-6 pb-20 pt-32">
         <h1 className="text-5xl font-semibold ">All <span className="text-rose-gradient">Templates</span></h1>
 
-        <div className="sticky top-[72px] z-40 -mx-6 mt-6 bg-night/90 px-6 py-3 backdrop-blur">
+        <div className="search-dock sticky top-[62px] z-40 -mx-6 mt-6 px-6 pb-3 pt-4">
           <label className="flex items-center gap-2 rounded-full glass px-4 py-2.5">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input

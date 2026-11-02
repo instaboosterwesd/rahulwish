@@ -110,6 +110,17 @@
     inset 0 -2px 2px oklch(1 0 0 / 70%);
   --shadow-glow: 0 16px 40px -10px oklch(0.68 0.19 5 / 45%);
   --shadow-card: var(--shadow-clay);
+
+  /* Glassmorphism */
+  --glass-bg: linear-gradient(135deg, oklch(1 0 0 / 62%), oklch(0.98 0.03 350 / 38%));
+  --glass-bg-strong: linear-gradient(135deg, oklch(1 0 0 / 78%), oklch(0.98 0.03 350 / 58%));
+  --glass-fallback: oklch(0.99 0.01 350 / 94%);
+  --glass-border: oklch(1 0 0 / 65%);
+  --glass-field: oklch(1 0 0 / 55%);
+  --glass-shadow:
+    0 10px 30px -12px oklch(0.6 0.1 350 / 30%),
+    inset 0 1px 0 oklch(1 0 0 / 85%),
+    inset 0 -1px 0 oklch(0.7 0.08 350 / 10%);
 }
 
 @layer base {
@@ -192,11 +203,77 @@
   }
 }
 
+/* Frosted glass: translucent tint + blur + saturation, with a bright top edge.
+   Write only the standard backdrop-filter; the build adds the Safari prefix. */
 @utility glass {
-  background: oklch(0.99 0.01 350 / 70%);
-  backdrop-filter: blur(16px);
-  border: 1px solid oklch(1 0 0 / 60%);
-  box-shadow: var(--shadow-clay-sm);
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px) saturate(170%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+@utility glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+/* Sticky bar that sits just under the header: near-solid page tint so cards
+   scrolling underneath never show through the search field. */
+@utility search-dock {
+  background: linear-gradient(180deg, var(--background) 0%, color-mix(in oklab, var(--background) 94%, transparent) 100%);
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: 0 10px 18px -14px oklch(0.6 0.1 350 / 45%);
+}
+
+/* Browsers without blur support get a solid tint so text stays readable. */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass, .glass-strong { background: var(--glass-fallback); }
+  .search-dock { background: var(--background); }
+}
+
+/* Custom 3D clay icons */
+@utility clay-icon {
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px oklch(0.6 0.1 350 / 25%));
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Login page form fields and segmented switch */
+@utility glass-field {
+  width: 100%;
+  border-radius: 1rem;
+  background: var(--glass-field);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 2px 6px oklch(0.6 0.1 350 / 12%);
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  font-size: 0.95rem;
+  color: var(--color-foreground);
+  outline: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  &::placeholder { color: var(--color-muted-foreground); font-weight: 500; }
+  &:focus { border-color: var(--color-primary); box-shadow: 0 0 0 4px oklch(0.68 0.19 5 / 18%); }
+}
+@utility segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  border-radius: 9999px;
+  background: var(--glass-field);
+  box-shadow: inset 0 2px 6px oklch(0.6 0.1 350 / 14%);
+}
+@utility segmented-item {
+  border-radius: 9999px;
+  padding: 0.55rem 0;
+  font-size: 0.875rem;
+  color: var(--color-muted-foreground);
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  &[data-active="true"] {
+    background-image: var(--gradient-rose);
+    color: var(--color-primary-foreground);
+    box-shadow: var(--shadow-glow);
+  }
 }
 @utility grain {
   &::after {
@@ -666,7 +743,7 @@
   opacity:0; transition:opacity .45s ease, transform .45s var(--ease-out);
   pointer-events:none; white-space:nowrap; max-width:92vw; overflow:hidden;
   text-overflow:ellipsis; box-shadow:0 14px 36px rgba(0,0,0,.45), 0 0 24px var(--glow);
-  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
 }
 .garden-root #toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 

@@ -15,7 +15,7 @@ export async function firebaseServiceToken(credentialJson: string) {
   try { credential = JSON.parse(credentialJson); } catch { throw new Error("Firebase server credentials are invalid"); }
   if (credential.project_id !== firebaseConfig.projectId || !credential.client_email || !credential.private_key) throw new Error("Firebase server credentials must belong to rahul-wish");
   const key = await importPKCS8(credential.private_key, "RS256");
-  const assertion = await new SignJWT({ scope: "https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/devstorage.read_write" })
+  const assertion = await new SignJWT({ scope: "https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/cloud-platform" })
     .setProtectedHeader({ alg: "RS256" }).setIssuer(credential.client_email)
     .setAudience("https://oauth2.googleapis.com/token").setIssuedAt().setExpirationTime("1h").sign(key);
   const response = await fetch("https://oauth2.googleapis.com/token", {

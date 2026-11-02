@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import {
   adminEditUser,
   adminDeleteUser,
+  adminSetUserRole,
   adminStatsQuery,
   adminSurprisesQuery,
   adminTemplatesQuery,
@@ -78,6 +79,8 @@ function AdminPage() {
   const qc = useQueryClient();
   const editUser = useServerFn(adminEditUser);
   const deleteUser = useServerFn(adminDeleteUser);
+  const setRole = useServerFn(adminSetUserRole);
+  const roleMut = useMutation({ mutationFn: (v: { id: string; role: "admin" | "user" }) => setRole({ data: v }), onSuccess: (_r, v) => { refresh(); toast.success(v.role === "admin" ? "Admin access given" : "Admin access removed"); }, onError: (e) => toast.error(e.message) });
   const editMut = useMutation({ mutationFn: (v: { id: string; full_name: string }) => editUser({ data: v }), onSuccess: () => { refresh(); setEditing(null); }, onError: (e) => toast.error(e.message) });
   const deleteMut = useMutation({ mutationFn: (id: string) => deleteUser({ data: { id } }), onSuccess: () => refresh(), onError: (e) => toast.error(e.message) });
   const setPrice = useServerFn(adminSetTemplatePrice);
@@ -288,7 +291,7 @@ function AdminPage() {
                 <tbody>
                   {users.map((u) => (
                     <tr key={u.id} className="border-b border-border/50 last:border-0">
-                      <td className="px-5 py-4 font-semibold"><p>{u.full_name || "Unnamed user"}</p><p className="text-xs text-muted-foreground">{u.email || u.id.slice(0, 8)}</p></td>
+                      <td className="px-5 py-4 font-semibold"><p>{u.full_name || "Unnamed user"}{u.role === "admin" && <span className="ml-2 rounded-full bg-gold-gradient px-2 py-0.5 text-[10px] font-semibold uppercase text-accent-foreground">Admin</span>}</p><p className="text-xs text-muted-foreground">{u.email || u.id.slice(0, 8)}</p></td>
                       <td className="px-5 py-4 text-muted-foreground">
                         {new Date(u.created_at).toLocaleDateString("en-IN")}
                       </td>
@@ -311,6 +314,15 @@ function AdminPage() {
                           onClick={() => banMut.mutate({ id: u.id, banned: !u.banned })}
                         >
                           {u.banned ? "Unban" : "Ban"}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="ml-1"
+                          disabled={roleMut.isPending}
+                          onClick={() => roleMut.mutate({ id: u.id, role: u.role === "admin" ? "user" : "admin" })}
+                        >
+                          {u.role === "admin" ? "Make user" : "Make admin"}
                         </Button>
                         <Button size="icon" variant="ghost" aria-label="Edit user" title="Edit user" onClick={() => setEditing({ id: u.id, full_name: u.full_name })}><Pencil /></Button>
                         <Button size="icon" variant="ghost" aria-label="Delete user" title="Delete user" disabled={deleteMut.isPending} onClick={() => { if (window.confirm("Remove this user and disable their access? Payment records will be retained.")) deleteMut.mutate(u.id); }}><Trash2 /></Button>

@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight, Gift, Heart, Music, Quote, Sparkles, Star } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Gift, Heart, Quote, Sparkles, Star } from "lucide-react";
+import { ClayIcon, type ClayIconName } from "@/components/ClayIcon";
 import { templatesQuery } from "@/lib/templates.functions";
 import { TemplateCard } from "@/components/TemplateCard";
 import { SiteHeader, SiteFooter } from "@/components/SiteHeader";
@@ -64,11 +65,11 @@ const REVIEWS = [
   },
 ];
 
-const PROOF = [
-  { value: "12,000+", label: "Surprises delivered" },
-  { value: "4.9★", label: "Average rating" },
-  { value: "2 min", label: "To create yours" },
-  { value: "98%", label: "Said it made them cry (happy tears)" },
+const PROOF: { value: string; label: string; icon: ClayIconName }[] = [
+  { value: "12,000+", label: "Surprises delivered", icon: "orders" },
+  { value: "4.9★", label: "Average rating", icon: "rating" },
+  { value: "2 min", label: "To create yours", icon: "time" },
+  { value: "98%", label: "Said it made them cry (happy tears)", icon: "tears" },
 ];
 
 const MARQUEE_IMAGES = [
@@ -144,7 +145,7 @@ function Home() {
               <Heart className="h-4 w-4 fill-primary text-primary" /> 12,000+ smiles
             </div>
             <div className="clay-sm absolute -right-6 bottom-16 flex rotate-3 items-center gap-2 px-4 py-2.5 text-sm font-bold">
-              <Music className="h-4 w-4 text-primary" /> Music included
+              <ClayIcon name="music" className="h-6 w-6" /> Music included
             </div>
           </div>
         </div>
@@ -152,11 +153,12 @@ function Home() {
 
       {/* Proof stats */}
       <section className="border-y border-border/60 bg-card/40">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 py-12 ">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-6 py-12 ">
           {PROOF.map((p) => (
-            <div key={p.label} className="text-center">
-              <p className="font-display text-4xl font-semibold text-gold ">{p.value}</p>
-              <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">{p.label}</p>
+            <div key={p.label} className="glass rounded-3xl px-3 py-5 text-center">
+              <ClayIcon name={p.icon} className="mx-auto h-12 w-12" />
+              <p className="mt-2 font-display text-3xl font-semibold text-gold ">{p.value}</p>
+              <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{p.label}</p>
             </div>
           ))}
         </div>
@@ -317,26 +319,26 @@ function Home() {
             Three steps to their <span className="font-script text-6xl text-gold">smile</span>
           </h2>
           <div className="mt-14 grid gap-6 ">
-            {[
+            {([
               {
-                icon: Gift,
+                icon: "templates",
                 title: "Pick a template",
                 text: "Birthday, proposal, invitation, friendship — choose the mood that fits your moment.",
               },
               {
-                icon: Heart,
+                icon: "create",
                 title: "Make it yours",
                 text: "Add their name, your photos and a heartfelt message. We wrap it in music and magic.",
               },
               {
-                icon: Music,
+                icon: "share",
                 title: "Share the link",
                 text: "Send the secret link on WhatsApp. They open it — and the surprise unfolds.",
               },
-            ].map((s, i) => (
+            ] satisfies { icon: ClayIconName; title: string; text: string }[]).map((s, i) => (
               <div key={s.title} className="clay p-8 transition-transform hover:-translate-y-1 hover:rotate-1">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-rose-gradient text-primary-foreground shadow-glow">
-                  <s.icon className="h-5 w-5" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-3xl glass">
+                  <ClayIcon name={s.icon} className="h-12 w-12" />
                 </div>
                 <p className="mt-5 text-xs uppercase tracking-[0.25em] text-muted-foreground">
                   Step {i + 1}

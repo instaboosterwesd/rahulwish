@@ -1,3 +1,12 @@
+- [x] Templates search bar stays solid above cards while scrolling; richer template details (back link, what you get, steps, suggestions, clear buying notice); profile with stats, recent surprises, name editing, account details, password change and share.
+- [x] Email sign-in and registration on the login page (verification link, resend, forgot password), custom clay icons for navigation, login, stats and steps, and glass effect fixes.
+- [x] Firebase-only sign-in: email registration signs in directly (no verification email), profile saved to Realtime Database users/{uid}, header/profile/protected pages use Firebase.
+- [x] Published locked-down Firebase database rules with the service account.
+- [x] Moved orders, wallet, purchases, customizing, photos, shared links, settings and admin to Firebase (server-side with the service account); verified end-to-end with a temporary account.
+- [x] Role stored inside each user record (users/{uid}/role = user|admin) for every account, Admin button in header for admins, Make admin / Make user switch in admin Users tab.
+- [ ] Owner switches their own users/{uid}/role to admin in the Firebase console (first admin).
+- [x] FamGateway key saved (admin setting); UPI QR checkout verified up to "waiting for payment". A real paid ₹1 test is still needed.
+- [ ] Copy of instaboosterwesd/rahulwish: code copied and public pages (home, templates from Firebase, demos) load in preview. Sign-in, wallet, orders, admin and shared surprise links still need the database connected (Settings → General → External Supabase → Connect) — waiting on user.
 - [x] Fix wallet/account loading after remix: restore signup profile trigger and caller-only recovery, avoid auth callback lock, show monetary zero correctly, verify Wallet/Orders/Profile and a free order signed in; temporary test accounts removed.
 - [x] Update the remixed GitHub, Google API and Google Analytics secrets through the secure form; all three saved.
 - [x] Newest remix: copied setup history was empty and connection refreshed; restored signup profile setup and the six free templates, then re-verified Wallet/Orders/Profile and a free order signed in.
@@ -6,7 +15,7 @@
 - [x] Finish English-only wording across site screens and default surprise text; all 32 tests pass.
 - [x] Remove Home navigation, keep Templates as the first tab, and verify all three landing-page actions open Templates.
 - [x] Add wallet + button, amount dialog and Pay action; verified signed-in on desktop/mobile with unchanged balance.
-- [ ] Connect wallet FamPay payment link and verified-success balance credit — waiting for payment documentation.
+- [x] Wallet "Add money" uses FamGateway UPI; balance credited only after verified payment (QR flow tested; real paid top-up still to try).
 - [x] Write root agent_memory.md with current project context and limitations.
 - [x] Bundle all 22 supplied media files, resolve catalog covers, add protected admin photo uploads, preserve on/off and user controls, remove favicon and Lovable Twitter metadata; 19 tests and public demo media verified.
 - [ ] Verify photo upload and template/user controls signed in as admin — external unmanaged Supabase has no browser test session.
@@ -39,4 +48,4 @@
 - [x] Restore six uploaded template entries in Firebase and the verified checkout catalog with matching IDs; six loaded covers, birthday search, all detail/demo pages and love-answer animation checked.
 - [x] Verify signed-in free customization and saved orders after remix using a temporary test account; free purchase opens customization and reads back in Orders, Wallet shows ₹0, mobile has no overflow.
 - [x] Switch the sign-in button to Firebase Google sign-in linked to existing accounts; Google window opens on the Firebase project; push to GitHub.
-- [ ] Allow the preview/published web addresses in Firebase Authorized domains — only the user can add them in the Firebase console.
+- [x] Added the preview addresses to Firebase authorized domains (published address to add after first publish).

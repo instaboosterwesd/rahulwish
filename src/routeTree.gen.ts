@@ -22,6 +22,8 @@ import { Route as SurpriseCodeRouteImport } from './routes/surprise.$code'
 import { Route as TemplatesIndexRouteImport } from './routes/templates.index'
 import { Route as TemplatesSlugRouteImport } from './routes/templates.$slug'
 import { Route as AuthenticatedCustomizeIdRouteImport } from './routes/_authenticated/customize.$id'
+import { Route as MediaCoverTemplateIdRouteImport } from './routes/media.cover.$templateId'
+import { Route as MediaPhotoOrderIdPhotoIdRouteImport } from './routes/media.photo.$orderId.$photoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,6 +90,17 @@ const AuthenticatedCustomizeIdRoute =
     path: '/customize/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const MediaCoverTemplateIdRoute = MediaCoverTemplateIdRouteImport.update({
+  id: '/media/cover/$templateId',
+  path: '/media/cover/$templateId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediaPhotoOrderIdPhotoIdRoute =
+  MediaPhotoOrderIdPhotoIdRouteImport.update({
+    id: '/media/photo/$orderId/$photoId',
+    path: '/media/photo/$orderId/$photoId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -102,6 +115,8 @@ export interface FileRoutesByFullPath {
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
   '/customize/$id': typeof AuthenticatedCustomizeIdRoute
+  '/media/cover/$templateId': typeof MediaCoverTemplateIdRoute
+  '/media/photo/$orderId/$photoId': typeof MediaPhotoOrderIdPhotoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -116,6 +131,8 @@ export interface FileRoutesByTo {
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates': typeof TemplatesIndexRoute
   '/customize/$id': typeof AuthenticatedCustomizeIdRoute
+  '/media/cover/$templateId': typeof MediaCoverTemplateIdRoute
+  '/media/photo/$orderId/$photoId': typeof MediaPhotoOrderIdPhotoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -132,6 +149,8 @@ export interface FileRoutesById {
   '/templates/$slug': typeof TemplatesSlugRoute
   '/templates/': typeof TemplatesIndexRoute
   '/_authenticated/customize/$id': typeof AuthenticatedCustomizeIdRoute
+  '/media/cover/$templateId': typeof MediaCoverTemplateIdRoute
+  '/media/photo/$orderId/$photoId': typeof MediaPhotoOrderIdPhotoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -148,6 +167,8 @@ export interface FileRouteTypes {
     | '/templates/$slug'
     | '/templates/'
     | '/customize/$id'
+    | '/media/cover/$templateId'
+    | '/media/photo/$orderId/$photoId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -162,6 +183,8 @@ export interface FileRouteTypes {
     | '/templates/$slug'
     | '/templates'
     | '/customize/$id'
+    | '/media/cover/$templateId'
+    | '/media/photo/$orderId/$photoId'
   id:
     | '__root__'
     | '/'
@@ -177,6 +200,8 @@ export interface FileRouteTypes {
     | '/templates/$slug'
     | '/templates/'
     | '/_authenticated/customize/$id'
+    | '/media/cover/$templateId'
+    | '/media/photo/$orderId/$photoId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -187,6 +212,8 @@ export interface RootRouteChildren {
   SurpriseCodeRoute: typeof SurpriseCodeRoute
   TemplatesSlugRoute: typeof TemplatesSlugRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
+  MediaCoverTemplateIdRoute: typeof MediaCoverTemplateIdRoute
+  MediaPhotoOrderIdPhotoIdRoute: typeof MediaPhotoOrderIdPhotoIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -282,6 +309,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCustomizeIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/media/cover/$templateId': {
+      id: '/media/cover/$templateId'
+      path: '/media/cover/$templateId'
+      fullPath: '/media/cover/$templateId'
+      preLoaderRoute: typeof MediaCoverTemplateIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media/photo/$orderId/$photoId': {
+      id: '/media/photo/$orderId/$photoId'
+      path: '/media/photo/$orderId/$photoId'
+      fullPath: '/media/photo/$orderId/$photoId'
+      preLoaderRoute: typeof MediaPhotoOrderIdPhotoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -314,6 +355,8 @@ const rootRouteChildren: RootRouteChildren = {
   SurpriseCodeRoute: SurpriseCodeRoute,
   TemplatesSlugRoute: TemplatesSlugRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
+  MediaCoverTemplateIdRoute: MediaCoverTemplateIdRoute,
+  MediaPhotoOrderIdPhotoIdRoute: MediaPhotoOrderIdPhotoIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

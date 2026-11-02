@@ -31,16 +31,41 @@ describe("Firebase migration security", () => {
     });
   });
 });
-import { firebaseGoogleIdentity } from "@/lib/firebase-access";
-describe("Firebase Google sign-in", () => {
-  const google = { firebase: { sign_in_provider: "google.com" }, email: "Rahul@Gmail.com", email_verified: true, name: "Rahul" };
-  it("accepts a verified Google account and normalises the email", () => {
-    expect(firebaseGoogleIdentity(google)).toEqual({ email: "rahul@gmail.com", name: "Rahul", picture: null });
+import { buildUserProfile } from "@/lib/firebase-access";
+describe("Direct registration profile saved to the Realtime Database", () => {
+  const fresh = { email: "Priya@Example.com", displayName: null, photoURL: null };
+  it("saves a new email account immediately with the typed name and lowercase email", () => {
+    expect(buildUserProfile(fresh, "password", null, 1000, "Priya")).toEqual({
+      name: "Priya", email: "priya@example.com", photo: null, provider: "password", createdAt: 1000, lastLoginAt: 1000,
+    });
   });
-  it("rejects sign-ins that did not come from Google", () => {
-    expect(() => firebaseGoogleIdentity({ ...google, firebase: { sign_in_provider: "password" } })).toThrow("Please sign in with Google");
+  it("keeps the original sign-up time when the user signs in again", () => {
+    const again = buildUserProfile({ ...fresh, displayName: "Priya" }, "password", { createdAt: 1000, name: "Priya" }, 5000);
+    expect(again.createdAt).toBe(1000);
+    expect(again.lastLoginAt).toBe(5000);
   });
-  it("rejects unverified Google emails", () => {
-    expect(() => firebaseGoogleIdentity({ ...google, email_verified: false })).toThrow("not verified");
+  it("uses the Google name and photo for Google accounts", () => {
+    const g = buildUserProfile({ email: "rahul@gmail.com", displayName: "Rahul", photoURL: "https://lh3.googleusercontent.com/a" }, "google.com", null, 1);
+    expect(g.name).toBe("Rahul");
+    expect(g.photo).toBe("https://lh3.googleusercontent.com/a");
+  });
+  it("rejects an account without an email", () => {
+    expect(() => buildUserProfile({ email: null, displayName: "X", photoURL: null }, "google.com", null, 1)).toThrow("no email");
+  });
+});
+
+describe("cleanDisplayName", () => {
+  it("trims and collapses spaces", async () => {
+    const { cleanDisplayName } = await import("@/lib/firebase-access");
+    expect(cleanDisplayName("  Priya   Sharma ")).toBe("Priya Sharma");
+  });
+  it("rejects an empty name", async () => {
+    const { cleanDisplayName } = await import("@/lib/firebase-access");
+    expect(() => cleanDisplayName("   ")).toThrow("Please enter your name.");
+  });
+  it("rejects names longer than 80 characters", async () => {
+    const { cleanDisplayName } = await import("@/lib/firebase-access");
+    expect(cleanDisplayName("a".repeat(80))).toHaveLength(80);
+    expect(() => cleanDisplayName("a".repeat(81))).toThrow("80 characters");
   });
 });

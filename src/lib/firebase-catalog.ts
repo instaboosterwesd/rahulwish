@@ -11,11 +11,23 @@ const templateSchema = z.object({
   created_at: z.string(), updated_at: z.string(),
 });
 
+export type CatalogRow = z.infer<typeof templateSchema>;
+
+const sortRows = (a: CatalogRow, b: CatalogRow) => Number(b.featured) - Number(a.featured) || a.created_at.localeCompare(b.created_at);
+
+// All rows (admin view), including switched-off templates. Malformed rows are skipped.
+export function parseCatalogRows(value: unknown): CatalogRow[] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return [];
+  return Object.values(value).flatMap((row) => {
+    const parsed = templateSchema.safeParse(row);
+    return parsed.success ? [parsed.data] : [];
+  }).sort(sortRows);
+}
+
 export function parseFirebaseCatalog(value: unknown) {
   if (value === null) return null;
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Invalid Firebase catalog");
-  return Object.values(value).map((row) => templateSchema.parse(row)).filter((row) => row.active)
-    .sort((a, b) => Number(b.featured) - Number(a.featured) || a.created_at.localeCompare(b.created_at));
+  return Object.values(value).map((row) => templateSchema.parse(row)).filter((row) => row.active).sort(sortRows);
 }
 
 export async function readFirebaseCatalog(databaseURL: string) {

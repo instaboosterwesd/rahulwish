@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import type { User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import type { User } from "firebase/auth";
+import { watchFirebaseUser } from "@/lib/firebase-browser";
+import { myRole } from "@/lib/role.functions";
 
+// Accounts live in Firebase Authentication; the role comes from users/{uid}/role, checked on the server.
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -9,24 +11,23 @@ export function useAuth() {
 
   useEffect(() => {
     let active = true;
-    const load = async (u: User | null) => {
+    let unsubscribe = () => {};
+    watchFirebaseUser(async (u) => {
       if (!active) return;
       setUser(u);
+      let admin = false;
       if (u) {
-        const { data } = await supabase.rpc("has_role", { _user_id: u.id, _role: "admin" });
-        if (active) setIsAdmin(!!data);
-      } else setIsAdmin(false);
-      if (active) setLoading(false);
-    };
-    supabase.auth.getUser().then(({ data }) => load(data.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      // Leave the auth callback before making another SDK request: its session lock
-      // is still held while callbacks run.
-      setTimeout(() => { void load(session?.user ?? null); }, 0);
-    });
+        try { admin = (await myRole()).role === "admin"; } catch { admin = false; }
+      }
+      if (!active) return;
+      setIsAdmin(admin);
+      setLoading(false);
+    })
+      .then((off) => { if (active) unsubscribe = off; else off(); })
+      .catch(() => { if (active) { setUser(null); setLoading(false); } });
     return () => {
       active = false;
-      sub.subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
 

@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { checkFamPayment, type FamCheckout } from "@/lib/famgateway.functions";
 import { formatINR } from "@/lib/format";
 
+// Shows the UPI QR and checks every few seconds until FamGateway confirms the payment.
+// Template purchases open the customize page; wallet top-ups refresh the balance.
 export function FamPayDialog({ checkout, onClose }: { checkout: FamCheckout | null; onClose: () => void }) {
   const check = useServerFn(checkFamPayment);
   const navigate = useNavigate();
@@ -23,10 +25,13 @@ export function FamPayDialog({ checkout, onClose }: { checkout: FamCheckout | nu
       if (stop) return;
       try {
         const r = await check({ data: { orderId: checkout.orderId } });
-        if (r.status === "success" && r.surpriseId) {
-          stop = true; toast.success("Payment received!");
+        if (r.status === "success") {
+          stop = true;
           qc.invalidateQueries({ queryKey: ["customer-dashboard"] });
-          onClose(); navigate({ to: "/customize/$id", params: { id: r.surpriseId } }); return;
+          onClose();
+          if (r.surpriseId) { toast.success("Payment received!"); navigate({ to: "/customize/$id", params: { id: r.surpriseId } }); }
+          else toast.success(`${formatINR(r.walletCredited ?? checkout.amount)} added to your wallet`);
+          return;
         }
         if (r.status === "expired") { stop = true; setState("expired"); return; }
       } catch (e) { toast.error((e as Error).message); }
