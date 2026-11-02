@@ -22,3 +22,4 @@
 - Accounts live only in Firebase Authentication (email/password or Google popup); profiles are stored at users/{uid} in the Realtime Database under owner-only validated rules, and the role is stored at users/{uid}/role, which users cannot raise, so no account data depends on the old database.
 - Public Firebase catalog reads validate and project display fields only; purchases always re-read prices from the server-side catalog, never from the browser.
 - Site icons are custom generated 3D clay images rendered through one shared icon component, and glass surfaces use shared glass utilities with only the standard backdrop-filter property, because hand-written prefixes make the production build drop the blur.
+- Admin visibility refreshes the server-verified role on focus, reconnect and a visible-page interval; discard stale identity responses so promotions and demotions do not require signing in again.

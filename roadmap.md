@@ -1,3 +1,6 @@
+- [x] Fix missing Admin button for Firebase admin accounts; verified live promotion and Admin page with a temporary account, 16 tests passed; upload corrected code to instaboosterwesd/rahulwish.
+- [x] Current remix: replace FIREBASE_SERVICE_ACCOUNT_JSON and GITHUB_FINE_GRAINED_PERSONAL_ACCESS_TOKEN through the secure form.
+- [ ] Current remix: reset copied Drizzle migrations — blocked because the platform protects the migration journal from edits; reference copies archived, active files retained consistently, no remote database data changed.
 - [x] Templates search bar stays solid above cards while scrolling; richer template details (back link, what you get, steps, suggestions, clear buying notice); profile with stats, recent surprises, name editing, account details, password change and share.
 - [x] Email sign-in and registration on the login page (verification link, resend, forgot password), custom clay icons for navigation, login, stats and steps, and glass effect fixes.
 - [x] Firebase-only sign-in: email registration signs in directly (no verification email), profile saved to Realtime Database users/{uid}, header/profile/protected pages use Firebase.
